@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Sword, LayoutDashboard, Trophy, BookOpen, User, Settings, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -84,5 +85,3 @@ function NavItem({ href, icon, label, active = false }: { href: string; icon: Re
     </Link>
   );
 }
-
-import { cn } from '@/lib/utils';

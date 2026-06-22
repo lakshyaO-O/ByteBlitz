@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Clock, Send, Trophy, Skull, Terminal, Play, HelpCircle, Code2, AlertTriangle } from 'lucide-react';
 import { generateProblemHint } from '@/ai/flows/problem-hint-generator';
+import { cn } from '@/lib/utils';
 
 export function BattleArena() {
   const [timeLeft, setTimeLeft] = useState(1200); // 20 mins

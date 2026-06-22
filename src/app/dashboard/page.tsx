@@ -3,7 +3,8 @@ import { Shell } from '@/components/layout/Shell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Trophy, Zap, Sword, Target, Flame, Medal, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { getTier, getTierColor } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { cn, getTier, getTierColor } from '@/lib/utils';
 
 export default function DashboardPage() {
   const stats = {
@@ -178,5 +179,3 @@ function AchievementIcon({ active, icon, label }: { active: boolean; icon: React
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';

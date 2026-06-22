@@ -3,6 +3,7 @@ import { Shell } from '@/components/layout/Shell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Trophy, ChevronUp, ChevronDown, User, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 
 export default function LeaderboardPage() {
@@ -32,9 +33,9 @@ export default function LeaderboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <TopPlayerCard rank={2} name="LogicLords" rating={2715} avatar="2" />
-          <TopPlayerCard rank={1} name="BinaryWizard" rating={2842} avatar="1" />
-          <TopPlayerCard rank={3} name="NullPointer_Ex" rating={2698} avatar="3" />
+          <TopPlayerCard rank={2} name="LogicLords" rating={2715} />
+          <TopPlayerCard rank={1} name="BinaryWizard" rating={2842} />
+          <TopPlayerCard rank={3} name="NullPointer_Ex" rating={2698} />
         </div>
 
         <Card className="bg-card/50 border-border overflow-hidden">
@@ -56,7 +57,7 @@ export default function LeaderboardPage() {
   );
 }
 
-function TopPlayerCard({ rank, name, rating, avatar }: { rank: number; name: string; rating: number; avatar: string }) {
+function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rating: number }) {
   const isFirst = rank === 1;
   const tier = getTier(rating);
 
