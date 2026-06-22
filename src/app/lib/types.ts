@@ -17,12 +17,14 @@ export interface Problem {
   id: string;
   title: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  category: string;
+  points: number;
   description: string;
-  constraints: string[];
-  inputFormat: string;
-  outputFormat: string;
-  examples: Array<{ input: string; output: string; explanation?: string }>;
-  tags: string[];
+  constraints?: string[];
+  inputFormat?: string;
+  outputFormat?: string;
+  examples?: Array<{ input: string; output: string; explanation?: string }>;
+  tags?: string[];
 }
 
 export interface BattleState {

@@ -9,9 +9,7 @@ import {
   BookOpen, 
   Settings, 
   Zap, 
-  User,
-  Menu,
-  X
+  Menu
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, useDoc } from '@/firebase';
@@ -45,14 +43,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop Sidebar */}
       <aside className="w-64 border-r border-border bg-card/30 backdrop-blur-md flex flex-col hidden md:flex">
         <div className="p-6">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-md neon-glow">
+            <div className="bg-primary p-1.5 rounded-md">
               <Zap className="h-6 w-6 text-background fill-background" />
             </div>
-            <span className="text-2xl font-headline font-bold tracking-tight text-primary neon-text">
+            <span className="text-2xl font-headline font-bold tracking-tight text-primary">
               CODEZARENA
             </span>
           </Link>
@@ -72,7 +69,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <div className="p-4 border-t border-border mt-auto">
           <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-secondary neon-glow overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
               <img 
                 src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} 
                 alt="Avatar" 
@@ -87,11 +84,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 border-b border-border flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="flex items-center gap-4">
-            {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -117,27 +112,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
                     />
                   ))}
                 </nav>
-                <div className="mt-auto p-4 border-t border-border absolute bottom-0 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
-                      <img 
-                        src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} 
-                        alt="Avatar" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">{stats.username}</p>
-                      <p className="text-xs text-muted-foreground">{stats.rating} ELO</p>
-                    </div>
-                  </div>
-                </div>
               </SheetContent>
             </Sheet>
 
             <h1 className="font-headline text-sm md:text-lg font-semibold uppercase tracking-widest text-muted-foreground truncate">
-              <span className="hidden sm:inline">Current Environment: </span>
-              <span className="text-foreground">Global Arena</span>
+              Global Arena
             </h1>
           </div>
           
@@ -188,7 +167,6 @@ function NavItem({
         {icon}
       </span>
       {label}
-      {active && <div className="ml-auto w-1 h-4 bg-primary rounded-full neon-glow" />}
     </Link>
   );
 }
