@@ -14,7 +14,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Zap className="h-6 w-6 text-background fill-background" />
             </div>
             <span className="text-2xl font-headline font-bold tracking-tight text-primary neon-text">
-              BYTEBLITZ
+              CODEZARENA
             </span>
           </Link>
         </div>

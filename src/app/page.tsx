@@ -20,7 +20,7 @@ export default function Home() {
           
           <div className="space-y-6">
             <h1 className="text-7xl md:text-9xl font-headline font-black tracking-tighter text-foreground uppercase leading-[0.85]">
-              BYTE<span className="text-primary neon-text">BLITZ</span>
+              CODEZ<span className="text-primary neon-text">ARENA</span>
             </h1>
             <p className="max-w-2xl mx-auto text-xl text-muted-foreground font-body">
               The high-octane coding arena where logic meets speed. Compete in 1v1 battles, climb the ELO ladder, and become a legendary architect.
@@ -78,9 +78,9 @@ export default function Home() {
         <div className="container px-4 mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-primary" />
-            <span className="text-xl font-headline font-bold tracking-tight text-foreground">BYTEBLITZ</span>
+            <span className="text-xl font-headline font-bold tracking-tight text-foreground">CODEZARENA</span>
           </div>
-          <p className="text-sm text-muted-foreground">© 2025 ByteBlitz Arena. Built for the modern architect.</p>
+          <p className="text-sm text-muted-foreground">© 2025 CodezArena. Built for the modern architect.</p>
           <div className="flex gap-6">
             <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github className="w-5 h-5" /></Link>
             <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Discord</Link>
