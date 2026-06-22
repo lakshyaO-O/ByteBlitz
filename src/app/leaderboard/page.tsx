@@ -1,22 +1,24 @@
+
+'use client';
 import React from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Trophy, ChevronUp, ChevronDown, User, Zap } from 'lucide-react';
+import { Trophy, ChevronUp, ChevronDown, User, Zap, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn, getTier, getTierColor } from '@/lib/utils';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 export default function LeaderboardPage() {
-  const leaderData = [
-    { rank: 1, name: "BinaryWizard", rating: 2842, change: "up", wins: 842, games: 1200 },
-    { rank: 2, name: "LogicLords", rating: 2715, change: "none", wins: 765, games: 1050 },
-    { rank: 3, name: "NullPointer_Ex", rating: 2698, change: "down", wins: 712, games: 980 },
-    { rank: 4, name: "AsyncLegend", rating: 2542, change: "up", wins: 532, games: 740 },
-    { rank: 5, name: "CodeRunnerX", rating: 2431, change: "up", wins: 412, games: 620 },
-    { rank: 6, name: "GitGud_007", rating: 2315, change: "down", wins: 389, games: 590 },
-    { rank: 7, name: "RustEnthusiast", rating: 2284, change: "up", wins: 342, games: 510 },
-    { rank: 8, name: "Pythonista", rating: 2156, change: "none", wins: 312, games: 480 },
-  ];
+  const db = useFirestore();
+
+  const leadersQuery = React.useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, 'users'), orderBy('rating', 'desc'), limit(50));
+  }, [db]);
+
+  const { data: leaders, loading } = useCollection(leadersQuery);
 
   return (
     <Shell>
@@ -29,29 +31,41 @@ export default function LeaderboardPage() {
           <h1 className="text-5xl font-headline font-black uppercase tracking-tighter text-foreground">
             GLOBAL <span className="text-primary neon-text">RANKINGS</span>
           </h1>
-          <p className="text-muted-foreground">The top 0.1% of architects currently dominating the arena.</p>
+          <p className="text-muted-foreground">The top architects currently dominating the arena.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <TopPlayerCard rank={2} name="LogicLords" rating={2715} />
-          <TopPlayerCard rank={1} name="BinaryWizard" rating={2842} />
-          <TopPlayerCard rank={3} name="NullPointer_Ex" rating={2698} />
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {leaders && leaders.length > 1 && <TopPlayerCard rank={2} name={leaders[1].username} rating={leaders[1].rating} />}
+              {leaders && leaders.length > 0 && <TopPlayerCard rank={1} name={leaders[0].username} rating={leaders[0].rating} />}
+              {leaders && leaders.length > 2 && <TopPlayerCard rank={3} name={leaders[2].username} rating={leaders[2].rating} />}
+            </div>
 
-        <Card className="bg-card/50 border-border overflow-hidden">
-          <div className="bg-muted/50 p-4 border-b border-border grid grid-cols-12 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            <div className="col-span-1">Rank</div>
-            <div className="col-span-5 px-4">Architect</div>
-            <div className="col-span-2 text-center">Elo Rating</div>
-            <div className="col-span-2 text-center">Wins</div>
-            <div className="col-span-2 text-right">Win Rate</div>
-          </div>
-          <div className="divide-y divide-border">
-            {leaderData.map((player) => (
-              <LeaderRow key={player.rank} {...player} />
-            ))}
-          </div>
-        </Card>
+            <Card className="bg-card/50 border-border overflow-hidden">
+              <div className="bg-muted/50 p-4 border-b border-border grid grid-cols-12 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-5 px-4">Architect</div>
+                <div className="col-span-3 text-center">Elo Rating</div>
+                <div className="col-span-3 text-right px-4">Wins</div>
+              </div>
+              <div className="divide-y divide-border">
+                {leaders?.map((player: any, index: number) => (
+                  <LeaderRow key={player.id} rank={index + 1} name={player.username} rating={player.rating} wins={player.wins} games={player.wins + player.losses} />
+                ))}
+                {!leaders?.length && (
+                  <div className="p-20 text-center text-muted-foreground uppercase text-xs font-bold tracking-widest">
+                    No legends registered yet.
+                  </div>
+                )}
+              </div>
+            </Card>
+          </>
+        )}
       </div>
     </Shell>
   );
@@ -86,24 +100,19 @@ function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rat
         <div className="text-3xl font-headline font-black text-foreground tracking-tighter">
           {rating} <span className="text-sm font-mono text-muted-foreground align-middle">ELO</span>
         </div>
-        <Button variant={isFirst ? "default" : "outline"} size="sm" className={cn("w-full uppercase font-bold text-xs tracking-widest", isFirst ? "bg-primary text-background" : "")}>
-          View Profile
-        </Button>
       </CardContent>
     </Card>
   );
 }
 
-function LeaderRow({ rank, name, rating, change, wins, games }: { rank: number; name: string; rating: number; change: string; wins: number; games: number }) {
-  const winRate = Math.round((wins / games) * 100);
+function LeaderRow({ rank, name, rating, wins, games }: { rank: number; name: string; rating: number; wins: number; games: number }) {
+  const winRate = games > 0 ? Math.round((wins / games) * 100) : 0;
   const tier = getTier(rating);
 
   return (
     <div className="grid grid-cols-12 p-4 items-center hover:bg-muted/30 transition-colors group cursor-pointer">
       <div className="col-span-1 flex items-center gap-2">
         <span className="font-headline font-black text-xl italic opacity-30 group-hover:opacity-100 transition-opacity">#{rank.toString().padStart(2, '0')}</span>
-        {change === 'up' && <ChevronUp className="w-3 h-3 text-emerald-500" />}
-        {change === 'down' && <ChevronDown className="w-3 h-3 text-destructive" />}
       </div>
       <div className="col-span-5 px-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-muted border border-border overflow-hidden">
@@ -114,17 +123,11 @@ function LeaderRow({ rank, name, rating, change, wins, games }: { rank: number; 
           <p className={cn("text-[10px] font-bold uppercase tracking-widest", getTierColor(tier))}>{tier}</p>
         </div>
       </div>
-      <div className="col-span-2 text-center">
+      <div className="col-span-3 text-center">
         <span className="text-xl font-headline font-bold text-foreground">{rating}</span>
       </div>
-      <div className="col-span-2 text-center text-sm font-bold text-muted-foreground">{wins}</div>
-      <div className="col-span-2 text-right">
-        <div className="inline-flex items-center gap-2">
-          <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden hidden sm:block">
-            <div className="h-full bg-primary" style={{ width: `${winRate}%` }} />
-          </div>
-          <span className="text-sm font-bold text-primary">{winRate}%</span>
-        </div>
+      <div className="col-span-3 text-right px-4">
+         <span className="text-sm font-bold text-primary">{wins} WINS</span>
       </div>
     </div>
   );

@@ -1,9 +1,21 @@
+
+'use client';
 import React from 'react';
 import Link from 'next/link';
-import { Sword, LayoutDashboard, Trophy, BookOpen, User, Settings, Zap } from 'lucide-react';
+import { Sword, LayoutDashboard, Trophy, BookOpen, Settings, Zap, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUser, useDoc } from '@/firebase';
 
 export function Shell({ children }: { children: React.ReactNode }) {
+  const { user } = useUser();
+  const { data: profile } = useDoc(user ? `/users/${user.uid}` : null);
+
+  const stats = profile || {
+    username: user?.displayName || 'Architect',
+    rating: 1000,
+    tier: 'Beginner'
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -21,7 +33,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <nav className="flex-1 px-4 space-y-1">
           <NavItem href="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />} label="Dashboard" />
-          <NavItem href="/arena" icon={<Sword className="w-5 h-5" />} label="Arena" active />
+          <NavItem href="/arena" icon={<Sword className="w-5 h-5" />} label="Arena" />
           <NavItem href="/leaderboard" icon={<Trophy className="w-5 h-5" />} label="Leaderboards" />
           <NavItem href="/problems" icon={<BookOpen className="w-5 h-5" />} label="Practice" />
         </nav>
@@ -29,11 +41,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-border mt-auto">
           <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer">
             <div className="w-10 h-10 rounded-full bg-secondary neon-glow overflow-hidden">
-              <img src="https://picsum.photos/seed/user123/100/100" alt="Avatar" />
+              <img src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} alt="Avatar" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">CodeRunnerX</p>
-              <p className="text-xs text-muted-foreground">1642 ELO • Pro</p>
+              <p className="text-sm font-medium truncate">{stats.username}</p>
+              <p className="text-xs text-muted-foreground">{stats.rating} ELO</p>
             </div>
           </div>
         </div>
@@ -50,7 +62,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-xs font-mono border border-border">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              1,248 CODERS ONLINE
+              LIVE OPERATIONS ACTIVE
             </div>
             <button className="p-2 hover:bg-muted rounded-md transition-colors">
               <Settings className="w-5 h-5" />
