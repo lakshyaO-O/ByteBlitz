@@ -42,9 +42,9 @@ Do not provide a solution or fix the code directly. Instead, guide the user to i
 
 Here is the code to review:
 Language: {{{language}}}
-```{{{language}}}
+\`\`\`{{{language}}}
 {{{code}}}
-```
+\`\`\`
 `,
 });
 

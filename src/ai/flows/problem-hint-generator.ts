@@ -43,19 +43,19 @@ const prompt = ai.definePrompt({
 
 Here is the problem statement:
 Problem:
-```
+\`\`\`
 {{{problemStatement}}}
-```
+\`\`\`
 
 Here is the student's code (Language: {{{language}}}):
-```
+\`\`\`
 {{{userCode}}}
-```
+\`\`\`
 
 Here is the test case failure message:
-```
+\`\`\`
 {{{failureMessage}}}
-```
+\`\`\`
 
 What subtle hint can you provide to help the student find the logical error? Remember, do not give the direct solution or correct code.`,
 });
