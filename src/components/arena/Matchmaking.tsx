@@ -1,39 +1,35 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Zap, Sword, Shield, Loader2, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/firebase/auth/use-user';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { useMatchmaking } from '@/hooks/use-matchmaking';
 
 interface MatchmakingProps {
-  onMatchFound: () => void;
+  onMatchFound: (opponent: { id: string; username: string; rating: number; tier: string }) => void;
 }
 
 export function Matchmaking({ onMatchFound }: MatchmakingProps) {
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchTime, setSearchTime] = useState(0);
-  const [eloRange, setEloRange] = useState(100);
+  const { user } = useUser();
+  const { data: profile } = useDoc(user ? `/users/${user.uid}` : null);
+  const { 
+    isSearching, 
+    searchTime, 
+    opponent, 
+    eloRange, 
+    error, 
+    startSearch, 
+    cancelSearch 
+  } = useMatchmaking(user?.uid || null, profile?.rating || 1200, profile?.tier || 'Beginner');
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isSearching) {
-      timer = setInterval(() => {
-        setSearchTime(prev => {
-          if (prev > 5 && prev % 2 === 0) setEloRange(r => r + 50);
-          if (prev >= 8) {
-            setIsSearching(false);
-            onMatchFound();
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    } else {
-      setSearchTime(0);
-      setEloRange(100);
+  React.useEffect(() => {
+    if (opponent) {
+      onMatchFound(opponent);
     }
-    return () => clearInterval(timer);
-  }, [isSearching, onMatchFound]);
+  }, [opponent, onMatchFound]);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 py-12">
@@ -65,10 +61,16 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
         />
       </div>
 
+      {error && (
+        <div className="w-full max-w-lg p-4 bg-destructive/10 border border-destructive/50 rounded-lg">
+          <p className="text-sm text-destructive font-mono">{error}</p>
+        </div>
+      )}
+
       {!isSearching ? (
         <Button 
           size="lg" 
-          onClick={() => setIsSearching(true)}
+          onClick={() => startSearch()}
           className="h-16 px-12 text-lg font-headline font-bold bg-primary text-background hover:bg-primary/90 rounded-none transform transition-transform hover:scale-105 group relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -96,22 +98,20 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
               <div className="h-2 bg-muted overflow-hidden rounded-full">
                 <div 
                   className="h-full bg-primary transition-all duration-500 ease-out" 
-                  style={{ width: `${(searchTime / 8) * 100}%` }}
+                  style={{ width: `${Math.min((searchTime / 15) * 100, 100)}%` }}
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                <User className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-bold uppercase tracking-tighter">CodeRunnerX</p>
-                <p className="text-xs text-muted-foreground font-mono">1642 ELO • Advanced</p>
-              </div>
+            <div className="text-center text-xs text-muted-foreground">
+              Looking for opponents in your tier...
             </div>
 
-            <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setIsSearching(false)}>
+            <Button 
+              variant="ghost" 
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10" 
+              onClick={() => cancelSearch()}
+            >
               CANCEL SEARCH
             </Button>
           </CardContent>
@@ -119,6 +119,7 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
       )}
     </div>
   );
+}
 }
 
 function ModeCard({ icon, title, desc, active = false }: { icon: React.ReactNode; title: string; desc: string; active?: boolean }) {

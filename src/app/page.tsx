@@ -1,11 +1,37 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Zap, Sword, Trophy, Users, ShieldCheck, Github } from 'lucide-react';
+import { useGlobalStats } from '@/firebase/stats/use-stats';
+import { useUser } from '@/firebase/auth/use-user';
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useUser();
+  const { stats, loading } = useGlobalStats();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-primary overflow-x-hidden">
+    <div className="min-h-screen bg-transparent selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative pt-24 pb-32 flex flex-col items-center">
         {/* Decorative Background Elements */}
@@ -29,7 +55,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="h-16 px-12 text-lg font-headline font-bold bg-primary text-background hover:bg-primary/90 rounded-none relative overflow-hidden group">
-              <Link href="/arena">
+              <Link href={user ? "/arena" : "/auth"}>
                 <span className="relative z-10 flex items-center gap-2">
                   <Sword className="w-5 h-5" /> ENTER THE ARENA
                 </span>
@@ -37,15 +63,15 @@ export default function Home() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-16 px-12 text-lg font-headline font-bold border-border hover:bg-muted rounded-none">
-              <Link href="/problems">PRACTICE ZONE</Link>
+              <Link href={user ? "/problems" : "/auth"}>{user ? "PRACTICE ZONE" : "CREATE ACCOUNT"}</Link>
             </Button>
           </div>
 
           <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <StatItem value="12,542" label="Global Coders" />
-            <StatItem value="1.2M+" label="Tests Passed" />
-            <StatItem value="150ms" label="Avg Execution" />
-            <StatItem value="24/7" label="Rated Battles" />
+            <StatItem value={loading ? "..." : stats.totalPlayers.toLocaleString()} label="Global Coders" />
+            <StatItem value={loading ? "..." : stats.totalBattles.toLocaleString()} label="Total Battles" />
+            <StatItem value={loading ? "..." : `${stats.avgExecutionTime}ms`} label="Avg Execution" />
+            <StatItem value={loading ? "..." : `${stats.activeBattles}`} label="Live Battles Now" />
           </div>
         </div>
       </section>

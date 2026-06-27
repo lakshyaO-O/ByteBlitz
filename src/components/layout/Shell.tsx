@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   Sword, 
   LayoutDashboard, 
@@ -9,10 +9,12 @@ import {
   BookOpen, 
   Settings, 
   Zap, 
-  Menu
+  Menu,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, useDoc } from '@/firebase';
+import { getAuth, signOut } from 'firebase/auth';
 import { 
   Sheet, 
   SheetContent, 
@@ -24,6 +26,7 @@ import { Button } from '@/components/ui/button';
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
+  const router = useRouter();
   const pathname = usePathname();
   const { data: profile } = useDoc(user ? `/users/${user.uid}` : null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,6 +37,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
     tier: 'Beginner'
   };
 
+  const handleLogout = async () => {
+    try {
+      const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('mock_user') !== null;
+      if (isDemoMode) {
+        localStorage.removeItem('mock_user');
+        window.dispatchEvent(new Event('mock-auth-change'));
+        router.push('/auth');
+        return;
+      }
+      const auth = getAuth();
+      await signOut(auth);
+      router.push('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const navItems = [
     { href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
     { href: '/arena', icon: <Sword className="w-5 h-5" />, label: 'Arena' },
@@ -42,10 +62,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-transparent">
       <aside className="w-64 border-r border-border bg-card/30 backdrop-blur-md flex flex-col hidden md:flex">
         <div className="p-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <div className="bg-primary p-1.5 rounded-md">
               <Zap className="h-6 w-6 text-background fill-background" />
             </div>
@@ -67,8 +87,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-border mt-auto">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer">
+        <div className="p-4 border-t border-border mt-auto space-y-3">
+          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors">
             <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
               <img 
                 src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} 
@@ -81,6 +101,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <p className="text-xs text-muted-foreground">{stats.rating} ELO</p>
             </div>
           </div>
+          <Button 
+            onClick={handleLogout}
+            variant="outline" 
+            className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase">Logout</span>
+          </Button>
         </div>
       </aside>
 

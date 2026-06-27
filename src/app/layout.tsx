@@ -1,6 +1,9 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { RootLayoutClient } from '@/components/RootLayoutClient';
+import { RoboticMascot } from '@/components/RoboticMascot';
+import { DynamicBackground } from '@/components/DynamicBackground';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
@@ -24,7 +27,11 @@ export default function RootLayout({
       <body className="font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary">
         <FirebaseClientProvider>
           <FirebaseErrorListener />
-          {children}
+          <DynamicBackground />
+          <RootLayoutClient>
+            {children}
+          </RootLayoutClient>
+          <RoboticMascot />
           <Toaster />
         </FirebaseClientProvider>
       </body>

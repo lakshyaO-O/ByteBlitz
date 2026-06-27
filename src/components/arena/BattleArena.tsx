@@ -1,29 +1,57 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Zap, Clock, Send, Trophy, Skull, Terminal, Play, HelpCircle, Code2, AlertTriangle } from 'lucide-react';
+import { Zap, Clock, Send, Trophy, Skull, Terminal, Play, HelpCircle, Code2, AlertTriangle, User } from 'lucide-react';
 import { generateProblemHint } from '@/ai/flows/problem-hint-generator';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/firebase/auth/use-user';
 
-export function BattleArena() {
+interface Opponent {
+  id: string;
+  username: string;
+  rating: number;
+  tier: string;
+}
+
+interface BattleArenaProps {
+  opponent: Opponent;
+  onBattleEnd: () => void;
+}
+
+export function BattleArena({ opponent, onBattleEnd }: BattleArenaProps) {
+  const router = useRouter();
+  const { user } = useUser();
   const [timeLeft, setTimeLeft] = useState(1200); // 20 mins
   const [code, setCode] = useState(`// Solve the Two Sum problem
 function twoSum(nums, target) {
   // Your code here
 }`);
-  const [output, setOutput] = useState<string[]>(['Arena established.', 'Waiting for submission...']);
+  const [output, setOutput] = useState<string[]>(['Arena established.', `Opponent: ${opponent.username} (${opponent.rating} ELO)`, 'Waiting for submission...']);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [isGettingHint, setIsGettingHint] = useState(false);
+  const [yourScore, setYourScore] = useState(0);
+  const [opponentScore, setOpponentScore] = useState(0);
+  const [battleEnded, setBattleEnded] = useState(false);
+  const [battleResult, setBattleResult] = useState<'WIN' | 'LOSS' | 'DRAW' | null>(null);
+  const consoleRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const el = consoleRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [output]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -31,16 +59,164 @@ function twoSum(nums, target) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const getTwoSumFunction = (sourceCode: string) => {
+    if (/^\s*#include\b/m.test(sourceCode) || /\bint\s+main\s*\(/m.test(sourceCode)) {
+      throw new Error('Detected non-JavaScript code. Please use JavaScript and define a function named twoSum.');
+    }
+
+    const wrappedCode = `${sourceCode}\nreturn typeof twoSum !== 'undefined' ? twoSum : undefined;`;
+    const runUserCode = new Function(wrappedCode);
+    const userFn = runUserCode();
+
+    if (typeof userFn !== 'function') {
+      throw new Error('Expected to export a function named twoSum.');
+    }
+
+    return userFn;
+  };
+
   const handleRun = () => {
-    setOutput(prev => [...prev, `[${new Date().toLocaleTimeString()}] Running local test cases...`, '>> Sample 1: PASSED', '>> Sample 2: PASSED']);
+    const timestamp = new Date().toLocaleTimeString();
+    const logs = [`[${timestamp}] Running local test cases...`];
+    setOutput(prev => [...prev, ...logs]);
+    const sampleCases = [
+      { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
+      { nums: [3, 2, 4], target: 6, expected: [1, 2] },
+    ];
+
+    const fallbackTwoSum = (nums: number[], target: number) => {
+      const seen = new Map<number, number>();
+      for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (seen.has(complement)) {
+          return [seen.get(complement) as number, i];
+        }
+        seen.set(nums[i], i);
+      }
+      return [];
+    };
+
+    let userFn: ((nums: number[], target: number) => any) | undefined;
+    let usedFallback = false;
+
+    try {
+      userFn = getTwoSumFunction(code);
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : String(error);
+      let message = rawMessage;
+
+      if (rawMessage.includes('already been declared')) {
+        message = 'Syntax error: duplicate identifier found in your code. Rename duplicate variables or parameters and try again.';
+      } else if (rawMessage.includes('Private field')) {
+        message = 'Detected non-JavaScript or unsupported syntax. Please use JavaScript and define a function named twoSum.';
+      } else if (rawMessage.includes('Unexpected token') || rawMessage.includes('Unexpected end of input')) {
+        message = 'Syntax error in your code. Check for missing brackets, parentheses, or incorrect JavaScript syntax.';
+      }
+
+      logs.push(`[ERROR] ${message}`);
+      if (message !== rawMessage) {
+        logs.push(`[DETAIL] ${rawMessage}`);
+      }
+      logs.push('[INFO] Running fallback implementation so you still see output. Fix the editor code to run your own submission.');
+      console.error('[BattleArena] Run error:', error);
+      userFn = fallbackTwoSum;
+      usedFallback = true;
+    }
+
+    if (userFn) {
+      sampleCases.forEach((testCase, index) => {
+        const result = userFn(testCase.nums, testCase.target);
+        const passed = Array.isArray(result) && result.length === testCase.expected.length && result.every((value, i) => value === testCase.expected[i]);
+        logs.push(`>> Sample ${index + 1}: ${passed ? 'PASSED' : 'FAILED'}`);
+        if (!passed) {
+          logs.push(`   Expected: [${testCase.expected.join(', ')}], Got: [${Array.isArray(result) ? result.join(', ') : result}]`);
+        }
+      });
+    }
+
+    if (usedFallback) {
+      logs.push('[TIP] You can copy the valid twoSum template from the help text and try again.');
+    }
+
+    setOutput(prev => [...prev, ...logs]);
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    // Simulate complex judge
-    await new Promise(r => setTimeout(r, 1500));
-    setOutput(prev => [...prev, `[SYSTEM] VALIDATING SUBMISSION...`, `[ERROR] TEST CASE #4 FAILED: Expected [3,4], Got [4,3].`]);
+    const timestamp = new Date().toLocaleTimeString();
+    const logs = [`[${timestamp}] Submitting your solution...`];
+
+    setOutput(prev => [...prev, ...logs]);
+
+    const sampleCases = [
+      { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
+      { nums: [3, 2, 4], target: 6, expected: [1, 2] },
+    ];
+
+    const fallbackTwoSum = (nums: number[], target: number) => {
+      const seen = new Map<number, number>();
+      for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (seen.has(complement)) {
+          return [seen.get(complement) as number, i];
+        }
+        seen.set(nums[i], i);
+      }
+      return [];
+    };
+
+    let userFn: ((nums: number[], target: number) => any) | undefined;
+    let usedFallback = false;
+
+    try {
+      userFn = getTwoSumFunction(code);
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : String(error);
+      let message = rawMessage;
+
+      if (rawMessage.includes('already been declared')) {
+        message = 'Syntax error: duplicate identifier found in your code. Rename duplicate variables or parameters and try again.';
+      } else if (rawMessage.includes('Private field')) {
+        message = 'Detected non-JavaScript or unsupported syntax. Please use JavaScript and define a function named twoSum.';
+      } else if (rawMessage.includes('Unexpected token') || rawMessage.includes('Unexpected end of input')) {
+        message = 'Syntax error in your code. Check for missing brackets, parentheses, or incorrect JavaScript syntax.';
+      }
+
+      logs.push(`[ERROR] ${message}`);
+      if (message !== rawMessage) {
+        logs.push(`[DETAIL] ${rawMessage}`);
+      }
+      logs.push('[INFO] Running fallback implementation so you still see output. Fix the editor code to run your own submission.');
+      console.error('[BattleArena] Submit error:', error);
+      userFn = fallbackTwoSum;
+      usedFallback = true;
+    }
+
+    let submissionPassed = true;
+
+    if (userFn) {
+      sampleCases.forEach((testCase, index) => {
+        const result = userFn(testCase.nums, testCase.target);
+        const passed = Array.isArray(result) && result.length === testCase.expected.length && result.every((value, i) => value === testCase.expected[i]);
+        submissionPassed = submissionPassed && passed;
+        logs.push(`>> Submission Test ${index + 1}: ${passed ? 'PASSED' : 'FAILED'}`);
+        if (!passed) {
+          logs.push(`   Expected: [${testCase.expected.join(', ')}], Got: [${Array.isArray(result) ? result.join(', ') : result}]`);
+        }
+      });
+    }
+
+    if (usedFallback) {
+      logs.push('[TIP] Use the valid twoSum template from the help text and submit again.');
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+    setOutput(prev => [...prev, ...logs]);
     setIsSubmitting(false);
+
+    if (submissionPassed && !usedFallback) {
+      router.push('/arena/congrats');
+    }
   };
 
   const handleGetHint = async () => {
@@ -139,7 +315,7 @@ function twoSum(nums, target) {
             <div className="h-6 w-px bg-border" />
             <div className="flex items-center gap-2">
               <Terminal className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs font-bold text-muted-foreground uppercase">JavaScript (V8)</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase">Browser JS evaluator</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -171,7 +347,7 @@ function twoSum(nums, target) {
                   <TabsTrigger value="console" className="h-full bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-primary border-b-2 border-transparent data-[state=active]:border-primary rounded-none px-0 text-xs font-bold uppercase">Console</TabsTrigger>
                   <TabsTrigger value="hint" className="h-full bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-secondary border-b-2 border-transparent data-[state=active]:border-secondary rounded-none px-0 text-xs font-bold uppercase">AI Debugger</TabsTrigger>
                 </TabsList>
-                <TabsContent value="console" className="flex-1 m-0 p-4 font-code text-xs overflow-y-auto">
+                <TabsContent value="console" className="flex-1 m-0 p-4 font-code text-xs overflow-y-auto" ref={consoleRef}>
                   {output.map((line, i) => (
                     <div key={i} className={cn(
                       "mb-1",
