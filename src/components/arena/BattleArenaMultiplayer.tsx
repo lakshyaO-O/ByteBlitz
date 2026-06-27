@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,9 +7,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Clock, Send, Trophy, Skull, Terminal, Play, HelpCircle, Code2, AlertTriangle, User, Crown } from 'lucide-react';
-import { generateProblemHint } from '@/ai/flows/problem-hint-generator';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
+import { initializeFirebase } from '@/firebase';
+import { collection, doc, addDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 
 interface Opponent {
   id: string;
@@ -33,8 +34,8 @@ function twoSum(nums, target) {
 }`);
   const [output, setOutput] = useState<string[]>([
     'Arena established.',
-    `📍 Opponent: ${opponent.username} (${opponent.rating} ELO • ${opponent.tier})`,
-    '⏱️ Battle started!',
+    `ðŸ“ Opponent: ${opponent.username} (${opponent.rating} ELO â€¢ ${opponent.tier})`,
+    'â±ï¸ Battle started!',
     'Waiting for submission...'
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,7 +115,7 @@ function twoSum(nums, target) {
       sampleCases.forEach((testCase, index) => {
         const result = userFn(testCase.nums, testCase.target);
         const passed = Array.isArray(result) && result.length === testCase.expected.length && result.every((value, i) => value === testCase.expected[i]);
-        logs.push(`✓ Test ${index + 1}: ${passed ? '✅ PASS' : '❌ FAIL'}`);
+        logs.push(`âœ“ Test ${index + 1}: ${passed ? 'âœ… PASS' : 'âŒ FAIL'}`);
       });
     }
 
@@ -126,7 +127,7 @@ function twoSum(nums, target) {
     setIsSubmitting(true);
 
     const timestamp = new Date().toLocaleTimeString();
-    const logs = [`[${timestamp}] 🚀 Submitting solution...`];
+    const logs = [`[${timestamp}] ðŸš€ Submitting solution...`];
 
     const sampleCases = [
       { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
@@ -162,21 +163,21 @@ function twoSum(nums, target) {
         const result = userFn(testCase.nums, testCase.target);
         const passed = Array.isArray(result) && result.length === testCase.expected.length && result.every((value, i) => value === testCase.expected[i]);
         if (passed) passedTestCases++;
-        logs.push(`Test ${index + 1}: ${passed ? '✅ PASSED' : '❌ FAILED'}`);
+        logs.push(`Test ${index + 1}: ${passed ? 'âœ… PASSED' : 'âŒ FAILED'}`);
       });
     }
 
     const yourNewScore = usedFallback ? passedTestCases * 50 : (passedTestCases === 2 ? 100 : passedTestCases * 50);
     setYourScore(yourNewScore);
 
-    logs.push(`━━━━━━━━━━━━━━━━━━━━━━`);
-    logs.push(`📊 Your Score: ${yourNewScore}/100`);
+    logs.push(`â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”`);
+    logs.push(`ðŸ“Š Your Score: ${yourNewScore}/100`);
 
     // Simulate opponent score
     await new Promise(r => setTimeout(r, 1500));
     const randomOpponentScore = Math.floor(Math.random() * 85) + 15;
     setOpponentScore(randomOpponentScore);
-    logs.push(`👾 Opponent Score: ${randomOpponentScore}/100`);
+    logs.push(`ðŸ‘¾ Opponent Score: ${randomOpponentScore}/100`);
 
     // Determine result
     let result: 'WIN' | 'LOSS' | 'DRAW';
@@ -185,57 +186,83 @@ function twoSum(nums, target) {
     if (yourNewScore > randomOpponentScore) {
       result = 'WIN';
       change = 25;
-      logs.push(`🎉 VICTORY! +${change} ELO`);
+      logs.push(`ðŸŽ‰ VICTORY! +${change} ELO`);
     } else if (randomOpponentScore > yourNewScore) {
       result = 'LOSS';
       change = -20;
-      logs.push(`💔 DEFEAT... ${change} ELO`);
+      logs.push(`ðŸ’” DEFEAT... ${change} ELO`);
     } else {
       result = 'DRAW';
       change = 0;
-      logs.push(`🤝 DRAW! +0 ELO`);
+      logs.push(`ðŸ¤ DRAW! +0 ELO`);
     }
 
     setBattleResult(result);
     setEloChange(change);
     setBattleEnded(true);
-    logs.push(`━━━━━━━━━━━━━━━━━━━━━━`);
+    logs.push(`â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”`);
 
     setOutput(prev => [...prev, ...logs]);
 
-    // Save battle to database
-    if (user && opponent) {
+    if (user) {
       try {
-        await fetch('/api/battles/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            battleId: `${user.uid}_${opponent.id}_${Date.now()}`,
-            userId1: user.uid,
-            userId2: opponent.id,
-            code1: code,
-            code2: 'opponent_code_placeholder',
-            score1: yourNewScore,
-            score2: randomOpponentScore,
-            timeUsed1: 1200 - timeLeft,
-            timeUsed2: Math.floor(Math.random() * 600) + 300,
-            problemId: 'two-sum',
-            problemTitle: 'Two Sum',
-          }),
-        });
+        const { firestore: db } = initializeFirebase();
+        const timeUsed = 1200 - timeLeft;
+        const matchPayload = {
+          players: [
+            {
+              uid: user.uid,
+              username: user.displayName || user.email || 'Player',
+              score: yourNewScore,
+              timeUsed,
+              result,
+              eloChange: change,
+            },
+            {
+              uid: opponent.id,
+              username: opponent.username,
+              score: randomOpponentScore,
+              timeUsed: Math.floor(Math.random() * 600) + 300,
+              result: result === 'WIN' ? 'LOSS' : result === 'LOSS' ? 'WIN' : 'DRAW',
+              eloChange: -change,
+            },
+          ],
+          winnerIds: result === 'WIN' ? [user.uid] : result === 'LOSS' ? [opponent.id] : [],
+          problem: {
+            id: 'two-sum',
+            title: 'Two Sum',
+          },
+          score: {
+            [user.uid]: yourNewScore,
+            [opponent.id]: randomOpponentScore,
+          },
+          duration: timeUsed,
+          gameMode: 'rated',
+          createdAt: serverTimestamp(),
+          timestamp: serverTimestamp(),
+        };
 
-        await fetch('/api/battles/calculate-elo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId1: user.uid,
-            userId2: opponent.id,
-            score1: yourNewScore,
-            score2: randomOpponentScore,
-          }),
+        const matchRef = await addDoc(collection(db, 'matches'), matchPayload);
+        await addDoc(collection(db, 'users', user.uid, 'gameHistory'), {
+          ...matchPayload,
+          matchId: matchRef.id,
+          opponentId: opponent.id,
+          opponentName: opponent.username,
+        });
+        await updateDoc(doc(db, 'users', user.uid), {
+          rating: increment(change),
+          highestScore: increment(yourNewScore),
+          wins: increment(result === 'WIN' ? 1 : 0),
+          losses: increment(result === 'LOSS' ? 1 : 0),
+          draws: increment(result === 'DRAW' ? 1 : 0),
+          totalGamesPlayed: increment(1),
+          xp: increment(Math.max(10, Math.floor(yourNewScore / 2))),
+          lastActive: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
       } catch (error) {
-        console.error('Failed to save battle:', error);
+        console.error('Failed to save battle result:', error);
+        setOutput(prev => [...prev, 'Match finished, but saving history failed. It will not affect this result screen.']);
       }
     }
 
@@ -243,25 +270,16 @@ function twoSum(nums, target) {
   };
 
   const handleTimeExpired = () => {
-    setOutput(prev => [...prev, '[⏰ TIME EXPIRED] Battle ended!']);
+    setOutput(prev => [...prev, '[â° TIME EXPIRED] Battle ended!']);
     setBattleEnded(true);
     setBattleResult('LOSS');
   };
 
   const handleGetHint = async () => {
     setIsGettingHint(true);
-    try {
-      const res = await generateProblemHint({
-        problemStatement: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
-        userCode: code,
-        failureMessage: "Test cases failing.",
-        language: "JavaScript"
-      });
-      setHint(res.hint);
-      setOutput(prev => [...prev, `💡 Hint: ${res.hint}`]);
-    } catch (e) {
-      console.error(e);
-    }
+    const offlineHint = 'Use a Map to remember each number you have seen, then check whether target - current number already exists.';
+    setHint(offlineHint);
+    setOutput(prev => [...prev, `Hint: ${offlineHint}`]);
     setIsGettingHint(false);
   };
 
@@ -311,7 +329,7 @@ function twoSum(nums, target) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold truncate">{opponent.username}</p>
-                <p className="text-xs text-muted-foreground">{opponent.rating} ELO • {opponent.tier}</p>
+                <p className="text-xs text-muted-foreground">{opponent.rating} ELO â€¢ {opponent.tier}</p>
               </div>
             </div>
             {!battleEnded ? (
@@ -428,3 +446,6 @@ function twoSum(nums, target) {
     </div>
   );
 }
+
+
+

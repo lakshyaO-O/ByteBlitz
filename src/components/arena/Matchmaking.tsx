@@ -120,7 +120,6 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
     </div>
   );
 }
-}
 
 function ModeCard({ icon, title, desc, active = false }: { icon: React.ReactNode; title: string; desc: string; active?: boolean }) {
   return (

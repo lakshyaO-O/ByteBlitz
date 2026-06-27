@@ -1,0 +1,39 @@
+
+> nextn@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.9
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 17.3s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/12) ...
+   Generating static pages (3/12) 
+   Generating static pages (6/12) 
+   Generating static pages (9/12) 
+ ✓ Generating static pages (12/12)
+   Finalizing page optimization ...
+   Collecting build traces ...
+   Exporting (0/2) ...
+ ✓ Exporting (2/2)
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    4.09 kB         233 kB
+├ ○ /_not-found                            991 B         103 kB
+├ ○ /arena                               12.3 kB         258 kB
+├ ○ /arena/congrats                        184 B         246 kB
+├ ○ /auth                                5.13 kB         230 kB
+├ ○ /dashboard                           2.96 kB         249 kB
+├ ○ /leaderboard                         2.11 kB         248 kB
+├ ○ /problems                            2.94 kB         249 kB
+└ ○ /rooms                                 123 B         102 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/255-e40677fceda396aa.js       45.5 kB
+  ├ chunks/4bd1b696-21f374d1156f834a.js  54.2 kB
+  └ other shared chunks (total)             2 kB
+
+
+○  (Static)  prerendered as static content
+

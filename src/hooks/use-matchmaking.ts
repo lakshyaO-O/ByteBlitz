@@ -1,6 +1,19 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { initializeFirebase } from '@/firebase';
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot,
+  limit,
+  serverTimestamp,
+} from 'firebase/firestore';
 
 export interface Opponent {
   id: string;
@@ -9,7 +22,7 @@ export interface Opponent {
   tier: string;
 }
 
-export function useMatchmaking(userId: string | null, userRating: number, userTier: string) {
+export function useMatchmaking(userId: string | null, userRating: number, userTier: string, username?: string) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchTime, setSearchTime] = useState(0);
   const [opponent, setOpponent] = useState<Opponent | null>(null);
@@ -18,99 +31,99 @@ export function useMatchmaking(userId: string | null, userRating: number, userTi
 
   const startSearch = useCallback(async () => {
     if (!userId) return;
-    
     setIsSearching(true);
     setSearchTime(0);
     setOpponent(null);
     setError(null);
-  }, [userId]);
+
+    try {
+      const { firestore: db } = initializeFirebase();
+      await setDoc(doc(db, 'matchmaking', userId), {
+        userId,
+        username: username || 'Player',
+        rating: userRating,
+        tier: userTier,
+        status: 'waiting',
+        createdAt: serverTimestamp(),
+      });
+    } catch (err: any) {
+      console.error('Start matchmaking error:', err);
+      setError('Failed to join matchmaking');
+      setIsSearching(false);
+    }
+  }, [userId, userRating, userTier, username]);
 
   const cancelSearch = useCallback(async () => {
     if (!userId) return;
-
     try {
-      await fetch('/api/matchmaking/find-opponent', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
+      const { firestore: db } = initializeFirebase();
+      await deleteDoc(doc(db, 'matchmaking', userId));
     } catch (err) {
-      console.error('Cancel error:', err);
+      console.error('Cancel matchmaking error:', err);
     }
-
     setIsSearching(false);
     setSearchTime(0);
     setOpponent(null);
   }, [userId]);
 
-  // Main matchmaking loop
   useEffect(() => {
     if (!isSearching || !userId) return;
+    let unsubscribe: (() => void) | null = null;
 
-    let interval: NodeJS.Timeout | null = null;
-
-    const attemptMatch = async () => {
+    const findMatch = async () => {
       try {
-        // Expand ELO range every 2 seconds
-        if (searchTime > 0 && searchTime % 2 === 0) {
-          setEloRange(prev => prev + 50);
-        }
+        const { firestore: db } = initializeFirebase();
+        const range = eloRange;
+        const opponentsQuery = query(
+          collection(db, 'matchmaking'),
+          where('rating', '>=', userRating - range),
+          where('rating', '<=', userRating + range),
+          where('status', '==', 'waiting'),
+          limit(10)
+        );
 
-        const response = await fetch('/api/matchmaking/find-opponent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            rating: userRating,
-            tier: userTier,
-          }),
-        });
+        unsubscribe = onSnapshot(
+          opponentsQuery,
+          (snapshot) => {
+            const candidates = snapshot.docs
+              .map((d: any) => ({ id: d.id, ...d.data() }))
+              .filter((d: any) => d.userId !== userId);
 
-        const data = await response.json();
-
-        if (data.found && data.opponent) {
-          setOpponent(data.opponent);
-          setIsSearching(false);
-          return;
-        }
-
-        if (data.error) {
-          setError(data.error);
-          setIsSearching(false);
-        }
-      } catch (err) {
-        console.error('Matchmaking error:', err);
-        setError('Connection error. Please try again.');
+            if (candidates.length > 0) {
+              const found = candidates[0] as any;
+              setOpponent({
+                id: found.userId,
+                username: found.username,
+                rating: found.rating,
+                tier: found.tier,
+              });
+              setIsSearching(false);
+              updateDoc(doc(db, 'matchmaking', userId), { status: 'matched' }).catch(() => {});
+              updateDoc(doc(db, 'matchmaking', found.userId), { status: 'matched' }).catch(() => {});
+            }
+          },
+          (err) => {
+            console.error('Matchmaking listener error:', err);
+            setError('Connection error. Please try again.');
+          }
+        );
+      } catch (err: any) {
+        console.error('Matchmaking setup error:', err);
+        setError('Failed to start matchmaking');
+        setIsSearching(false);
       }
     };
 
-    // Try matchmaking immediately and every 2 seconds
-    attemptMatch();
-    interval = setInterval(attemptMatch, 2000);
+    findMatch();
+    return () => { if (unsubscribe) unsubscribe(); };
+  }, [isSearching, userId, userRating, eloRange]);
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isSearching, userId, userRating, userTier, searchTime]);
-
-  // Update search time
   useEffect(() => {
     if (!isSearching) return;
-
-    const timer = setInterval(() => {
-      setSearchTime(prev => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
+    const timer = setInterval(() => setSearchTime(prev => prev + 1), 1000);
+    const rangeTimer = setInterval(() => setEloRange(prev => prev + 50), 2000);
+    return () => { clearInterval(timer); clearInterval(rangeTimer); };
   }, [isSearching]);
 
-  return {
-    isSearching,
-    searchTime,
-    opponent,
-    eloRange,
-    error,
-    startSearch,
-    cancelSearch,
-  };
+  return { isSearching, searchTime, opponent, eloRange, error, startSearch, cancelSearch };
 }

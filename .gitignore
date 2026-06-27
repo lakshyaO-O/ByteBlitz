@@ -23,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+.tooling/
+android/local.properties
 
 # debug
 npm-debug.log*

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CodezArena app icon">
+  <rect width="512" height="512" rx="108" fill="#05070f"/>
+  <path d="M104 192 64 256l40 64" fill="none" stroke="#28f7a5" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m408 192 40 64-40 64" fill="none" stroke="#28f7a5" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m296 136-80 240" fill="none" stroke="#7c5cff" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="62" fill="#11182a" stroke="#ffffff" stroke-opacity=".9" stroke-width="18"/>
+  <path d="M229 256h54M256 229v54" stroke="#28f7a5" stroke-width="20" stroke-linecap="round"/>
+</svg>

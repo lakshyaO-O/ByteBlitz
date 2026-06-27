@@ -1,0 +1,19 @@
+{
+  "name": "CodezArena",
+  "short_name": "CodezArena",
+  "description": "Competitive coding battles on mobile and web.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05070f",
+  "theme_color": "#05070f",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

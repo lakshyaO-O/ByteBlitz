@@ -3,21 +3,28 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/firebase/provider';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
+import { getDoc, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, AlertCircle } from 'lucide-react';
+import { Zap, AlertCircle, Chrome } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { firebaseConfig } from '@/firebase/config';
+import { firebaseConfig, isDemoMode } from '@/firebase/config';
 
 export default function AuthPage() {
   const router = useRouter();
   const auth = useAuth();
   const db = useFirestore();
-  
+
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,46 +32,98 @@ export default function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const isDemoMode = firebaseConfig.apiKey === 'demo-key';
-  
-  const handleSignUp = async (e: React.FormEvent) => {
+  const demo = isDemoMode();
+
+  const createUserProfile = async (userId: string, email: string, displayName: string, photoURL: string) => {
+    if (!db) return;
+    const userRef = doc(db, 'users', userId);
+    const existingProfile = await getDoc(userRef);
+    if (existingProfile.exists()) {
+      await updateDoc(userRef, {
+        username: displayName,
+        email,
+        photoURL,
+        onlineStatus: 'online',
+        lastActive: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    await setDoc(userRef, {
+      uid: userId,
+      username: displayName,
+      email,
+      photoURL,
+      coins: 0,
+      xp: 0,
+      level: 1,
+      rating: 1200,
+      highestRating: 1200,
+      highestScore: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      totalGamesPlayed: 0,
+      tier: 'Beginner',
+      rank: 0,
+      lastActive: serverTimestamp(),
+      onlineStatus: 'online',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    await setDoc(doc(db, 'leaderboard', userId), {
+      userId,
+      username: displayName,
+      photoURL,
+      rating: 1200,
+      wins: 0,
+      tier: 'Beginner',
+      period: 'all-time',
+      periodStart: serverTimestamp(),
+      periodEnd: serverTimestamp(),
+    }, { merge: true }).catch(() => {});
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      // Validate inputs
-      if (!email || !password || !username) {
+      if (!email || !password) {
         throw new Error('Please fill in all fields');
       }
-      if (password !== confirmPassword) {
+      if (isSignUp && !username) {
+        throw new Error('Please enter a username');
+      }
+      if (isSignUp && username.trim().length < 2) {
+        throw new Error('Username must be at least 2 characters');
+      }
+      if (isSignUp && password !== confirmPassword) {
         throw new Error('Passwords do not match');
       }
-      if (password.length < 6) {
-        throw new Error('Password must be at least 6 characters');
-      }
-      if (!email.includes('@')) {
-        throw new Error('Please enter a valid email');
-      }
 
-      if (isDemoMode) {
+      if (demo) {
+        const normalizedName = username || email.split('@')[0];
         const mockUser = {
-          uid: 'mock-' + username.toLowerCase().replace(/\s+/g, '-'),
-          email: email,
-          displayName: username,
-          photoURL: `https://picsum.photos/seed/${username}/200/200`
+          uid: 'mock-' + normalizedName.toLowerCase().replace(/\s+/g, '-'),
+          email,
+          displayName: normalizedName,
+          photoURL: `https://picsum.photos/seed/${encodeURIComponent(normalizedName)}/200/200`,
         };
         localStorage.setItem('mock_user', JSON.stringify(mockUser));
-        
-        // Save initial stats to mock database
         const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
         const dbState = JSON.parse(storedDb);
         dbState[`users/${mockUser.uid}`] = {
+          ...dbState[`users/${mockUser.uid}`],
           id: mockUser.uid,
           uid: mockUser.uid,
-          username: username,
-          email: email,
+          username: normalizedName,
+          email,
           rating: 1200,
           highestRating: 1200,
           wins: 0,
@@ -74,77 +133,13 @@ export default function AuthPage() {
           level: 1,
           tier: 'Beginner',
           photoURL: mockUser.photoURL,
+          coins: 0,
+          onlineStatus: 'online',
+          lastActive: new Date().toISOString(),
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         };
         localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
-
-        window.dispatchEvent(new Event('mock-auth-change'));
-        window.dispatchEvent(new Event('mock-db-change'));
-        router.push('/dashboard');
-        return;
-      }
-
-      if (!auth || !db) {
-        throw new Error('Firebase not initialized');
-      }
-
-      // Create user account
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Update profile with username
-      await updateProfile(user, {
-        displayName: username,
-      });
-
-      // Create user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        username: username,
-        email: email,
-        rating: 1200,
-        highestRating: 1200,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        xp: 0,
-        level: 1,
-        tier: 'Beginner',
-        photoURL: `https://picsum.photos/seed/${username}/200/200`,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      // Redirect to app
-      router.push('/dashboard');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'An error occurred';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      if (!email || !password) {
-        throw new Error('Please fill in all fields');
-      }
-
-      if (isDemoMode) {
-        const mockUsername = email.split('@')[0];
-        const mockUser = {
-          uid: 'mock-' + mockUsername.toLowerCase().replace(/\s+/g, '-'),
-          email: email,
-          displayName: mockUsername.charAt(0).toUpperCase() + mockUsername.slice(1),
-          photoURL: `https://picsum.photos/seed/${mockUsername}/200/200`
-        };
-        localStorage.setItem('mock_user', JSON.stringify(mockUser));
         window.dispatchEvent(new Event('mock-auth-change'));
         window.dispatchEvent(new Event('mock-db-change'));
         router.push('/dashboard');
@@ -152,93 +147,147 @@ export default function AuthPage() {
       }
 
       if (!auth) {
-        throw new Error('Firebase not initialized');
+        throw new Error('Firebase Auth is not initialized');
       }
 
-      await signInWithEmailAndPassword(auth, email, password);
+      let user;
+      if (isSignUp) {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        user = cred.user;
+        await updateProfile(user, { displayName: username });
+      } else {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        user = cred.user;
+      }
+
+      const photoURL =
+        user.photoURL || `https://picsum.photos/seed/${encodeURIComponent(user.displayName || user.email || 'user')}/200/200`;
+      await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL);
       router.push('/dashboard');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'An error occurred';
-      setError(message);
+    } catch (err: any) {
+      console.error('Auth error:', err);
+      setError(err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = isSignUp ? handleSignUp : handleSignIn;
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setIsGoogleLoading(true);
 
-  return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 blur-[120px] rounded-full" />
+    try {
+      if (!auth) {
+        throw new Error('Firebase Auth is not initialized');
+      }
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Zap className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-headline font-black tracking-tight">CODEZARENA</span>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            {isSignUp ? 'Join the competitive coding arena' : 'Welcome back to the arena'}
-          </p>
-        </div>
+      if (demo) {
+        const normalizedName = 'Player' + Math.floor(Math.random() * 1000);
+        const mockUser = {
+          uid: 'mock-google-' + Date.now(),
+          email: normalizedName + '@demo.local',
+          displayName: normalizedName,
+          photoURL: `https://picsum.photos/seed/${encodeURIComponent(normalizedName)}/200/200`,
+        };
+        localStorage.setItem('mock_user', JSON.stringify(mockUser));
+        const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
+        const dbState = JSON.parse(storedDb);
+        dbState[`users/${mockUser.uid}`] = {
+          ...dbState[`users/${mockUser.uid}`],
+          id: mockUser.uid,
+          uid: mockUser.uid,
+          username: mockUser.displayName,
+          email: mockUser.email,
+          rating: 1200,
+          highestRating: 1200,
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          xp: 0,
+          level: 1,
+          tier: 'Beginner',
+          photoURL: mockUser.photoURL,
+          coins: 0,
+          onlineStatus: 'online',
+          lastActive: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
+        window.dispatchEvent(new Event('mock-auth-change'));
+        window.dispatchEvent(new Event('mock-db-change'));
+        router.push('/dashboard');
+        return;
+      }
 
-        {/* Auth Card */}
-        <Card className="bg-card/50 border-border backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-center uppercase tracking-tight">
-              {isSignUp ? 'Create Account' : 'Sign In'}
-            </CardTitle>
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
+      router.push('/dashboard');
+    } catch (err: any) {
+      console.error('Google sign-in error:', err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message || 'Google sign-in failed');
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (!email) {
+        throw new Error('Please enter your email address');
+      }
+
+      if (demo) {
+        setError('Demo mode: password reset is simulated. In production, a reset email would be sent.');
+        return;
+      }
+
+      if (!auth) {
+        throw new Error('Firebase Auth is not initialized');
+      }
+
+      await sendPasswordResetEmail(auth, email);
+      setError(null);
+      alert('Password reset email sent! Check your inbox.');
+      setShowForgotPassword(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
+        <Card className="max-w-md w-full bg-card/80 border-border backdrop-blur-xl">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center mb-2 text-primary">
+              <Zap className="h-8 w-8 fill-primary" />
+            </div>
+            <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">Reset Password</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Enter your email and we'll send you a reset link.
+            </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Firebase Setup Warning Banner */}
-              {isDemoMode && (
-                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-200 text-sm space-y-2">
-                  <div className="font-bold flex items-center gap-1.5 uppercase text-xs tracking-wider">
-                    ⚠️ Firebase Configuration Required
-                  </div>
-                  <p className="text-xs text-amber-300/80 leading-relaxed">
-                    This project is configured with dummy demo credentials. Authenticating or creating accounts will fail until you populate your real keys in <code className="bg-amber-950/50 px-1 py-0.5 rounded font-mono">.env.local</code>.
-                  </p>
-                  <p className="text-xs">
-                    Please refer to the <a href="file:///c:/Users/nothing/Downloads/download/ByteBlitz/FIREBASE_SETUP.md" className="underline font-bold text-amber-200 hover:text-amber-100">FIREBASE_SETUP.md</a> guide for credentials instructions.
-                  </p>
-                </div>
-              )}
-
-              {/* Error Message */}
+            <form onSubmit={handleForgotPassword} className="space-y-4">
               {error && (
                 <div className="p-3 bg-destructive/10 border border-destructive/50 rounded-lg flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-destructive" />
-                  <p className="text-sm text-destructive">{error}</p>
+                  <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                  <p className="text-xs text-destructive">{error}</p>
                 </div>
               )}
-
-              {/* Username (Sign Up Only) */}
-              {isSignUp && (
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    Username
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Choose your battle name"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    disabled={loading}
-                    className="mt-1 bg-muted/50 border-border"
-                  />
-                </div>
-              )}
-
-              {/* Email */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                  Email
-                </label>
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
                 <Input
                   type="email"
                   placeholder="your@email.com"
@@ -248,79 +297,180 @@ export default function AuthPage() {
                   className="mt-1 bg-muted/50 border-border"
                 />
               </div>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase rounded-none"
+              >
+                {loading ? 'Sending...' : 'Send Reset Link'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-xs"
+                onClick={() => setShowForgotPassword(false)}
+              >
+                Back to Sign In
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-              {/* Password */}
+  return (
+    <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
+      <Card className="max-w-md w-full bg-card/80 border-border backdrop-blur-xl">
+        <CardHeader className="text-center space-y-2">
+          <div className="flex justify-center mb-2 text-primary">
+            <Zap className="h-8 w-8 fill-primary" />
+          </div>
+          <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">
+            {isSignUp ? 'Join CodezArena' : 'Welcome Back'}
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            {isSignUp
+              ? 'Create your account and enter the arena.'
+              : 'Sign in to continue your journey.'}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {/* Google Sign-In */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 mb-4 font-headline font-bold uppercase text-sm border-border hover:bg-muted"
+            onClick={handleGoogleSignIn}
+            disabled={loading || isGoogleLoading}
+          >
+            {isGoogleLoading ? (
+              'Connecting...'
+            ) : (
+              <>
+                <Chrome className="w-5 h-5 mr-2" />
+                Continue with Google
+              </>
+            )}
+          </Button>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-destructive/10 border border-destructive/50 rounded-lg flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                <p className="text-xs text-destructive">{error}</p>
+              </div>
+            )}
+
+            {isSignUp && (
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                  Password
-                </label>
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Username</label>
+                <Input
+                  type="text"
+                  placeholder="CoderName"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
+                  className="mt-1 bg-muted/50 border-border"
+                  maxLength={20}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">2-20 characters</p>
+              </div>
+            )}
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
+              <Input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="mt-1 bg-muted/50 border-border"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Password</label>
+              <Input
+                type="password"
+                placeholder={isSignUp ? 'Min 6 characters' : ''}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="mt-1 bg-muted/50 border-border"
+              />
+            </div>
+
+            {isSignUp && (
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Confirm Password</label>
                 <Input
                   type="password"
-                  placeholder={isSignUp ? 'Min 6 characters' : '••••••••'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
                   className="mt-1 bg-muted/50 border-border"
                 />
               </div>
+            )}
 
-              {/* Confirm Password (Sign Up Only) */}
-              {isSignUp && (
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    Confirm Password
-                  </label>
-                  <Input
-                    type="password"
-                    placeholder="Confirm password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    disabled={loading}
-                    className="mt-1 bg-muted/50 border-border"
-                  />
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase rounded-none mt-6"
-              >
-                {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
-              </Button>
-            </form>
-
-            {/* Toggle Sign Up / Sign In */}
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">
-                {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-              </span>
+            {!isSignUp && (
               <button
                 type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setError(null);
-                  setEmail('');
-                  setPassword('');
-                  setUsername('');
-                  setConfirmPassword('');
-                }}
-                className="text-primary font-bold hover:underline"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-xs text-primary hover:underline"
               >
-                {isSignUp ? 'Sign In' : 'Create Account'}
+                Forgot password?
               </button>
-            </div>
-          </CardContent>
-        </Card>
+            )}
 
-        {/* Info */}
-        <div className="mt-8 text-center text-xs text-muted-foreground space-y-2">
-          <p>🎮 Compete 1v1 in real-time coding battles</p>
-          <p>📊 Climb the ELO ladder</p>
-          <p>🏆 Become a legendary architect</p>
-        </div>
-      </div>
+            <Button
+              type="submit"
+              disabled={loading || isGoogleLoading}
+              className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase rounded-none"
+            >
+              {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm">
+            <span className="text-muted-foreground">
+              {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError(null);
+                setEmail('');
+                setPassword('');
+                setUsername('');
+                setConfirmPassword('');
+              }}
+              className="text-primary font-bold hover:underline"
+            >
+              {isSignUp ? 'Sign In' : 'Create Account'}
+            </button>
+          </div>
+
+          <div className="mt-8 text-center text-xs text-muted-foreground space-y-2">
+            <p> Compete 1v1 in real-time coding battles</p>
+            <p> Climb the ELO ladder</p>
+            <p> Become a legendary architect</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

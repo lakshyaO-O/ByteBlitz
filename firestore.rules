@@ -1,0 +1,144 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------
+    // Helper functions
+    // -------------------------------------------------------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // -------------------------------------------------------------------
+    // Users collection
+    // -------------------------------------------------------------------
+    match /users/{userId} {
+      // Anyone signed in can read public user profiles
+      allow read: if isAuthenticated();
+
+      // Users can create their own profile on signup
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.username is string
+        && request.resource.data.username.size() >= 2
+        && request.resource.data.username.size() <= 20;
+
+      // Users can update their own profile
+      allow update: if isOwner(userId)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.uid == request.auth.uid;
+
+      // Sub-collection: combat logs
+      match /combatLogs/{logId} {
+        allow read: if isOwner(userId);
+        allow create: if isAuthenticated();
+        allow update, delete: if false; // immutable logs
+      }
+
+      // Sub-collection: game history (replaces combatLogs)
+      match /gameHistory/{historyId} {
+        allow read: if isOwner(userId);
+        allow create: if isAuthenticated();
+        allow update, delete: if false; // immutable records
+      }
+
+      // Sub-collection: friends
+      match /friends/{friendId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendId);
+        allow update, delete: if isOwner(userId);
+      }
+
+      // Sub-collection: friend requests
+      match /friendRequests/{reqId} {
+        allow read: if isOwner(userId);
+        allow create: if isAuthenticated() && request.resource.data.fromUserId == request.auth.uid;
+        allow update, delete: if isOwner(userId);
+      }
+
+      // Sub-collection: notifications
+      match /notifications/{notifId} {
+        allow read: if isOwner(userId);
+        allow create: if isAuthenticated() && request.resource.data.userId == userId;
+        allow update, delete: if isOwner(userId);
+      }
+    }
+
+    // -------------------------------------------------------------------
+    // Rooms collection (for room-based multiplayer)
+    // -------------------------------------------------------------------
+    match /gameRooms/{roomId} {
+      allow read: if isAuthenticated();
+
+      allow create: if isAuthenticated()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.roomCode is string
+        && request.resource.data.roomCode.size() == 6
+        && request.resource.data.status == 'waiting';
+
+      allow update: if isAuthenticated()
+        && (
+          request.auth.uid == resource.data.hostId
+          || request.auth.uid in resource.data.players
+          || (
+            resource.data.status == 'waiting'
+            && request.auth.uid in request.resource.data.players
+            && request.resource.data.players.size() <= resource.data.maxPlayers
+          )
+        );
+
+      allow delete: if isOwner(resource.data.hostId);
+    }
+
+    // -------------------------------------------------------------------
+    // Matches collection (global match records)
+    // -------------------------------------------------------------------
+    match /matches/{matchId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false; // immutable once created
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------------------
+    // Battles collection (legacy / alternative - keep for compat)
+    // -------------------------------------------------------------------
+    match /battles/{battleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // -------------------------------------------------------------------
+    // Game History collection (top-level mirror)
+    // -------------------------------------------------------------------
+    match /gameHistory/{historyId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // -------------------------------------------------------------------
+    // Matchmaking collection (transient queue)
+    // -------------------------------------------------------------------
+    match /matchmaking/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(docId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(docId);
+      allow delete: if isOwner(docId);
+    }
+
+    // -------------------------------------------------------------------
+    // Leaderboard collection
+    // -------------------------------------------------------------------
+    match /leaderboard/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+  }
+}

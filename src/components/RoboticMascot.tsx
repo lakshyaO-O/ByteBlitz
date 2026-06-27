@@ -36,76 +36,38 @@ const SLOGANS = [
 ];
 
 export function RoboticMascot() {
-  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
-  const [trailPositions, setTrailPositions] = useState<Position[]>([]);
+  const [eyeOffset, setEyeOffset] = useState<Position>({ x: 0, y: 0 });
   const [reaction, setReaction] = useState('🤖');
   const [isHovering, setIsHovering] = useState(false);
-  const [currentOffset, setCurrentOffset] = useState<Position>({ x: 24, y: 24 });
   const [slogan, setSlogan] = useState("Let's Fight!");
+  const trailPositions: Position[] = [];
+  const currentOffset: Position = { x: 0, y: 0 };
   
-  const mousePositionRef = useRef<Position>({ x: 0, y: 0 });
-  const lastUpdateRef = useRef(Date.now());
-  const reactionTimeoutRef = useRef<NodeJS.Timeout>();
+  const mascotRef = useRef<HTMLDivElement>(null);
+  const reactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Handle mouse move
+  // Keep the mascot still while the eyes track the pointer.
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePositionRef.current = {
-        x: e.clientX,
-        y: e.clientY,
-      };
+    const handlePointerMove = (e: PointerEvent) => {
+      const mascot = mascotRef.current;
+      if (!mascot) return;
+
+      const rect = mascot.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      const distance = Math.hypot(dx, dy) || 1;
+      const maxEyeTravel = 2.8;
+
+      setEyeOffset({
+        x: (dx / distance) * maxEyeTravel,
+        y: (dy / distance) * maxEyeTravel,
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Smooth follower animation with dynamic offset interpolation
-  useEffect(() => {
-    const animationFrame = setInterval(() => {
-      const now = Date.now();
-      const timeDelta = now - lastUpdateRef.current;
-      lastUpdateRef.current = now;
-
-      setPosition((prev) => {
-        const dx = mousePositionRef.current.x - prev.x;
-        const dy = mousePositionRef.current.y - prev.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 1) return prev;
-
-        const speed = 0.2;
-        const newX = prev.x + dx * speed;
-        const newY = prev.y + dy * speed;
-
-        // Add to trail
-        setTrailPositions((trail) => {
-          const newTrail = [...trail, { x: newX, y: newY }];
-          return newTrail.length > 8 ? newTrail.slice(-8) : newTrail;
-        });
-
-        return { x: newX, y: newY };
-      });
-
-      // Smoothly update offset to avoid overlaying the cursor and stay on screen
-      setCurrentOffset((prevOffset) => {
-        const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
-        const height = typeof window !== 'undefined' ? window.innerHeight : 800;
-        
-        const targetX = mousePositionRef.current.x > width - 100 ? -74 : 24;
-        const targetY = mousePositionRef.current.y > height - 100 ? -64 : 24;
-        
-        const dox = targetX - prevOffset.x;
-        const doy = targetY - prevOffset.y;
-        
-        return {
-          x: prevOffset.x + dox * 0.15,
-          y: prevOffset.y + doy * 0.15,
-        };
-      });
-    }, 30);
-
-    return () => clearInterval(animationFrame);
+    window.addEventListener('pointermove', handlePointerMove);
+    return () => window.removeEventListener('pointermove', handlePointerMove);
   }, []);
 
   // Random reactions
@@ -127,14 +89,17 @@ export function RoboticMascot() {
       }, 1500);
     };
 
+    const handlePointerDown = () => setIsHovering(true);
+    const handlePointerUp = () => setIsHovering(false);
+
     window.addEventListener('click', handleInteraction);
-    window.addEventListener('mousedown', () => setIsHovering(true));
-    window.addEventListener('mouseup', () => setIsHovering(false));
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
 
     return () => {
       window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('mousedown', () => setIsHovering(true));
-      window.removeEventListener('mouseup', () => setIsHovering(false));
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
     };
   }, []);
 
@@ -166,18 +131,22 @@ export function RoboticMascot() {
   };
 
   const expr = getExpression(reaction);
+  const eyeStyle = {
+    transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)`,
+    transition: 'transform 90ms ease-out',
+  };
 
   const renderEye = (eyeName: 'left' | 'right') => {
     if (expr === 'happy') {
       return (
-        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]">
+        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]" style={eyeStyle}>
           <path d="M1.5 7 C 3 4, 7 4, 8.5 7" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" fill="none" />
         </svg>
       );
     }
     if (expr === 'cool') {
       return (
-        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]">
+        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]" style={eyeStyle}>
           <path d="M1 5 H9" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" />
         </svg>
       );
@@ -185,13 +154,13 @@ export function RoboticMascot() {
     if (expr === 'thinking') {
       if (eyeName === 'left') {
         return (
-          <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]">
+          <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee]" style={eyeStyle}>
             <circle cx="5" cy="5" r="3.5" fill="#22d3ee" />
           </svg>
         );
       } else {
         return (
-          <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee] -translate-y-[2px] scale-90">
+          <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_3px_#22d3ee] scale-90" style={{ ...eyeStyle, transform: `translate(${eyeOffset.x}px, ${eyeOffset.y - 2}px)` }}>
             <circle cx="5" cy="5" r="3.5" fill="#22d3ee" />
           </svg>
         );
@@ -199,14 +168,14 @@ export function RoboticMascot() {
     }
     if (expr === 'excited') {
       return (
-        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_4px_#22d3ee] animate-pulse">
+        <svg width="12" height="12" viewBox="0 0 10 10" className="drop-shadow-[0_0_4px_#22d3ee] animate-pulse" style={eyeStyle}>
           <ellipse cx="5" cy="5" rx="3.5" ry="4.5" fill="#22d3ee" />
         </svg>
       );
     }
     // idle
     return (
-      <svg width="12" height="12" viewBox="0 0 10 10" className="eye-blink drop-shadow-[0_0_3px_#22d3ee]">
+      <svg width="12" height="12" viewBox="0 0 10 10" className="eye-blink drop-shadow-[0_0_3px_#22d3ee]" style={eyeStyle}>
         <circle cx="5" cy="5" r="3.5" fill="#22d3ee" />
       </svg>
     );
@@ -270,11 +239,10 @@ export function RoboticMascot() {
 
       {/* Main mascot */}
       <div
-        className="fixed pointer-events-none z-[9999] transition-transform"
+        ref={mascotRef}
+        className="fixed bottom-5 right-5 pointer-events-none z-[9999] transition-transform"
         style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          transform: `translate(${currentOffset.x}px, ${currentOffset.y}px) scale(${isHovering ? 1.15 : 1})`,
+          transform: `scale(${isHovering ? 1.12 : 1})`,
         }}
       >
         {/* Robot body */}
