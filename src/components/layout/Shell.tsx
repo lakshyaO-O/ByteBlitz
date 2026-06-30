@@ -1,200 +1,207 @@
 'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  Sword, 
-  LayoutDashboard, 
-  Trophy, 
-  BookOpen, 
-  Settings, 
-  Zap, 
+import {
+  LayoutDashboard,
+  Swords,
+  Trophy,
+  BookOpen,
+  Settings,
+  Zap,
   Menu,
-  LogOut
+  LogOut,
+  Users,
+  Target,
+  Calendar,
+  BarChart3,
+  UserCircle,
+  Bell,
+  Search,
+  Gamepad2,
+  Medal,
+  ChevronLeft,
+  Code2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUser, useDoc } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
+import { useDoc } from '@/firebase/firestore/use-doc';
 import { getAuth, signOut } from 'firebase/auth';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle 
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { SettingsModal } from '@/components/settings/SettingsModal';
+import { getTier, getTierColor } from '@/lib/utils';
+
+const NAV_ITEMS = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/arena', label: 'Arena', icon: Swords },
+  { href: '/practice', label: 'Practice', icon: Code2 },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+  { href: '/contests', label: 'Contests', icon: Calendar },
+  { href: '/challenges', label: 'Challenges', icon: Target },
+  { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
+  { href: '/friends', label: 'Friends', icon: Users },
+  { href: '/notifications', label: 'Notifications', icon: Bell },
+  { href: '/progress', label: 'Progress', icon: BarChart3 },
+  { href: '/achievements', label: 'Achievements', icon: Medal },
+  { href: '/profile', label: 'Profile', icon: UserCircle },
+  { href: '/search', label: 'Search', icon: Search },
+  { href: '/settings', label: 'Settings', icon: Settings },
+];
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-  const { data: profile } = useDoc(user ? `/users/${user.uid}` : null);
+  const { data: profile } = useDoc(user ? `users/${user.uid}` : null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const stats = profile || {
-    username: user?.displayName || 'Architect',
-    rating: 1000,
-    tier: 'Beginner'
-  };
+  const profileData = profile as any;
 
   const handleLogout = async () => {
-    try {
-      const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('mock_user') !== null;
-      if (isDemoMode) {
-        localStorage.removeItem('mock_user');
-        window.dispatchEvent(new Event('mock-auth-change'));
-        router.push('/auth');
-        return;
-      }
-      const auth = getAuth();
-      await signOut(auth);
-      router.push('/auth');
-    } catch (error) {
-      console.error('Logout error:', error);
+    const isDemo = typeof window !== 'undefined' && localStorage.getItem('mock_user') !== null;
+    if (isDemo) {
+      localStorage.removeItem('mock_user');
+      window.dispatchEvent(new Event('mock-auth-change'));
+    } else {
+      await getAuth().signOut();
     }
+    router.push('/auth');
   };
 
-  const navItems = [
-    { href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
-    { href: '/arena', icon: <Sword className="w-5 h-5" />, label: 'Arena' },
-    { href: '/leaderboard', icon: <Trophy className="w-5 h-5" />, label: 'Leaderboards' },
-    { href: '/problems', icon: <BookOpen className="w-5 h-5" />, label: 'Practice' },
-  ];
+  const initials = (profileData?.username || user?.displayName || user?.email || '?')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  const tier = profileData ? getTier(profileData.rating) : 'Beginner';
+
+  const NavLink = ({ item }: { item: typeof NAV_ITEMS[number] }) => {
+    const isActive = pathname === item.href;
+    return (
+      <Link
+        href={item.href}
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={cn(
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
+          isActive
+            ? 'bg-primary/10 text-primary border-l-2 border-primary'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-l-2 border-transparent'
+        )}
+      >
+        <item.icon className={cn('w-5 h-5 shrink-0', isActive && 'text-primary')} />
+        {!sidebarCollapsed && <span>{item.label}</span>}
+      </Link>
+    );
+  };
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b border-border">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Zap className="w-6 h-6 text-primary fill-primary" />
+          {!sidebarCollapsed && (
+            <span className="text-lg font-headline font-bold tracking-tight">
+              CODEZ<span className="text-primary">ARENA</span>
+            </span>
+          )}
+        </Link>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+        {NAV_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
+      </nav>
+
+      <div className="p-3 border-t border-border space-y-2">
+        {!sidebarCollapsed && profileData && (
+          <div className="px-3 py-2 mb-2">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8 border border-primary/30">
+                <AvatarImage src={user?.photoURL || ''} />
+                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold truncate">
+                  {profileData?.username || user?.displayName || 'Player'}
+                </p>
+                <p className={cn('text-[10px] font-bold uppercase tracking-widest', getTierColor(tier))}>
+                  {tier}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4" />
+          {!sidebarCollapsed && <span>Logout</span>}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-transparent">
-      <aside className="w-64 border-r border-border bg-card/30 backdrop-blur-md flex flex-col hidden md:flex">
-        <div className="p-6">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-md">
-              <Zap className="h-6 w-6 text-background fill-background" />
-            </div>
-            <span className="text-2xl font-headline font-bold tracking-tight text-primary">
-              CODEZARENA
-            </span>
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
-            <NavItem 
-              key={item.href} 
-              href={item.href} 
-              icon={item.icon} 
-              label={item.label} 
-              active={pathname === item.href} 
-            />
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-border mt-auto space-y-3">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors">
-            <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden">
-              <img 
-                src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} 
-                alt="Avatar" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{stats.username}</p>
-              <p className="text-xs text-muted-foreground">{stats.rating} ELO</p>
-            </div>
-          </div>
-          <Button 
-            onClick={handleLogout}
-            variant="outline" 
-            className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase">Logout</span>
-          </Button>
-        </div>
+    <div className="flex h-screen overflow-hidden bg-background">
+      <aside
+        className={cn(
+          'hidden lg:flex flex-col border-r border-border bg-card/50 backdrop-blur-sm transition-all duration-300',
+          sidebarCollapsed ? 'w-16' : 'w-64'
+        )}
+      >
+        <SidebarContent />
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 p-1 rounded-full border border-border hover:bg-muted transition-colors hidden lg:block"
+        >
+          <ChevronLeft
+            className={cn(
+              'w-4 h-4 text-muted-foreground transition-transform',
+              sidebarCollapsed && 'rotate-180'
+            )}
+          />
+        </button>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-16 border-b border-border flex items-center justify-between px-4 md:px-8 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6 text-primary" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="bg-background border-r border-border p-0 w-72">
-                <SheetHeader className="p-6 border-b border-border text-left">
-                  <SheetTitle className="flex items-center gap-2">
-                    <Zap className="h-6 w-6 text-primary" />
-                    <span className="text-xl font-headline font-bold text-primary">CODEZARENA</span>
-                  </SheetTitle>
-                </SheetHeader>
-                <nav className="p-4 space-y-2">
-                  {navItems.map((item) => (
-                    <NavItem 
-                      key={item.href} 
-                      href={item.href} 
-                      icon={item.icon} 
-                      label={item.label} 
-                      active={pathname === item.href} 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    />
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden fixed top-4 left-4 z-50"
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-72 p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation</SheetTitle>
+          </SheetHeader>
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
 
-            <h1 className="font-headline text-sm md:text-lg font-semibold uppercase tracking-widest text-muted-foreground truncate">
-              Global Arena
-            </h1>
-          </div>
-          
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-[10px] md:text-xs font-mono border border-border">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              LIVE OPS
-            </div>
-            <button className="p-2 hover:bg-muted rounded-md transition-colors">
-              <Settings className="w-5 h-5 text-muted-foreground" />
-            </button>
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
           {children}
         </div>
       </main>
-    </div>
-  );
-}
 
-function NavItem({ 
-  href, 
-  icon, 
-  label, 
-  active = false,
-  onClick
-}: { 
-  href: string; 
-  icon: React.ReactNode; 
-  label: string; 
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-        active 
-          ? "bg-primary/10 text-primary border border-primary/20" 
-          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-      )}
-    >
-      <span className={cn(active ? "text-primary" : "text-muted-foreground group-hover:text-primary transition-colors")}>
-        {icon}
-      </span>
-      {label}
-    </Link>
+      <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+    </div>
   );
 }

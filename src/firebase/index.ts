@@ -2,22 +2,39 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
-import { firebaseConfig, isDemoMode } from './config';
+import { getAuth, browserLocalPersistence } from 'firebase/auth';
+import { firebaseConfig, isDemoMode, validateFirebaseConfig } from './config';
+
+let initialized = false;
 
 export function initializeFirebase() {
+  if (initialized) {
+    const app = getApps().length > 0 ? getApp() : null;
+    if (!app) {
+      initialized = false;
+      return initializeFirebase();
+    }
+    return {
+      app,
+      firestore: getFirestore(app),
+      auth: getAuth(app),
+    };
+  }
+
+  const demo = isDemoMode();
+
+  if (!demo) {
+    validateFirebaseConfig();
+  }
+
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const firestore = getFirestore(app);
   const auth = getAuth(app);
 
-  // Enable persistent login so users stay signed in after reopening the app
-  if (!isDemoMode() && auth) {
-    auth.setPersistence(browserLocalPersistence).catch(() => {
-      // Fallback to session persistence if local persistence fails
-      auth.setPersistence(browserSessionPersistence).catch(() => {
-        // Silently fail - user will need to sign in again
-      });
-    });
+  initialized = true;
+
+  if (!demo && auth) {
+    auth.setPersistence(browserLocalPersistence).catch(() => {});
   }
 
   return { app, firestore, auth };
@@ -30,4 +47,3 @@ export * from './firestore/use-collection';
 export * from './firestore/use-doc';
 export { errorEmitter } from './error-emitter';
 export { FirestorePermissionError } from './errors';
-

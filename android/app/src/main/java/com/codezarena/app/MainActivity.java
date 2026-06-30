@@ -1,4 +1,4 @@
-package com.byteblitz.app;
+package com.codezarena.app;
 
 import com.getcapacitor.BridgeActivity;
 

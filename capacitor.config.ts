@@ -1,19 +1,27 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.byteblitz.app',
-  appName: 'ByteBlitz',
+  appId: 'com.codezarena.app',
+  appName: 'CodezArena',
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    // For production builds, use your hosting URL:
-    // url: 'https://your-app.web.app',
+    allowNavigation: [],
+  },
+  android: {
+    buildOptions: {
+      keystorePath: 'release-keystore.jks',
+      keystoreAlias: 'codezarena',
+    },
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 1200,
-      backgroundColor: '#050816',
+      launchShowDuration: 1500,
+      backgroundColor: '#05070f',
       showSpinner: false,
+      androidSpinnerStyle: 'large',
+      iosSpinnerStyle: 'large',
+      spinnerColor: '#28f7a5',
     },
   },
 };

@@ -37,13 +37,70 @@ export default function AuthPage() {
 
   const demo = isDemoMode();
 
-  const createUserProfile = async (userId: string, email: string, displayName: string, photoURL: string) => {
+  const createUserProfile = async (userId: string, email: string, displayName: string, photoURL: string, isNewUser: boolean = false) => {
+    console.log('[Auth] createUserProfile called:', { userId, email, displayName: displayName?.substring(0, 20), isNewUser });
+    if (!db && !demo) return;
+    
+    if (demo) {
+      const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
+      const dbState = JSON.parse(storedDb);
+      const existing = dbState[`users/${userId}`];
+      
+      if (existing && !isNewUser) {
+        console.log('[Auth] Existing mock user found, preserving profile data for:', userId);
+        dbState[`users/${userId}`] = {
+          ...existing,
+          onlineStatus: 'online',
+          lastActive: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+      } else {
+        console.log('[Auth] Creating/updating mock profile for:', userId);
+        dbState[`users/${userId}`] = {
+          ...dbState[`users/${userId}`],
+          id: userId,
+          uid: userId,
+          username: displayName,
+          email,
+          rating: existing?.rating ?? 1200,
+          highestRating: existing?.highestRating ?? 1200,
+          wins: existing?.wins ?? 0,
+          losses: existing?.losses ?? 0,
+          draws: existing?.draws ?? 0,
+          xp: existing?.xp ?? 0,
+          level: existing?.level ?? 1,
+          tier: existing?.tier ?? 'Beginner',
+          photoURL,
+          coins: existing?.coins ?? 0,
+          onlineStatus: 'online',
+          lastActive: new Date().toISOString(),
+          createdAt: existing?.createdAt ?? new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      
+      localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
+      window.dispatchEvent(new Event('mock-db-change'));
+      return;
+    }
+
     if (!db) return;
     const userRef = doc(db, 'users', userId);
     const existingProfile = await getDoc(userRef);
-    if (existingProfile.exists()) {
+    
+    if (existingProfile.exists() && !isNewUser) {
+      console.log('[Auth] Existing Firestore user found, only updating lastActive for:', userId);
+      // Preserve existing username/email/photoURL on login
       await updateDoc(userRef, {
-        username: displayName,
+        onlineStatus: 'online',
+        lastActive: serverTimestamp(),
+      });
+      return;
+    }
+
+    if (existingProfile.exists() && isNewUser) {
+      console.log('[Auth] Existing Firestore user found during sign-up, updating profile for:', userId);
+      await updateDoc(userRef, {
         email,
         photoURL,
         onlineStatus: 'online',
@@ -53,6 +110,7 @@ export default function AuthPage() {
       return;
     }
 
+    console.log('[Auth] Creating new Firestore profile for:', userId);
     await setDoc(userRef, {
       uid: userId,
       username: displayName,
@@ -74,7 +132,7 @@ export default function AuthPage() {
       onlineStatus: 'online',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-    }, { merge: true });
+    });
     await setDoc(doc(db, 'leaderboard', userId), {
       userId,
       username: displayName,
@@ -85,7 +143,7 @@ export default function AuthPage() {
       period: 'all-time',
       periodStart: serverTimestamp(),
       periodEnd: serverTimestamp(),
-    }, { merge: true }).catch(() => {});
+    }, { merge: true }).catch((e) => console.warn('[Auth] Leaderboard creation failed:', e));
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -108,38 +166,18 @@ export default function AuthPage() {
       }
 
       if (demo) {
-        const normalizedName = username || email.split('@')[0];
+        // uid is ALWAYS derived from email to ensure the same account gets the same uid
+        // regardless of whether the user is signing up or signing in.
+        const emailPrefix = email.split('@')[0].toLowerCase().replace(/\s+/g, '-');
         const mockUser = {
-          uid: 'mock-' + normalizedName.toLowerCase().replace(/\s+/g, '-'),
+          uid: 'mock-' + emailPrefix,
           email,
-          displayName: normalizedName,
-          photoURL: `https://picsum.photos/seed/${encodeURIComponent(normalizedName)}/200/200`,
+          displayName: isSignUp && username ? username : emailPrefix,
+          photoURL: `https://picsum.photos/seed/${encodeURIComponent(emailPrefix)}/200/200`,
         };
+        console.log('[Auth] Demo mode auth:', { isSignUp, email, uid: mockUser.uid });
         localStorage.setItem('mock_user', JSON.stringify(mockUser));
-        const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
-        const dbState = JSON.parse(storedDb);
-        dbState[`users/${mockUser.uid}`] = {
-          ...dbState[`users/${mockUser.uid}`],
-          id: mockUser.uid,
-          uid: mockUser.uid,
-          username: normalizedName,
-          email,
-          rating: 1200,
-          highestRating: 1200,
-          wins: 0,
-          losses: 0,
-          draws: 0,
-          xp: 0,
-          level: 1,
-          tier: 'Beginner',
-          photoURL: mockUser.photoURL,
-          coins: 0,
-          onlineStatus: 'online',
-          lastActive: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
+        await createUserProfile(mockUser.uid, email, mockUser.displayName, mockUser.photoURL, isSignUp);
         window.dispatchEvent(new Event('mock-auth-change'));
         window.dispatchEvent(new Event('mock-db-change'));
         router.push('/dashboard');
@@ -155,14 +193,16 @@ export default function AuthPage() {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         user = cred.user;
         await updateProfile(user, { displayName: username });
+        console.log('[Auth] Firebase user created:', user.uid, user.email);
       } else {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         user = cred.user;
+        console.log('[Auth] Firebase user signed in:', user.uid, user.email);
       }
 
       const photoURL =
         user.photoURL || `https://picsum.photos/seed/${encodeURIComponent(user.displayName || user.email || 'user')}/200/200`;
-      await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL);
+      await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL, isSignUp);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -223,7 +263,9 @@ export default function AuthPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
+      const isNewGoogleUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+      console.log('[Auth] Google sign-in result:', { uid: user.uid, email: user.email, isNewUser: isNewGoogleUser });
+      await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '', isNewGoogleUser);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Google sign-in error:', err);

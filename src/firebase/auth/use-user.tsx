@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useAuth } from '../provider';
-import { firebaseConfig } from '../config';
+import { isDemoMode } from '../config';
 
 export function useUser() {
   const auth = useAuth();
@@ -11,29 +11,45 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const isDemoMode = firebaseConfig.apiKey === 'demo-key';
-    if (isDemoMode) {
+    const demo = isDemoMode();
+
+    if (demo) {
       const checkMockUser = () => {
-        const stored = localStorage.getItem('mock_user');
-        if (stored) {
-          setUser(JSON.parse(stored));
-        } else {
+        try {
+          const stored = localStorage.getItem('mock_user');
+          if (stored) {
+            setUser(JSON.parse(stored));
+          } else {
+            setUser(null);
+          }
+        } catch {
           setUser(null);
         }
         setLoading(false);
       };
 
       checkMockUser();
-      
       window.addEventListener('mock-auth-change', checkMockUser);
       return () => window.removeEventListener('mock-auth-change', checkMockUser);
     }
 
-    if (!auth) return;
-    return onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    if (!auth) {
       setLoading(false);
-    });
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser) => {
+        setUser(firebaseUser);
+        setLoading(false);
+      },
+      () => {
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
   }, [auth]);
 
   return { user, loading };

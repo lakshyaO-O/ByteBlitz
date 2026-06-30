@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { useToast } from '@/hooks/use-toast';
 
@@ -8,19 +8,15 @@ export function FirebaseErrorListener() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = errorEmitter.on('permission-error', (error) => {
-      // In a real dev environment, this would surface a rich error overlay.
-      // For now, we use a toast for visibility.
+    const unsub = errorEmitter.on('permission-error', (error: any) => {
       toast({
-        variant: "destructive",
-        title: "Security Rules Violation",
-        description: error.message,
+        variant: 'destructive',
+        title: 'Permission Error',
+        description: 'Your request was denied by security rules. Please try again.',
       });
-      // We throw to trigger the Next.js error boundary/overlay in development
-      throw error;
     });
 
-    return () => unsubscribe();
+    return unsub;
   }, [toast]);
 
   return null;
