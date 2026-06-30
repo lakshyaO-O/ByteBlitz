@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Shell } from '@/components/layout/Shell';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,6 @@ import {
   Users,
   UserPlus,
   UserCheck,
-  UserX,
   Search,
   Loader2,
   Clock,
@@ -22,32 +21,45 @@ import {
   Swords,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { useFriends, useSendFriendRequest, useAcceptFriendRequest } from '@/hooks/use-friends';
 import { useToast } from '@/hooks/use-toast';
 import { getTier, getTierColor } from '@/lib/utils';
-
-const MOCK_FRIENDS = [
-  { friendId: 'f1', username: 'SyntaxSamurai', photoURL: '', tier: 'Expert' as const, rating: 1890, onlineStatus: 'online' as const, addedAt: new Date().toISOString() },
-  { friendId: 'f2', username: 'BinaryBoss', photoURL: '', tier: 'Advanced' as const, rating: 1650, onlineStatus: 'offline' as const, addedAt: new Date().toISOString() },
-  { friendId: 'f3', username: 'RecursionQueen', photoURL: '', tier: 'Master' as const, rating: 2150, onlineStatus: 'in-game' as const, addedAt: new Date().toISOString() },
-];
-
-const MOCK_REQUESTS = [
-  { id: 'r1', fromUserId: 'u1', fromUsername: 'NullPointer', fromPhotoURL: '', toUserId: 'me', status: 'pending' as const, createdAt: new Date().toISOString() },
-];
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 export default function FriendsPage() {
   const { user } = useUser();
+  const db = useFirestore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
-  const friends = useFriends(user?.uid || null);
+  const { friends, loading } = useFriends(user?.uid || null);
 
-  const friendsList = MOCK_FRIENDS;
-  const pendingRequests = MOCK_REQUESTS;
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [pendingLoading, setPendingLoading] = useState(true);
 
-  const onlineFriends = friendsList.filter(f => f.onlineStatus === 'online');
-  const inGameFriends = friendsList.filter(f => f.onlineStatus === 'in-game');
+  React.useEffect(() => {
+    if (!user || !db) {
+      setPendingLoading(false);
+      return;
+    }
+    const q = query(
+      collection(db, 'users', user.uid, 'friendRequests'),
+      orderBy('createdAt', 'desc')
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      setPendingRequests(snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() })));
+      setPendingLoading(false);
+    }, () => {
+      setPendingLoading(false);
+    });
+    return () => unsub();
+  }, [user, db]);
+
+  const friendsList = friends || [];
+  const pendingList = pendingRequests.filter((r: any) => r.status === 'pending');
+
+  const onlineFriends = friendsList.filter((f: any) => f.onlineStatus === 'online');
+  const inGameFriends = friendsList.filter((f: any) => f.onlineStatus === 'in-game');
 
   return (
     <Shell>
@@ -58,11 +70,6 @@ export default function FriendsPage() {
               FRIENDS
             </h1>
             <p className="text-muted-foreground">Connect with other architects and challenge them to battles.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button className="gap-2">
-              <UserPlus className="w-4 h-4" /> Add Friend
-            </Button>
           </div>
         </div>
 
@@ -95,7 +102,7 @@ export default function FriendsPage() {
             <TabsList className="bg-muted/50">
               <TabsTrigger value="all">All Friends</TabsTrigger>
               <TabsTrigger value="online">Online</TabsTrigger>
-              <TabsTrigger value="pending">Pending ({pendingRequests.length})</TabsTrigger>
+              <TabsTrigger value="pending">Pending ({pendingList.length})</TabsTrigger>
             </TabsList>
             <div className="relative flex-1 max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -110,12 +117,17 @@ export default function FriendsPage() {
 
           <TabsContent value="all">
             <div className="grid gap-4">
-              {friendsList
-                .filter(f => f.username.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map((friend) => (
-                  <FriendCard key={friend.friendId} friend={friend} />
-                ))}
-              {friendsList.length === 0 && (
+              {loading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
+              ) : friendsList.length > 0 ? (
+                friendsList
+                  .filter((f: any) => f.username?.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map((friend: any) => (
+                    <FriendCard key={friend.friendId || friend.id} friend={friend} />
+                  ))
+              ) : (
                 <div className="text-center py-20 text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-30" />
                   <p className="font-bold uppercase tracking-widest text-sm">No friends yet</p>
@@ -127,41 +139,31 @@ export default function FriendsPage() {
 
           <TabsContent value="online">
             <div className="grid gap-4">
-              {friendsList.filter(f => f.onlineStatus !== 'offline').map((friend) => (
-                <FriendCard key={friend.friendId} friend={friend} />
-              ))}
+              {friendsList.filter((f: any) => f.onlineStatus !== 'offline').length > 0 ? (
+                friendsList.filter((f: any) => f.onlineStatus !== 'offline').map((friend: any) => (
+                  <FriendCard key={friend.friendId || friend.id} friend={friend} />
+                ))
+              ) : (
+                <div className="text-center py-20 text-muted-foreground">
+                  <UserCheck className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                  <p className="font-bold uppercase tracking-widest text-sm">No friends online</p>
+                  <p className="text-xs mt-2">Invite friends to start competing!</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="pending">
             <div className="grid gap-4">
-              {pendingRequests.map((req) => (
-                <Card key={req.id} className="bg-card/50 border-border">
-                  <CardContent className="p-5 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-10 w-10 border border-muted">
-                        <AvatarImage src={req.fromPhotoURL} />
-                        <AvatarFallback className="bg-muted text-xs">{req.fromUsername[0]}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-bold">{req.fromUsername}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Pending friend request
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="gap-1 text-emerald-400 hover:text-emerald-300">
-                        <CheckCircle2 className="w-4 h-4" /> Accept
-                      </Button>
-                      <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive">
-                        <XCircle className="w-4 h-4" /> Decline
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {pendingRequests.length === 0 && (
+              {pendingLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
+              ) : pendingList.length > 0 ? (
+                pendingList.map((req: any) => (
+                  <PendingRequestCard key={req.id} request={req} />
+                ))
+              ) : (
                 <div className="text-center py-20 text-muted-foreground">
                   <UserCheck className="w-12 h-12 mx-auto mb-4 opacity-30" />
                   <p className="font-bold uppercase tracking-widest text-sm">No pending requests</p>
@@ -175,7 +177,7 @@ export default function FriendsPage() {
   );
 }
 
-function FriendCard({ friend }: { friend: { friendId: string; username: string; photoURL: string; tier: string; rating: number; onlineStatus: string } }) {
+function FriendCard({ friend }: { friend: any }) {
   const statusColors: Record<string, string> = {
     online: 'bg-emerald-400',
     offline: 'bg-muted-foreground',
@@ -195,7 +197,7 @@ function FriendCard({ friend }: { friend: { friendId: string; username: string; 
           <div className="relative">
             <Avatar className="h-12 w-12 border border-muted">
               <AvatarImage src={friend.photoURL} />
-              <AvatarFallback className="bg-muted text-sm">{friend.username[0]}</AvatarFallback>
+              <AvatarFallback className="bg-muted text-sm">{(friend.username || '?')[0]}</AvatarFallback>
             </Avatar>
             <div className={cn(
               'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-background',
@@ -205,11 +207,11 @@ function FriendCard({ friend }: { friend: { friendId: string; username: string; 
           <div>
             <p className="font-bold">{friend.username}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className={cn('font-bold uppercase tracking-widest', getTierColor(getTier(friend.rating)))}>
-                {friend.tier}
+              <span className={cn('font-bold uppercase tracking-widest', getTierColor(getTier(friend.rating || 1200)))}>
+                {friend.tier || getTier(friend.rating || 1200)}
               </span>
               <span>•</span>
-              <span>{friend.rating} ELO</span>
+              <span>{friend.rating || 1200} ELO</span>
               <span>•</span>
               <span>{statusLabels[friend.onlineStatus] || 'Unknown'}</span>
             </div>
@@ -221,6 +223,60 @@ function FriendCard({ friend }: { friend: { friendId: string; username: string; 
           </Button>
           <Button size="sm" variant="outline" className="gap-1">
             <Swords className="w-4 h-4" /> Challenge
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PendingRequestCard({ request }: { request: any }) {
+  const { toast } = useToast();
+  const { acceptRequest, rejectRequest } = useAcceptFriendRequest();
+
+  const handleAccept = async () => {
+    const success = await acceptRequest({
+      requestId: request.id,
+      toUserId: request.toUserId,
+      fromUser: {
+        uid: request.fromUserId,
+        username: request.fromUsername,
+        photoURL: request.fromPhotoURL,
+      },
+    });
+    if (success) {
+      toast({ title: 'Friend request accepted!' });
+    }
+  };
+
+  const handleDecline = async () => {
+    const success = await rejectRequest(request.id, request.toUserId);
+    if (success) {
+      toast({ title: 'Friend request declined' });
+    }
+  };
+
+  return (
+    <Card className="bg-card/50 border-border">
+      <CardContent className="p-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-10 w-10 border border-muted">
+            <AvatarImage src={request.fromPhotoURL} />
+            <AvatarFallback className="bg-muted text-xs">{(request.fromUsername || '?')[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-bold">{request.fromUsername}</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="w-3 h-3" /> Pending friend request
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="gap-1 text-emerald-400 hover:text-emerald-300" onClick={handleAccept}>
+            <CheckCircle2 className="w-4 h-4" /> Accept
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={handleDecline}>
+            <XCircle className="w-4 h-4" /> Decline
           </Button>
         </div>
       </CardContent>

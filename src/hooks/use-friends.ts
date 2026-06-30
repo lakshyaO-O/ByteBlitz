@@ -30,6 +30,7 @@ export function useFriends(userId: string | null) {
     setLoading(true);
     let unsubscribe: (() => void) | null = null;
     const { firestore: db } = initializeFirebase();
+    if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'friends'), orderBy('addedAt', 'desc'));
     unsubscribe = onSnapshot(q, (snapshot: any) => {
       setFriends(snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() })));
@@ -58,6 +59,7 @@ export function useSendFriendRequest() {
     setError(null);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) { setLoading(false); return false; }
       await addDoc(collection(db, 'users', params.toUserId, 'friendRequests'), {
         fromUserId: params.fromUserId, fromUsername: params.fromUsername, fromPhotoURL: params.fromPhotoURL,
         toUserId: params.toUserId, status: 'pending', createdAt: serverTimestamp(),
@@ -85,6 +87,7 @@ export function useAcceptFriendRequest() {
     setError(null);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) { setLoading(false); return false; }
       await updateDoc(doc(db, 'users', params.toUserId, 'friendRequests', params.requestId), { status: 'accepted' });
       const fu = params.fromUser;
       const fid = fu.uid || fu.id || 'unknown';
@@ -116,6 +119,7 @@ export function useAcceptFriendRequest() {
     setLoading(true); setError(null);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) { setLoading(false); return false; }
       await updateDoc(doc(db, 'users', toUserId, 'friendRequests', requestId), { status: 'rejected' });
       return true;
     } catch (err: any) { setError(err.message || 'Failed'); return false; }

@@ -3,36 +3,14 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useAuth } from '../provider';
-import { isDemoMode } from '../config';
 
 export function useUser() {
   const auth = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const demo = isDemoMode();
-
-    if (demo) {
-      const checkMockUser = () => {
-        try {
-          const stored = localStorage.getItem('mock_user');
-          if (stored) {
-            setUser(JSON.parse(stored));
-          } else {
-            setUser(null);
-          }
-        } catch {
-          setUser(null);
-        }
-        setLoading(false);
-      };
-
-      checkMockUser();
-      window.addEventListener('mock-auth-change', checkMockUser);
-      return () => window.removeEventListener('mock-auth-change', checkMockUser);
-    }
-
     if (!auth) {
       setLoading(false);
       return;
@@ -44,7 +22,8 @@ export function useUser() {
         setUser(firebaseUser);
         setLoading(false);
       },
-      () => {
+      (err) => {
+        setError(err.message || 'Authentication error');
         setLoading(false);
       }
     );
@@ -52,5 +31,5 @@ export function useUser() {
     return () => unsubscribe();
   }, [auth]);
 
-  return { user, loading };
+  return { user, loading, error };
 }

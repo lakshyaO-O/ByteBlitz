@@ -23,9 +23,9 @@ export const useFirestore = () => useContext(FirebaseContext).firestore;
 export const useAuth = () => useContext(FirebaseContext).auth;
 
 export const FirebaseProvider: React.FC<{
-  app: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+  app: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
   children: React.ReactNode;
 }> = ({ app, firestore, auth, children }) => {
   return (

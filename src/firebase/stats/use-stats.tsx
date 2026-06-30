@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import { useFirestore } from '../provider';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
-import { firebaseConfig } from '../config';
-
 export interface GlobalStats {
   totalPlayers: number;
   totalBattles: number;
@@ -18,33 +16,22 @@ export function useGlobalStats() {
   const [stats, setStats] = useState<GlobalStats>({
     totalPlayers: 0,
     totalBattles: 0,
-    avgExecutionTime: 150,
+    avgExecutionTime: 0,
     activeBattles: 0
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const isDemoMode = firebaseConfig.apiKey === 'demo-key';
-    if (isDemoMode) {
-      setStats({
-        totalPlayers: 1420,
-        totalBattles: 14892,
-        avgExecutionTime: 84,
-        activeBattles: 3
-      });
+    if (!db) {
       setLoading(false);
       return;
     }
 
-    if (!db) return;
-
     const fetchStats = async () => {
       try {
-        // Get total players
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const totalPlayers = usersSnapshot.size;
 
-        // Get total battles and avg execution time
         let totalBattles = 0;
         let totalExecutionTime = 0;
         let battleCount = 0;
@@ -60,9 +47,8 @@ export function useGlobalStats() {
           }
         });
 
-        const avgExecutionTime = battleCount > 0 ? Math.round(totalExecutionTime / battleCount) : 150;
+        const avgExecutionTime = battleCount > 0 ? Math.round(totalExecutionTime / battleCount) : 0;
 
-        // Get active battles (in-progress)
         const activeSnapshot = await getDocs(
           query(collection(db, 'battles'), where('status', '==', 'in-progress'))
         );

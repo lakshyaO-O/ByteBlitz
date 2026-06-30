@@ -227,7 +227,7 @@ export function DynamicBackground() {
       <div className="absolute top-[30%] right-[-15%] w-[45vw] h-[45vw] rounded-full bg-purple-500/8 blur-[130px] animate-nebula-mid pointer-events-none" />
 
       {/* Canvas for dynamic particles */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block pointer-events-none" />
 
       {/* Scanline pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_98%,rgba(34,211,238,0.04)_98%)] bg-[size:100%_30px] pointer-events-none" />

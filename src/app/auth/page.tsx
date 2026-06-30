@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/firebase/provider';
+import { isFirebaseConfigured } from '@/firebase/config';
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,20 +12,92 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  onAuthStateChanged,
 } from 'firebase/auth';
 import { getDoc, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, AlertCircle, Chrome } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { firebaseConfig, isDemoMode } from '@/firebase/config';
+import { Zap, AlertCircle, Chrome, Loader2 } from 'lucide-react';
 
-export default function AuthPage() {
-  const router = useRouter();
+const ALLOWED_REDIRECTS = new Set([
+  '/dashboard',
+  '/arena',
+  '/practice',
+  '/profile',
+  '/settings',
+  '/challenges',
+  '/leaderboard',
+  '/learning',
+  '/friends',
+  '/achievements',
+  '/',
+]);
+
+function sanitizeRedirect(redirect: string | null): string {
+  if (!redirect) return '/dashboard';
+  try {
+    const url = new URL(redirect, window.location.origin);
+    if (url.origin !== window.location.origin) return '/dashboard';
+    const path = url.pathname;
+    for (const allowed of ALLOWED_REDIRECTS) {
+      if (path === allowed || path.startsWith(allowed + '/')) {
+        return path;
+      }
+    }
+  } catch {
+    return '/dashboard';
+  }
+  return '/dashboard';
+}
+
+function sanitizeFirebaseError(err: any): string {
+  if (!err || !err.code) {
+    console.warn('[Auth] Unknown error (no code):', err?.message || err, err?.stack || '');
+    return 'An unexpected error occurred. Please try again.';
+  }
+
+  const code = err.code;
+  const isDev = process.env.NODE_ENV === 'development';
+
+  console.warn(`[Auth] Firebase error: ${code}`, err.message || '', isDev ? err.stack || '' : '');
+
+  const userMessages: Record<string, string> = {
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Invalid email or password.',
+    'auth/invalid-credential': 'Invalid email or password.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/email-already-in-use': 'An account with this email already exists.',
+    'auth/weak-password': 'Password must be at least 6 characters.',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
+    'auth/popup-closed-by-user': '',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled. Please contact support.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/account-exists-with-different-credential': 'An account already exists with the same email but different sign-in method.',
+    'auth/requires-recent-login': 'Please log out and log in again to continue.',
+    'auth/credential-already-in-use': 'This credential is already linked to another account.',
+    'auth/provider-already-linked': 'This account is already linked to this provider.',
+    'auth/invalid-action-code': 'The reset link is invalid or expired.',
+    'auth/expired-action-code': 'The reset link has expired.',
+    'auth/user-mismatch': 'The user credentials do not match. Please try again.',
+  };
+
+  const message = userMessages[code];
+  if (message !== undefined) return message;
+
+  if (isDev) {
+    return `Authentication error (${code}). Please try again.`;
+  }
+
+  return 'Authentication failed. Please try again.';
+}
+
+function AuthForm() {
   const auth = useAuth();
   const db = useFirestore();
+  const searchParams = useSearchParams();
 
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
@@ -35,62 +109,48 @@ export default function AuthPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const demo = isDemoMode();
+  const [firebaseAvailable, setFirebaseAvailable] = useState(true);
 
-  const createUserProfile = async (userId: string, email: string, displayName: string, photoURL: string, isNewUser: boolean = false) => {
-    console.log('[Auth] createUserProfile called:', { userId, email, displayName: displayName?.substring(0, 20), isNewUser });
-    if (!db && !demo) return;
-    
-    if (demo) {
-      const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
-      const dbState = JSON.parse(storedDb);
-      const existing = dbState[`users/${userId}`];
-      
-      if (existing && !isNewUser) {
-        console.log('[Auth] Existing mock user found, preserving profile data for:', userId);
-        dbState[`users/${userId}`] = {
-          ...existing,
-          onlineStatus: 'online',
-          lastActive: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-      } else {
-        console.log('[Auth] Creating/updating mock profile for:', userId);
-        dbState[`users/${userId}`] = {
-          ...dbState[`users/${userId}`],
-          id: userId,
-          uid: userId,
-          username: displayName,
-          email,
-          rating: existing?.rating ?? 1200,
-          highestRating: existing?.highestRating ?? 1200,
-          wins: existing?.wins ?? 0,
-          losses: existing?.losses ?? 0,
-          draws: existing?.draws ?? 0,
-          xp: existing?.xp ?? 0,
-          level: existing?.level ?? 1,
-          tier: existing?.tier ?? 'Beginner',
-          photoURL,
-          coins: existing?.coins ?? 0,
-          onlineStatus: 'online',
-          lastActive: new Date().toISOString(),
-          createdAt: existing?.createdAt ?? new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      
-      localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
-      window.dispatchEvent(new Event('mock-db-change'));
+  useEffect(() => {
+    setFirebaseAvailable(isFirebaseConfigured());
+  }, []);
+
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'login') {
+      setIsSignUp(false);
+    } else if (mode === 'register') {
+      setIsSignUp(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!auth) {
+      console.log('[AuthPage] auth is null, skipping auth state listener');
       return;
     }
+    console.log('[AuthPage] Setting up onAuthStateChanged listener');
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        console.log('[AuthPage] Auth state changed: USER SIGNED IN', firebaseUser.uid);
+        console.log('[AuthPage] auth.currentUser:', auth.currentUser?.uid);
+        const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
+        console.log('[AuthPage] Redirecting to:', redirectTo);
+        window.location.href = redirectTo;
+      } else {
+        console.log('[AuthPage] Auth state changed: NO USER');
+      }
+    });
+    return () => unsub();
+  }, [auth, searchParams]);
 
+  const createUserProfile = async (userId: string, email: string, displayName: string, photoURL: string, isNewUser: boolean = false) => {
     if (!db) return;
+
     const userRef = doc(db, 'users', userId);
     const existingProfile = await getDoc(userRef);
-    
+
     if (existingProfile.exists() && !isNewUser) {
-      console.log('[Auth] Existing Firestore user found, only updating lastActive for:', userId);
-      // Preserve existing username/email/photoURL on login
       await updateDoc(userRef, {
         onlineStatus: 'online',
         lastActive: serverTimestamp(),
@@ -99,7 +159,6 @@ export default function AuthPage() {
     }
 
     if (existingProfile.exists() && isNewUser) {
-      console.log('[Auth] Existing Firestore user found during sign-up, updating profile for:', userId);
       await updateDoc(userRef, {
         email,
         photoURL,
@@ -110,7 +169,6 @@ export default function AuthPage() {
       return;
     }
 
-    console.log('[Auth] Creating new Firestore profile for:', userId);
     await setDoc(userRef, {
       uid: userId,
       username: displayName,
@@ -143,7 +201,7 @@ export default function AuthPage() {
       period: 'all-time',
       periodStart: serverTimestamp(),
       periodEnd: serverTimestamp(),
-    }, { merge: true }).catch((e) => console.warn('[Auth] Leaderboard creation failed:', e));
+    }, { merge: true }).catch(() => {});
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -165,48 +223,37 @@ export default function AuthPage() {
         throw new Error('Passwords do not match');
       }
 
-      if (demo) {
-        // uid is ALWAYS derived from email to ensure the same account gets the same uid
-        // regardless of whether the user is signing up or signing in.
-        const emailPrefix = email.split('@')[0].toLowerCase().replace(/\s+/g, '-');
-        const mockUser = {
-          uid: 'mock-' + emailPrefix,
-          email,
-          displayName: isSignUp && username ? username : emailPrefix,
-          photoURL: `https://picsum.photos/seed/${encodeURIComponent(emailPrefix)}/200/200`,
-        };
-        console.log('[Auth] Demo mode auth:', { isSignUp, email, uid: mockUser.uid });
-        localStorage.setItem('mock_user', JSON.stringify(mockUser));
-        await createUserProfile(mockUser.uid, email, mockUser.displayName, mockUser.photoURL, isSignUp);
-        window.dispatchEvent(new Event('mock-auth-change'));
-        window.dispatchEvent(new Event('mock-db-change'));
-        router.push('/dashboard');
-        return;
-      }
-
       if (!auth) {
         throw new Error('Firebase Auth is not initialized');
       }
 
+      console.log('[AuthPage] Starting authentication...');
       let user;
       if (isSignUp) {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         user = cred.user;
         await updateProfile(user, { displayName: username });
-        console.log('[Auth] Firebase user created:', user.uid, user.email);
       } else {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         user = cred.user;
-        console.log('[Auth] Firebase user signed in:', user.uid, user.email);
       }
+      console.log('[AuthPage] Authentication SUCCESS, user:', user.uid);
+      console.log('[AuthPage] auth.currentUser after login:', auth.currentUser?.uid);
 
-      const photoURL =
-        user.photoURL || `https://picsum.photos/seed/${encodeURIComponent(user.displayName || user.email || 'user')}/200/200`;
+      const photoURL = user.photoURL || '';
       await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL, isSignUp);
-      router.push('/dashboard');
+      console.log('[AuthPage] User profile created/updated in Firestore');
+
+      const idToken = await user.getIdToken();
+      document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
+      console.log('[AuthPage] __session cookie set, redirecting...');
+
+      const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
+      window.location.href = redirectTo;
     } catch (err: any) {
-      console.error('Auth error:', err);
-      setError(err.message || 'Authentication failed');
+      console.error('[Auth] Sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
+      const msg = sanitizeFirebaseError(err);
+      if (msg) setError(msg);
     } finally {
       setLoading(false);
     }
@@ -221,57 +268,21 @@ export default function AuthPage() {
         throw new Error('Firebase Auth is not initialized');
       }
 
-      if (demo) {
-        const normalizedName = 'Player' + Math.floor(Math.random() * 1000);
-        const mockUser = {
-          uid: 'mock-google-' + Date.now(),
-          email: normalizedName + '@demo.local',
-          displayName: normalizedName,
-          photoURL: `https://picsum.photos/seed/${encodeURIComponent(normalizedName)}/200/200`,
-        };
-        localStorage.setItem('mock_user', JSON.stringify(mockUser));
-        const storedDb = localStorage.getItem('mock_firestore_db') || '{}';
-        const dbState = JSON.parse(storedDb);
-        dbState[`users/${mockUser.uid}`] = {
-          ...dbState[`users/${mockUser.uid}`],
-          id: mockUser.uid,
-          uid: mockUser.uid,
-          username: mockUser.displayName,
-          email: mockUser.email,
-          rating: 1200,
-          highestRating: 1200,
-          wins: 0,
-          losses: 0,
-          draws: 0,
-          xp: 0,
-          level: 1,
-          tier: 'Beginner',
-          photoURL: mockUser.photoURL,
-          coins: 0,
-          onlineStatus: 'online',
-          lastActive: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        localStorage.setItem('mock_firestore_db', JSON.stringify(dbState));
-        window.dispatchEvent(new Event('mock-auth-change'));
-        window.dispatchEvent(new Event('mock-db-change'));
-        router.push('/dashboard');
-        return;
-      }
-
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const isNewGoogleUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
-      console.log('[Auth] Google sign-in result:', { uid: user.uid, email: user.email, isNewUser: isNewGoogleUser });
       await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '', isNewGoogleUser);
-      router.push('/dashboard');
+
+      const idToken = await user.getIdToken();
+      document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
+
+      const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
+      window.location.href = redirectTo;
     } catch (err: any) {
-      console.error('Google sign-in error:', err);
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Google sign-in failed');
-      }
+      console.error('[Auth] Google sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
+      const msg = sanitizeFirebaseError(err);
+      if (msg) setError(msg);
     } finally {
       setIsGoogleLoading(false);
     }
@@ -287,21 +298,17 @@ export default function AuthPage() {
         throw new Error('Please enter your email address');
       }
 
-      if (demo) {
-        setError('Demo mode: password reset is simulated. In production, a reset email would be sent.');
-        return;
-      }
-
       if (!auth) {
         throw new Error('Firebase Auth is not initialized');
       }
 
       await sendPasswordResetEmail(auth, email);
       setError(null);
-      alert('Password reset email sent! Check your inbox.');
       setShowForgotPassword(false);
     } catch (err: any) {
-      setError(err.message || 'Failed to send reset email');
+      console.error('[Auth] Forgot password error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
+      const msg = sanitizeFirebaseError(err);
+      if (msg) setError(msg);
     } finally {
       setLoading(false);
     }
@@ -317,7 +324,7 @@ export default function AuthPage() {
             </div>
             <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">Reset Password</CardTitle>
             <p className="text-xs text-muted-foreground">
-              Enter your email and we'll send you a reset link.
+              Enter your email and we&apos;ll send you a reset link.
             </p>
           </CardHeader>
           <CardContent>
@@ -384,9 +391,11 @@ export default function AuthPage() {
             variant="outline"
             className="w-full h-12 mb-4 font-headline font-bold uppercase text-sm border-border hover:bg-muted"
             onClick={handleGoogleSignIn}
-            disabled={loading || isGoogleLoading}
+            disabled={loading || isGoogleLoading || !firebaseAvailable}
           >
-            {isGoogleLoading ? (
+            {!firebaseAvailable ? (
+              'Firebase not configured'
+            ) : isGoogleLoading ? (
               'Connecting...'
             ) : (
               <>
@@ -514,5 +523,13 @@ export default function AuthPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+      <AuthForm />
+    </Suspense>
   );
 }

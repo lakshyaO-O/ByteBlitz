@@ -26,7 +26,7 @@ function generateRoomCode() {
   return Array.from({ length: 6 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
 }
 
-async function generateUniqueRoomCode(db: ReturnType<typeof initializeFirebase>['firestore']) {
+async function generateUniqueRoomCode(db: import('firebase/firestore').Firestore) {
   for (let attempt = 0; attempt < 8; attempt++) {
     const roomCode = generateRoomCode();
     const existing = await getDocs(
@@ -45,6 +45,7 @@ export function useRooms() {
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
     const { firestore: db } = initializeFirebase();
+    if (!db) { setLoading(false); return; }
 
     const q = query(
       collection(db, 'gameRooms'),
@@ -83,6 +84,7 @@ export function useRoomByCode(roomCode: string | null) {
     let cancelled = false;
 
     const { firestore: db } = initializeFirebase();
+    if (!db) { setLoading(false); return; }
     const q = query(
       collection(db, 'gameRooms'),
       where('roomCode', '==', roomCode.toUpperCase()),
@@ -124,6 +126,7 @@ export function useCreateRoom() {
     setError(null);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) { setLoading(false); return null; }
       const roomCode = await generateUniqueRoomCode(db);
       const ref = await addDoc(collection(db, 'gameRooms'), {
         roomCode,
@@ -158,6 +161,7 @@ export function useJoinRoom() {
     setError(null);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) { setLoading(false); return null; }
       const roomRef = doc(db, 'gameRooms', params.roomId);
       await runTransaction(db, async (transaction) => {
         const snapshot = await transaction.get(roomRef);
@@ -200,6 +204,7 @@ export function useLeaveRoom() {
     setLoading(true);
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) return;
       const roomRef = doc(db, 'gameRooms', roomId);
       await updateDoc(roomRef, {
         players: arrayRemove(userId),

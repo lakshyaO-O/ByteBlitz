@@ -1,43 +1,58 @@
 'use client';
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth, browserLocalPersistence } from 'firebase/auth';
-import { firebaseConfig, isDemoMode, validateFirebaseConfig } from './config';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth, browserLocalPersistence } from 'firebase/auth';
+import { firebaseConfig, isFirebaseConfigured } from './config';
 
-let initialized = false;
+interface FirebaseServices {
+  app: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
+}
 
-export function initializeFirebase() {
-  if (initialized) {
-    const app = getApps().length > 0 ? getApp() : null;
-    if (!app) {
-      initialized = false;
-      return initializeFirebase();
+const nullServices: FirebaseServices = { app: null, firestore: null, auth: null };
+
+let appInstance: FirebaseApp | null = null;
+let firestoreInstance: Firestore | null = null;
+let authInstance: Auth | null = null;
+
+export function initializeFirebase(): FirebaseServices {
+  if (!isFirebaseConfigured()) {
+    if (typeof window !== 'undefined') {
+      console.warn('[Firebase] Not configured — set NEXT_PUBLIC_FIREBASE_* env vars.');
     }
-    return {
-      app,
-      firestore: getFirestore(app),
-      auth: getAuth(app),
-    };
+    return nullServices;
   }
 
-  const demo = isDemoMode();
-
-  if (!demo) {
-    validateFirebaseConfig();
+  try {
+    appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig as any);
+  } catch (err) {
+    console.error('[Firebase] App initialization failed:', err);
+    return nullServices;
   }
 
-  const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  const firestore = getFirestore(app);
-  const auth = getAuth(app);
-
-  initialized = true;
-
-  if (!demo && auth) {
-    auth.setPersistence(browserLocalPersistence).catch(() => {});
+  try {
+    firestoreInstance = getFirestore(appInstance);
+  } catch (err) {
+    console.error('[Firebase] Firestore initialization failed:', err);
   }
 
-  return { app, firestore, auth };
+  try {
+    authInstance = getAuth(appInstance);
+    authInstance.setPersistence(browserLocalPersistence).catch((err) => {
+      console.warn('[Firebase] Failed to set auth persistence:', err);
+    });
+  } catch (err) {
+    console.error('[Firebase] Auth initialization failed:', err);
+  }
+
+  return { app: appInstance, firestore: firestoreInstance, auth: authInstance };
+}
+
+export function getFirebaseServices(): FirebaseServices {
+  if (!appInstance) return initializeFirebase();
+  return { app: appInstance, firestore: firestoreInstance, auth: authInstance };
 }
 
 export * from './provider';

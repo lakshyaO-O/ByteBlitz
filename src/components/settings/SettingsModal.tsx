@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useAuth } from '@/firebase/provider';
 import { updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { getAuth, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const { user } = useUser();
   const { data: profile } = useDoc(user ? `users/${user.uid}` : null);
   const db = useFirestore();
-  const auth = getAuth();
+  const auth = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
 
@@ -70,7 +71,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   }, [open, profile, user]);
 
   const handleSaveProfile = async () => {
-    if (!user || !db) return;
+    if (!user || !auth || !db) return;
     setSaving(true);
     try {
       await updateProfile(user, { displayName: username });
@@ -80,8 +81,6 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
         email,
         updatedAt: serverTimestamp(),
       });
-      window.dispatchEvent(new Event('mock-auth-change'));
-      window.dispatchEvent(new Event('mock-db-change'));
       toast({ title: 'Profile updated', description: 'Your profile has been saved successfully.' });
     } catch (err: any) {
       toast({ variant: 'destructive', title: 'Update failed', description: err.message || 'Could not update profile.' });
@@ -92,19 +91,11 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
   const handleLogout = async () => {
     try {
-      const isDemoMode = typeof window !== 'undefined' && localStorage.getItem('mock_user') !== null;
-      if (isDemoMode) {
-        localStorage.removeItem('mock_user');
-        window.dispatchEvent(new Event('mock-auth-change'));
-        toast({ title: 'Logged out', description: 'See you next time!' });
-        onOpenChange(false);
-        setTimeout(() => { window.location.href = '/auth'; }, 300);
-        return;
-      }
+      if (!auth) return;
       await auth.signOut();
       toast({ title: 'Logged out', description: 'See you next time!' });
       onOpenChange(false);
-      setTimeout(() => { window.location.href = '/auth'; }, 300);
+      setTimeout(() => { window.location.href = '/'; }, 300);
     } catch (err: any) {
       toast({ variant: 'destructive', title: 'Logout failed', description: err.message });
     }
@@ -116,19 +107,22 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
     if (!confirmed) return;
     const password = prompt('Please enter your password to confirm account deletion:');
     if (!password) return;
+    if (!auth || !auth.currentUser) return;
+    const currentAuth = auth;
+    const currentUser = auth.currentUser;
     setDeleting(true);
     try {
-      if (auth.currentUser?.email) {
-        const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
-        await reauthenticateWithCredential(auth.currentUser, credential);
+      if (currentUser.email) {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
       }
       if (db) {
         await updateDoc(doc(db, 'users', user.uid), { deletedAt: serverTimestamp() });
       }
-      await deleteUser(auth.currentUser!);
+      await deleteUser(currentUser);
       toast({ title: 'Account deleted', description: 'Your account has been permanently removed.' });
       onOpenChange(false);
-      setTimeout(() => { window.location.href = '/auth'; }, 300);
+      setTimeout(() => { window.location.href = '/'; }, 300);
     } catch (err: any) {
       toast({ variant: 'destructive', title: 'Deletion failed', description: err.message || 'Could not delete account.' });
     } finally {

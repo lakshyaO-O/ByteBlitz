@@ -4,6 +4,7 @@ import { useEffect, ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase/auth/use-user';
 import { Loader2, AlertTriangle } from 'lucide-react';
+import { Shell } from '@/components/layout/Shell';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -26,7 +27,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.push('/auth');
+      router.push('/');
     }
   }, [user, loading, router]);
 
@@ -50,7 +51,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
             Still setting up. If this persists, try signing in.
           </p>
           <button
-            onClick={() => router.push('/auth')}
+            onClick={() => router.push('/auth?mode=login')}
             className="text-primary hover:underline text-sm font-bold"
           >
             Go to Sign In
@@ -64,5 +65,5 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return null;
   }
 
-  return <>{children}</>;
+  return <Shell>{children}</Shell>;
 }

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile tap optimization - eliminates 300ms delay */
+html {
+  touch-action: manipulation;
+}
+
 @layer base {
   :root {
     --background: 222 47% 7%;
@@ -86,5 +91,58 @@
     60% { transform: translate(2px, 2px); }
     80% { transform: translate(2px, -2px); }
     100% { transform: translate(0); }
+  }
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: 222 47% 4%;
+  --foreground: 0 0% 100%;
+  --card: 222 47% 6%;
+  --card-foreground: 0 0% 100%;
+  --muted: 222 47% 12%;
+  --muted-foreground: 0 0% 80%;
+  --border: 0 0% 30%;
+  --input: 0 0% 30%;
+  --primary: 184 100% 65%;
+  --secondary: 271 76% 63%;
+}
+
+.high-contrast .light {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 30%;
+  --border: 0 0% 60%;
+  --input: 0 0% 60%;
+}
+
+/* Screen reader only - accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

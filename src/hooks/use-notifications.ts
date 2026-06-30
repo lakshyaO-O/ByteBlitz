@@ -26,6 +26,7 @@ export function useNotifications(userId: string | null) {
     setLoading(true);
     let unsubscribe: (() => void) | null = null;
     const { firestore: db } = initializeFirebase();
+    if (!db) { setLoading(false); return; }
 
     const q = query(
       collection(db, 'users', userId, 'notifications'),
@@ -50,6 +51,7 @@ export function useNotifications(userId: string | null) {
     if (!userId) return;
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) return;
       await updateDoc(doc(db, 'users', userId, 'notifications', notificationId), { read: true });
       setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
@@ -67,6 +69,7 @@ export function useNotifications(userId: string | null) {
   }) => {
     try {
       const { firestore: db } = initializeFirebase();
+      if (!db) return;
       await addDoc(collection(db, 'users', params.userId, 'notifications'), {
         userId: params.userId,
         type: params.type,

@@ -1,50 +1,44 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, User, Code2, Loader2, X } from 'lucide-react';
+import { Search as SearchIcon, User, Code2, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-
-const MOCK_USERS = [
-  { id: 'u1', username: 'SyntaxSamurai', rating: 2150, tier: 'Master' },
-  { id: 'u2', username: 'BinaryBoss', rating: 1890, tier: 'Expert' },
-  { id: 'u3', username: 'RecursionQueen', rating: 1650, tier: 'Advanced' },
-  { id: 'u4', username: 'NullPointer', rating: 1420, tier: 'Intermediate' },
-  { id: 'u5', username: 'CodeWizard', rating: 2300, tier: 'Master' },
-  { id: 'u6', username: 'AlgoMaster', rating: 1780, tier: 'Expert' },
-  { id: 'u7', username: 'PixelPusher', rating: 1100, tier: 'Learner' },
-  { id: 'u8', username: 'ByteBaron', rating: 1950, tier: 'Expert' },
-];
-
-const MOCK_PROBLEMS = [
-  { id: 'two-sum', title: 'Two Sum', difficulty: 'Easy' },
-  { id: 'reverse-string', title: 'Reverse String', difficulty: 'Easy' },
-  { id: 'valid-parentheses', title: 'Valid Parentheses', difficulty: 'Medium' },
-  { id: 'fizz-buzz', title: 'FizzBuzz', difficulty: 'Easy' },
-  { id: 'merge-sorted', title: 'Merge Sorted Arrays', difficulty: 'Medium' },
-  { id: 'binary-search', title: 'Binary Search', difficulty: 'Medium' },
-  { id: 'linked-list-cycle', title: 'Linked List Cycle', difficulty: 'Hard' },
-];
+import { useCollection, useFirestore } from '@/firebase';
+import { collection, query as firestoreQuery, orderBy, limit } from 'firebase/firestore';
 
 export default function SearchPage() {
-  const [query, setQuery] = useState('');
+  const db = useFirestore();
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState<'all' | 'users' | 'problems'>('all');
 
-  const filteredUsers = query.length > 0
-    ? MOCK_USERS.filter(u => u.username.toLowerCase().includes(query.toLowerCase()))
-    : [];
+  const usersQuery = React.useMemo(() => {
+    if (!db || !searchQuery) return null;
+    return firestoreQuery(collection(db, 'users'), orderBy('rating', 'desc'), limit(20));
+  }, [db, searchQuery]);
 
-  const filteredProblems = query.length > 0
-    ? MOCK_PROBLEMS.filter(p => p.title.toLowerCase().includes(query.toLowerCase()))
-    : [];
+  const problemsQuery = React.useMemo(() => {
+    if (!db || !searchQuery) return null;
+    return firestoreQuery(collection(db, 'problems'), orderBy('title', 'asc'), limit(20));
+  }, [db, searchQuery]);
+
+  const { data: users, loading: usersLoading } = useCollection(usersQuery);
+  const { data: problems, loading: problemsLoading } = useCollection(problemsQuery);
+
+  const filteredUsers = (users || []).filter((u: any) =>
+    u.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredProblems = (problems || []).filter((p: any) =>
+    p.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const hasResults = filteredUsers.length > 0 || filteredProblems.length > 0;
+  const loading = usersLoading || problemsLoading;
 
   return (
     <Shell>
@@ -59,17 +53,17 @@ export default function SearchPage() {
         <Card className="bg-card/50 border-border">
           <CardContent className="p-6 space-y-6">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 placeholder="Search by username or problem name..."
                 className="pl-12 h-14 text-lg bg-muted/50 border-border"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
               />
-              {query && (
+              {searchQuery && (
                 <button
-                  onClick={() => setQuery('')}
+                  onClick={() => setSearchQuery('')}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-5 h-5" />
@@ -93,11 +87,17 @@ export default function SearchPage() {
           </CardContent>
         </Card>
 
-        {query.length > 0 && (
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        )}
+
+        {!loading && searchQuery.length > 0 && (
           <div className="space-y-6">
             {!hasResults && (
               <div className="text-center py-20 text-muted-foreground">
-                <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                <SearchIcon className="w-12 h-12 mx-auto mb-4 opacity-30" />
                 <p className="font-bold uppercase tracking-widest text-sm">No results found</p>
                 <p className="text-xs mt-2">Try a different search term.</p>
               </div>
@@ -109,16 +109,16 @@ export default function SearchPage() {
                   Players ({filteredUsers.length})
                 </h2>
                 <div className="space-y-2">
-                  {filteredUsers.map((user) => (
+                  {filteredUsers.map((user: any) => (
                     <Link key={user.id} href={`/profile`}>
                       <Card className="bg-card/50 border-border hover:border-primary/30 transition-all cursor-pointer">
                         <CardContent className="p-4 flex items-center gap-4">
                           <Avatar className="h-10 w-10 border border-muted">
-                            <AvatarFallback className="bg-muted text-xs">{user.username[0]}</AvatarFallback>
+                            <AvatarFallback className="bg-muted text-xs">{(user.username || '?')[0]}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
                             <p className="font-bold">{user.username}</p>
-                            <p className="text-xs text-muted-foreground">{user.rating} ELO • {user.tier}</p>
+                            <p className="text-xs text-muted-foreground">{user.rating || 1200} ELO • {user.tier || 'Beginner'}</p>
                           </div>
                           <Button variant="ghost" size="sm" asChild>
                             <span>View Profile</span>
@@ -137,7 +137,7 @@ export default function SearchPage() {
                   Problems ({filteredProblems.length})
                 </h2>
                 <div className="space-y-2">
-                  {filteredProblems.map((problem) => (
+                  {filteredProblems.map((problem: any) => (
                     <Link key={problem.id} href={`/arena`}>
                       <Card className="bg-card/50 border-border hover:border-primary/30 transition-all cursor-pointer">
                         <CardContent className="p-4 flex items-center gap-4">
@@ -165,9 +165,9 @@ export default function SearchPage() {
           </div>
         )}
 
-        {query.length === 0 && (
+        {!loading && searchQuery.length === 0 && (
           <div className="text-center py-20 text-muted-foreground">
-            <Search className="w-16 h-16 mx-auto mb-4 opacity-20" />
+            <SearchIcon className="w-16 h-16 mx-auto mb-4 opacity-20" />
             <p className="text-sm font-bold uppercase tracking-widest">Start typing to search</p>
             <p className="text-xs mt-2">Search for players by username or problems by name.</p>
           </div>

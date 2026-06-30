@@ -4,6 +4,7 @@ import React from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart3,
   TrendingUp,
@@ -12,9 +13,16 @@ import {
   Target,
   Flame,
   Loader2,
+  ChartBar,
+  GraduationCap,
+  Gift,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 import { useUser, useDoc } from '@/firebase';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import { WeeklyStats } from '@/components/analytics/WeeklyStats';
+import { LearningRoadmap } from '@/components/learning/LearningRoadmap';
+import { DailyLoginRewards } from '@/components/gamification/DailyLoginRewards';
 
 export default function ProgressPage() {
   const { user, loading: authLoading } = useUser();
@@ -154,6 +162,36 @@ export default function ProgressPage() {
             </Card>
           ))}
         </div>
+
+        <Tabs defaultValue="analytics" className="w-full">
+          <TabsList className="grid grid-cols-3 gap-2 h-auto bg-muted/50 p-1">
+            <TabsTrigger value="analytics" className="text-xs gap-1"><ChartBar className="w-3 h-3" /> Analytics</TabsTrigger>
+            <TabsTrigger value="learning" className="text-xs gap-1"><GraduationCap className="w-3 h-3" /> Learning</TabsTrigger>
+            <TabsTrigger value="rewards" className="text-xs gap-1"><Gift className="w-3 h-3" /> Daily Rewards</TabsTrigger>
+          </TabsList>
+          <TabsContent value="analytics" className="mt-4">
+            <AnalyticsDashboard
+              weeklyCodingTime={stats.weeklyCodingTime || 0}
+              problemsSolvedByDifficulty={{ Easy: 0, Medium: 0, Hard: 0 }}
+              winLossHistory={{ wins: stats.wins || 0, losses: stats.losses || 0, draws: stats.draws || 0 }}
+              accuracy={stats.accuracy || 0}
+              totalProblems={stats.problemsSolved || 0}
+              totalCodingTime={stats.totalCodingTime || 0}
+              winRate={winRate}
+            />
+          </TabsContent>
+          <TabsContent value="learning" className="mt-4">
+            <LearningRoadmap
+              goals={stats.learningGoals || []}
+              learningPath={stats.learningPath || null}
+            />
+          </TabsContent>
+          <TabsContent value="rewards" className="mt-4">
+            <DailyLoginRewards userId={user?.uid || null} />
+          </TabsContent>
+        </Tabs>
+
+        <WeeklyStats summary={stats.weeklySummary || null} />
       </div>
     </Shell>
   );

@@ -25,19 +25,31 @@ import {
   VolumeX,
   Copy,
   CheckCircle2,
+  Accessibility,
+  Monitor,
+  Type,
+  Code2,
+  Eye,
 } from 'lucide-react';
 import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useAuth } from '@/firebase/provider';
 import { updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { getAuth, updateProfile } from 'firebase/auth';
+import { updateProfile } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
+import { AccessibilitySettings } from '@/components/accessibility/AccessibilitySettings';
+import { SecuritySettings } from '@/components/security/SecuritySettings';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { EditorTheme, CodingLanguage } from '@/app/lib/types';
+import { useEditorPersistence, saveUserPreference } from '@/hooks/use-editor-persistence';
 
 export default function SettingsPage() {
   const { user } = useUser();
   const { data: profile } = useDoc(user ? `users/${user.uid}` : null);
   const db = useFirestore();
-  const auth = getAuth();
+  const auth = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
 
@@ -46,6 +58,9 @@ export default function SettingsPage() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editorTheme, setEditorTheme] = useState<EditorTheme>('vs-dark');
+  const [editorFontSize, setEditorFontSize] = useState(14);
+  const [preferredLang, setPreferredLang] = useState<CodingLanguage>('javascript');
 
   const handleSaveProfile = async () => {
     if (!user || !db) return;
@@ -62,14 +77,8 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
-    const isDemo = typeof window !== 'undefined' && localStorage.getItem('mock_user') !== null;
-    if (isDemo) {
-      localStorage.removeItem('mock_user');
-      window.dispatchEvent(new Event('mock-auth-change'));
-    } else {
-      await auth.signOut();
-    }
-    window.location.href = '/auth';
+    if (auth) await auth.signOut();
+    window.location.href = '/';
   };
 
   const initials = (user?.displayName || user?.email || '??')
@@ -86,11 +95,14 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="bg-muted/50">
+          <TabsList className="bg-muted/50 flex-wrap">
             <TabsTrigger value="profile" className="gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
             <TabsTrigger value="appearance" className="gap-2"><Palette className="w-4 h-4" /> Appearance</TabsTrigger>
+            <TabsTrigger value="editor" className="gap-2"><Code2 className="w-4 h-4" /> Editor</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" /> Notifications</TabsTrigger>
-            <TabsTrigger value="account" className="gap-2"><Shield className="w-4 h-4" /> Account</TabsTrigger>
+            <TabsTrigger value="accessibility" className="gap-2"><Accessibility className="w-4 h-4" /> Accessibility</TabsTrigger>
+            <TabsTrigger value="security" className="gap-2"><Shield className="w-4 h-4" /> Security</TabsTrigger>
+            <TabsTrigger value="account" className="gap-2"><LogOut className="w-4 h-4" /> Account</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -142,6 +154,55 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="editor">
+            <Card className="bg-card/50 border-border">
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Editor Preferences</h3>
+                  <p className="text-xs text-muted-foreground">Customize your coding experience.</p>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs font-bold uppercase tracking-widest">Editor Theme</Label>
+                    <Select value={editorTheme} onValueChange={(v: EditorTheme) => setEditorTheme(v)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="vs-dark">Dark (Default)</SelectItem>
+                        <SelectItem value="vs-light">Light</SelectItem>
+                        <SelectItem value="monokai">Monokai</SelectItem>
+                        <SelectItem value="dracula">Dracula</SelectItem>
+                        <SelectItem value="nord">Nord</SelectItem>
+                        <SelectItem value="hc-black">High Contrast Black</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold uppercase tracking-widest">Font Size: {editorFontSize}px</Label>
+                    <Slider value={[editorFontSize]} onValueChange={([v]) => setEditorFontSize(v)} min={10} max={24} step={1} className="mt-2" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold uppercase tracking-widest">Preferred Language</Label>
+                    <Select value={preferredLang} onValueChange={(v: CodingLanguage) => setPreferredLang(v)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="javascript">JavaScript</SelectItem>
+                        <SelectItem value="typescript">TypeScript</SelectItem>
+                        <SelectItem value="python">Python</SelectItem>
+                        <SelectItem value="java">Java</SelectItem>
+                        <SelectItem value="cpp">C++</SelectItem>
+                        <SelectItem value="go">Go</SelectItem>
+                        <SelectItem value="rust">Rust</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="notifications">
             <Card className="bg-card/50 border-border">
               <CardContent className="p-6 space-y-6">
@@ -163,6 +224,12 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="accessibility">
+            <AccessibilitySettings />
+          </TabsContent>
+          <TabsContent value="security">
+            <SecuritySettings />
+          </TabsContent>
           <TabsContent value="account">
             <Card className="bg-card/50 border-border">
               <CardContent className="p-6 space-y-6">
