@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 type Theme = 'dark' | 'light';
 
-const THEME_KEY = 'codezarena-theme';
+export const THEME_KEY = 'devrann-theme';
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>('dark');

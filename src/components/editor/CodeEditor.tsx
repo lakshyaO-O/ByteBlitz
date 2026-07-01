@@ -2,14 +2,15 @@
 
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Loader2, Save, Clock, ChevronDown, Monitor, Eye } from 'lucide-react';
+import { Loader2, Save, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CodingLanguage, EditorTheme } from '@/app/lib/types';
+import { CodingLanguage, EditorTheme } from '@/types';
 import { useEditorPersistence } from '@/hooks/use-editor-persistence';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { saveCode as saveToFirebase } from '@/services/practice.service';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false, loading: () => (
   <div className="flex items-center justify-center h-full bg-[#011627]">
@@ -69,8 +70,11 @@ export function CodeEditor({
   const editorRef = useRef<any>(null);
   const [isModified, setIsModified] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<EditorTheme>(themeProp || 'vs-dark');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved' | null>(null);
   const { isOnline } = useOnlineStatus();
   const { lastSaved, loadCode, autoSave } = useEditorPersistence(userId || null);
+
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -78,6 +82,7 @@ export function CodeEditor({
       loadCode(problemId, userId).then((savedCode) => {
         if (savedCode) {
           setCode(savedCode);
+          setIsModified(false);
         } else if (initialCode) {
           setCode(initialCode);
         }
@@ -136,10 +141,7 @@ export function CodeEditor({
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
       run: () => {
         const currentCode = editor.getValue();
-        if (userId) {
-          autoSave(problemId, problemTitle, currentLang, currentCode, userId);
-        }
-        onSave?.(currentCode);
+        handleManualSave(currentCode);
       },
     });
 
@@ -151,26 +153,41 @@ export function CodeEditor({
     });
   };
 
+  const handleManualSave = async (codeToSave?: string) => {
+    const finalCode = codeToSave || code;
+    setSaveStatus('saving');
+    if (userId && problemId) {
+      await saveToFirebase(userId, problemId, currentLang, finalCode);
+    }
+    autoSave(problemId, problemTitle, currentLang, finalCode, userId || '');
+    onSave?.(finalCode);
+    setSaveStatus('saved');
+    setIsModified(false);
+    setTimeout(() => setSaveStatus(null), 2000);
+  };
+
   const handleChange = (value: string | undefined) => {
     const newCode = value || '';
     setCode(newCode);
     setIsModified(true);
+    setSaveStatus('unsaved');
     onChange?.(newCode);
-    if (userId && problemId && isOnline) {
-      autoSave(problemId, problemTitle, currentLang, newCode, userId);
-    }
-  };
 
-  const handleSave = () => {
     if (userId && problemId && isOnline) {
-      autoSave(problemId, problemTitle, currentLang, code, userId);
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = setTimeout(async () => {
+        await saveToFirebase(userId, problemId, currentLang, newCode);
+        autoSave(problemId, problemTitle, currentLang, newCode, userId);
+        setSaveStatus('saved');
+        setIsModified(false);
+        setTimeout(() => setSaveStatus(null), 2000);
+      }, 3000);
     }
-    onSave?.(code);
-    setIsModified(false);
   };
 
   const handleLanguageChange = (lang: CodingLanguage) => {
     setCurrentLang(lang);
+    onChange?.(code);
   };
 
   const themeToUse = themeProp || currentTheme;
@@ -190,10 +207,6 @@ export function CodeEditor({
               ))}
             </SelectContent>
           </Select>
-          <Badge variant="outline" className="text-[10px] h-5 gap-1">
-            <Eye className="w-3 h-3" />
-            {readOnly ? 'Read Only' : 'Editable'}
-          </Badge>
         </div>
         <div className="flex items-center gap-3">
           {!isOnline && (
@@ -201,20 +214,31 @@ export function CodeEditor({
               Offline
             </Badge>
           )}
-          {lastSaved && (
+          {saveStatus === 'saved' && (
+            <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> Saved
+            </span>
+          )}
+          {saveStatus === 'saving' && (
+            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <Loader2 className="w-3 h-3 animate-spin" /> Saving...
+            </span>
+          )}
+          {lastSaved && !isModified && (
             <span className="text-[10px] text-muted-foreground flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {lastSaved.toLocaleTimeString()}
             </span>
           )}
           {isModified && (
-            <span className="text-[10px] text-yellow-400 font-bold">Unsaved</span>
+            <span className="text-[10px] text-yellow-400 font-bold">Modified</span>
           )}
           <Button
             variant="ghost"
             size="sm"
             className="h-7 text-xs gap-1"
-            onClick={handleSave}
+            onClick={() => handleManualSave()}
+            disabled={readOnly}
           >
             <Save className="w-3 h-3" />
             Save

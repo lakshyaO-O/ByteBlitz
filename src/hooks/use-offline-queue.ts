@@ -12,7 +12,7 @@ interface QueuedAction {
 }
 
 async function getQueueDB() {
-  return openDB('codezarena-offline', 1, {
+  return openDB('devrann-offline', 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('actionQueue')) {
         db.createObjectStore('actionQueue', { keyPath: 'id', autoIncrement: true });

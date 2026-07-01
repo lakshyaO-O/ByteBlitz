@@ -71,7 +71,7 @@ export function LandingFooter() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} CodezArena. Built for the modern architect.
+            &copy; {new Date().getFullYear()} DevRann. Built for the modern architect.
           </p>
         </motion.div>
       </div>

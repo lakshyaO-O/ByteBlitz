@@ -27,7 +27,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-32">
       <motion.div
-        className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full opacity-30"
+        className="pointer-events-none absolute top-[-12%] left-[-8%] h-[40%] w-[40%] rounded-full opacity-20"
         style={{
           background: 'radial-gradient(circle, hsl(184 100% 55% / 0.15), transparent 70%)',
         }}
@@ -36,7 +36,7 @@ export function HeroSection() {
         animate="visible"
       />
       <motion.div
-        className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full opacity-30"
+        className="pointer-events-none absolute bottom-[-12%] right-[-8%] h-[40%] w-[40%] rounded-full opacity-20"
         style={{
           background: 'radial-gradient(circle, hsl(271 76% 53% / 0.12), transparent 70%)',
         }}

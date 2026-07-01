@@ -1,10 +1,10 @@
-# Convert ByteBlitz to Mobile APK
+# Convert DevRann to Mobile APK
 
 ## Quick Setup (5 minutes)
 
 ### 1. Install Capacitor & Dependencies
 ```bash
-cd c:\Users\nothing\Downloads\download\ByteBlitz
+cd c:\Users\nothing\Downloads\download\DevRann
 
 # Install Capacitor CLI and core
 npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios
@@ -15,11 +15,11 @@ npm install @capacitor/app @capacitor/device @capacitor/splash-screen
 
 ### 2. Initialize Capacitor
 ```bash
-npx cap init ByteBlitz com.byteblitz.app
+npx cap init DevRann com.devrann.app
 ```
 When prompted:
-- App name: `ByteBlitz`
-- Package ID: `com.byteblitz.app`
+- App name: `DevRann`
+- Package ID: `com.devrann.app`
 - Web dir: `out` (we'll build Next.js to static files)
 
 ### 3. Add Android Platform
@@ -78,8 +78,8 @@ You can:
 ### capacitor.config.json (auto-created)
 ```json
 {
-  "appId": "com.byteblitz.app",
-  "appName": "ByteBlitz",
+  "appId": "com.devrann.app",
+  "appName": "DevRann",
   "webDir": "out",
   "server": {
     "androidScheme": "https"
@@ -98,7 +98,7 @@ Add: `output: 'export'` to enable static export
 npm install @capacitor/core @capacitor/cli @capacitor/android
 
 # 2. Initialize Capacitor
-npx cap init ByteBlitz com.byteblitz.app
+npx cap init DevRann com.devrann.app
 
 # 3. Add Android
 npx cap add android
@@ -167,7 +167,7 @@ Users can then:
 
 Update Firebase config to allow Android origin:
 1. Firebase Console → Settings → Authorized Domains
-2. Add: `byteblitz.firebaseapp.com` (if using Hosting)
+2. Add: `devrann.firebaseapp.com` (if using Hosting)
 3. Or configure custom domain
 
 ## Support

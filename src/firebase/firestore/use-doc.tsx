@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  doc, 
-  onSnapshot, 
-  DocumentReference, 
-  DocumentData, 
+import {
+  doc,
+  onSnapshot,
+  DocumentData,
   DocumentSnapshot,
-  getFirestore
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
@@ -26,14 +24,17 @@ export function useDoc(path: string | null) {
       return;
     }
 
+    let active = true;
     const docRef = doc(firestore, path);
     const unsubscribe = onSnapshot(
       docRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
+        if (!active) return;
         setData(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
         setLoading(false);
       },
       async (err) => {
+        if (!active) return;
         const permissionError = new FirestorePermissionError({
           path: docRef.path,
           operation: 'get',
@@ -44,7 +45,10 @@ export function useDoc(path: string | null) {
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [firestore, path]);
 
   return { data, loading, error };

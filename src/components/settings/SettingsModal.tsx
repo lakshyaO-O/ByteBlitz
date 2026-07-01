@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { useFirestore } from '@/firebase/provider';
 import { useAuth } from '@/firebase/provider';
 import { updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
@@ -37,7 +39,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme, THEME_KEY } from '@/hooks/use-theme';
 
 interface SettingsModalProps {
   open: boolean;
@@ -232,11 +234,11 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => { if (theme !== 'dark') { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); localStorage.setItem('codezarena-theme', 'dark'); window.dispatchEvent(new Event('storage')); } }} className={cn('flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all', theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30')}>
+                  <button onClick={() => { if (theme !== 'dark') { document.documentElement.classList.add('dark'); document.documentElement.classList.remove('light'); localStorage.setItem(THEME_KEY, 'dark'); window.dispatchEvent(new Event('storage')); } }} className={cn('flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all', theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30')}>
                     <div className="w-full h-20 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center"><Moon className="w-8 h-8 text-primary" /></div>
                     <span className="text-sm font-bold uppercase tracking-wider">Dark</span>
                   </button>
-                  <button onClick={() => { if (theme !== 'light') { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light'); localStorage.setItem('codezarena-theme', 'light'); window.dispatchEvent(new Event('storage')); } }} className={cn('flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all', theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30')}>
+                  <button onClick={() => { if (theme !== 'light') { document.documentElement.classList.remove('dark'); document.documentElement.classList.add('light'); localStorage.setItem(THEME_KEY, 'light'); window.dispatchEvent(new Event('storage')); } }} className={cn('flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all', theme === 'light' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30')}>
                     <div className="w-full h-20 rounded-lg bg-white border border-slate-200 flex items-center justify-center"><Sun className="w-8 h-8 text-amber-500" /></div>
                     <span className="text-sm font-bold uppercase tracking-wider">Light</span>
                   </button>

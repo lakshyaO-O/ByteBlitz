@@ -1,4 +1,4 @@
-package com.codezarena.app;
+package com.devrann.app;
 
 import com.getcapacitor.BridgeActivity;
 

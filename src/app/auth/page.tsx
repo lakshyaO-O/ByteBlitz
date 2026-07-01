@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/firebase/provider';
 import { isFirebaseConfigured } from '@/firebase/config';
 
@@ -54,14 +54,11 @@ function sanitizeRedirect(redirect: string | null): string {
 
 function sanitizeFirebaseError(err: any): string {
   if (!err || !err.code) {
-    console.warn('[Auth] Unknown error (no code):', err?.message || err, err?.stack || '');
     return 'An unexpected error occurred. Please try again.';
   }
 
   const code = err.code;
   const isDev = process.env.NODE_ENV === 'development';
-
-  console.warn(`[Auth] Firebase error: ${code}`, err.message || '', isDev ? err.stack || '' : '');
 
   const userMessages: Record<string, string> = {
     'auth/user-not-found': 'No account found with this email.',
@@ -97,6 +94,7 @@ function sanitizeFirebaseError(err: any): string {
 function AuthForm() {
   const auth = useAuth();
   const db = useFirestore();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [isSignUp, setIsSignUp] = useState(true);
@@ -109,6 +107,7 @@ function AuthForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
+  const isLoggingIn = useRef(false);
   const [firebaseAvailable, setFirebaseAvailable] = useState(true);
 
   useEffect(() => {
@@ -125,20 +124,11 @@ function AuthForm() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!auth) {
-      console.log('[AuthPage] auth is null, skipping auth state listener');
-      return;
-    }
-    console.log('[AuthPage] Setting up onAuthStateChanged listener');
+    if (!auth) return;
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        console.log('[AuthPage] Auth state changed: USER SIGNED IN', firebaseUser.uid);
-        console.log('[AuthPage] auth.currentUser:', auth.currentUser?.uid);
+      if (firebaseUser && !isLoggingIn.current) {
         const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-        console.log('[AuthPage] Redirecting to:', redirectTo);
-        window.location.href = redirectTo;
-      } else {
-        console.log('[AuthPage] Auth state changed: NO USER');
+        router.replace(redirectTo);
       }
     });
     return () => unsub();
@@ -169,8 +159,11 @@ function AuthForm() {
       return;
     }
 
+    const publicId = 'u_' + Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join('');
+
     await setDoc(userRef, {
       uid: userId,
+      publicId,
       username: displayName,
       email,
       photoURL,
@@ -191,6 +184,13 @@ function AuthForm() {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+
+    await setDoc(doc(db, 'usernames', displayName.toLowerCase()), {
+      name: displayName.toLowerCase(),
+      userId,
+      claimedAt: serverTimestamp(),
+    }).catch(() => {});
+
     await setDoc(doc(db, 'leaderboard', userId), {
       userId,
       username: displayName,
@@ -208,6 +208,7 @@ function AuthForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    isLoggingIn.current = true;
 
     try {
       if (!email || !password) {
@@ -227,7 +228,6 @@ function AuthForm() {
         throw new Error('Firebase Auth is not initialized');
       }
 
-      console.log('[AuthPage] Starting authentication...');
       let user;
       if (isSignUp) {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -237,31 +237,29 @@ function AuthForm() {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         user = cred.user;
       }
-      console.log('[AuthPage] Authentication SUCCESS, user:', user.uid);
-      console.log('[AuthPage] auth.currentUser after login:', auth.currentUser?.uid);
 
       const photoURL = user.photoURL || '';
       await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL, isSignUp);
-      console.log('[AuthPage] User profile created/updated in Firestore');
 
       const idToken = await user.getIdToken();
       document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
-      console.log('[AuthPage] __session cookie set, redirecting...');
 
       const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-      window.location.href = redirectTo;
+      router.replace(redirectTo);
     } catch (err: any) {
       console.error('[Auth] Sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
       if (msg) setError(msg);
     } finally {
       setLoading(false);
+      isLoggingIn.current = false;
     }
   };
 
   const handleGoogleSignIn = async () => {
     setError(null);
     setIsGoogleLoading(true);
+    isLoggingIn.current = true;
 
     try {
       if (!auth) {
@@ -278,13 +276,14 @@ function AuthForm() {
       document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
 
       const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-      window.location.href = redirectTo;
+      router.replace(redirectTo);
     } catch (err: any) {
       console.error('[Auth] Google sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
       if (msg) setError(msg);
     } finally {
       setIsGoogleLoading(false);
+      isLoggingIn.current = false;
     }
   };
 
@@ -376,7 +375,7 @@ function AuthForm() {
             <Zap className="h-8 w-8 fill-primary" />
           </div>
           <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">
-            {isSignUp ? 'Join CodezArena' : 'Welcome Back'}
+            {isSignUp ? 'Join DevRann' : 'Welcome Back'}
           </CardTitle>
           <p className="text-xs text-muted-foreground">
             {isSignUp

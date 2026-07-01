@@ -64,8 +64,8 @@ export function RegistrationModal({ open, onClose, redirectPath = '/auth', featu
               {/* Message */}
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {feature
-                  ? `Create an account to ${feature.toLowerCase()} and unlock all CodezArena features.`
-                  : 'Create an account to compete with other programmers, track your progress, save achievements, and unlock all CodezArena features.'}
+                  ? `Create an account to ${feature.toLowerCase()} and unlock all DevRann features.`
+                  : 'Create an account to compete with other programmers, track your progress, save achievements, and unlock all DevRann features.'}
               </p>
 
               {/* Feature list */}

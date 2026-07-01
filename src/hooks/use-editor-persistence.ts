@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { openDB, IDBPDatabase } from 'idb';
 import { CodingLanguage, SavedCode } from '@/app/lib/types';
 
-const DB_NAME = 'codezarena-editor';
+const DB_NAME = 'devrann-editor';
 const DB_VERSION = 1;
 
 async function getDB(): Promise<IDBPDatabase> {

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">CodezArena</string>
-    <string name="title_activity_main">CodezArena</string>
-    <string name="package_name">com.codezarena.app</string>
-    <string name="custom_url_scheme">com.codezarena.app</string>
+    <string name="app_name">DevRann</string>
+    <string name="title_activity_main">DevRann</string>
+    <string name="package_name">com.devrann.app</string>
+    <string name="custom_url_scheme">com.devrann.app</string>
 </resources>

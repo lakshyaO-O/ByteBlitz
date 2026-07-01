@@ -16,7 +16,9 @@ import {
   Sword,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useUser } from '@/firebase/auth/use-user';
+import { useFirestore } from '@/firebase/provider';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { GuestGate } from '@/components/auth/GuestGate';
 import { EmptyState } from '@/components/premium/EmptyState';

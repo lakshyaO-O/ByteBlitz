@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { AuthGuard } from '@/components/AuthGuard';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 interface ProtectedLayoutProps {
   children: ReactNode;
@@ -35,15 +36,19 @@ export function RootLayoutClient({ children }: ProtectedLayoutProps) {
 
   // Landing and auth pages: no shell, no guard (they handle auth themselves)
   if (isPublicNoShell) {
-    return <>{children}</>;
+    return <ErrorBoundary>{children}</ErrorBoundary>;
   }
 
   // Protected routes (profile, settings, friends, etc.) require auth
   if (isProtectedRoute) {
-    return <AuthGuard>{children}</AuthGuard>;
+    return (
+      <ErrorBoundary>
+        <AuthGuard>{children}</AuthGuard>
+      </ErrorBoundary>
+    );
   }
 
   // All other routes (arena, practice, contests, leaderboard, search, etc.)
   // are browsable by guests — they'll get action-level gates instead
-  return <>{children}</>;
+  return <ErrorBoundary>{children}</ErrorBoundary>;
 }

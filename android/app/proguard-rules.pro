@@ -12,7 +12,7 @@
 
 # Keep native methods for all plugins
 -keep class com.getcapacitor.** { *; }
--keep class com.codezarena.app.MainActivity { *; }
+-keep class com.devrann.app.MainActivity { *; }
 
 # Prevent obfuscation of WebView JavaScript interface
 -keepclassmembers class * {

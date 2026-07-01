@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -21,7 +20,8 @@ import {
   Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUser, useDoc } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
+import { useDoc } from '@/firebase/firestore/use-doc';
 
 const ACHIEVEMENTS = [
   { id: 'first-blood', title: 'First Blood', description: 'Win your first battle', icon: Trophy, requirement: '1 Win' },
@@ -44,11 +44,9 @@ export default function AchievementsPage() {
 
   if (authLoading || profileLoading) {
     return (
-      <Shell>
         <div className="flex items-center justify-center h-[50vh]">
           <Loader2 className="w-12 h-12 text-primary animate-spin" />
         </div>
-      </Shell>
     );
   }
 
@@ -70,7 +68,6 @@ export default function AchievementsPage() {
   const achievedCount = ACHIEVEMENTS.filter(a => isAchieved(a)).length;
 
   return (
-    <Shell>
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
@@ -125,6 +122,5 @@ export default function AchievementsPage() {
           })}
         </div>
       </div>
-    </Shell>
   );
 }

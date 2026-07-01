@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
+  SearchX,
   CheckCircle2, 
   Circle, 
   ChevronRight, 
@@ -15,9 +16,11 @@ import {
   Code2,
   Loader2
 } from 'lucide-react';
+import { EmptyState } from '@/components/premium/EmptyState';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import { collection, query, orderBy } from 'firebase/firestore';
 
 export default function ProblemsPage() {
@@ -89,6 +92,12 @@ export default function ProblemsPage() {
         <Card className="bg-card/50 border-border overflow-hidden">
           {loading ? (
             <div className="p-20 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+          ) : !problems || problems.length === 0 ? (
+            <EmptyState
+              icon={Code2}
+              title="No Problems Available"
+              description="Check back later for new coding challenges to sharpen your skills."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -129,7 +138,7 @@ export default function ProblemsPage() {
                       </td>
                       <td className="p-4 text-right">
                         <Button asChild variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link href={`/arena`}>
+                          <Link href={`/practice`}>
                             SOLVE <ChevronRight className="ml-1 w-4 h-4" />
                           </Link>
                         </Button>
@@ -139,10 +148,13 @@ export default function ProblemsPage() {
                 </tbody>
               </table>
               {filteredProblems.length === 0 && (
-                <div className="p-12 text-center space-y-4">
-                  <Code2 className="w-12 h-12 text-muted-foreground/30 mx-auto" />
-                  <p className="text-muted-foreground uppercase text-xs font-bold tracking-widest">No matching archives found.</p>
-                </div>
+                <EmptyState
+                  icon={SearchX}
+                  title="No Matching Archives"
+                  description="No problems match your current filters. Try adjusting your search or difficulty filter."
+                  actionLabel="Clear filters"
+                  onAction={() => { setSearch(''); setFilter('All'); }}
+                />
               )}
             </div>
           )}

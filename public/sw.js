@@ -1,4 +1,4 @@
-const CACHE_NAME = 'codezarena-shell-v1';
+const CACHE_NAME = 'devrann-shell-v1';
 const SHELL_ASSETS = ['/', '/manifest.webmanifest', '/icons/icon.svg'];
 
 self.addEventListener('install', (event) => {

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,7 +17,8 @@ import {
   Gift,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
-import { useUser, useDoc } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
+import { useDoc } from '@/firebase/firestore/use-doc';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { WeeklyStats } from '@/components/analytics/WeeklyStats';
 import { LearningRoadmap } from '@/components/learning/LearningRoadmap';
@@ -30,11 +30,9 @@ export default function ProgressPage() {
 
   if (authLoading || profileLoading) {
     return (
-      <Shell>
         <div className="flex items-center justify-center h-[50vh]">
           <Loader2 className="w-12 h-12 text-primary animate-spin" />
         </div>
-      </Shell>
     );
   }
 
@@ -58,7 +56,6 @@ export default function ProgressPage() {
   ];
 
   return (
-    <Shell>
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
@@ -193,6 +190,5 @@ export default function ProgressPage() {
 
         <WeeklyStats summary={stats.weeklySummary || null} />
       </div>
-    </Shell>
   );
 }

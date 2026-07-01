@@ -1,43 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Swords,
-  Trophy,
-  BookOpen,
-  Settings,
-  Zap,
-  Menu,
-  LogOut,
-  Users,
-  Target,
-  Calendar,
-  BarChart3,
-  UserCircle,
-  Bell,
-  Search,
-  Gamepad2,
-  Medal,
-  ChevronLeft,
-  Code2,
-  LogIn,
-  UserPlus,
-  Eye,
-  Shield,
-  Activity,
-  GraduationCap,
-  Crown,
-  Video,
-  Lock,
+  LayoutDashboard, Swords, Trophy, BookOpen, Settings, Zap, Menu, LogOut,
+  Users, Target, Calendar, BarChart3, UserCircle, Bell, Search, Gamepad2,
+  Medal, ChevronLeft, Code2, LogIn, UserPlus, Eye, Shield, GraduationCap,
+  Crown, Video,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
 import { useAuth } from '@/firebase/provider';
-import { useDoc } from '@/firebase/firestore/use-doc';
 import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase/provider';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -54,7 +31,6 @@ const NAV_ITEMS = [
   { href: '/challenges', label: 'Challenges', icon: Target },
   { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
   { href: '/learning', label: 'Learning', icon: GraduationCap },
-  { href: '/analytics', label: 'Analytics', icon: Activity },
   { href: '/friends', label: 'Friends', icon: Users },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/progress', label: 'Progress', icon: BarChart3 },
@@ -63,7 +39,6 @@ const NAV_ITEMS = [
   { href: '/search', label: 'Search', icon: Search },
   { href: '/replay', label: 'Replays', icon: Video },
   { href: '/admin', label: 'Admin', icon: Shield },
-  { href: '/security', label: 'Security', icon: Lock },
   { href: '/monetization', label: 'Premium', icon: Crown },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -71,21 +46,31 @@ const NAV_ITEMS = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const pathname = usePathname();
-  const { data: profile } = useDoc(user ? `users/${user.uid}` : null);
+  const [profile, setProfile] = useState<any>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const profileData = profile as any;
+  useEffect(() => {
+    if (!firestore || !user) return;
+    const ref = doc(firestore, 'users', user.uid);
+    getDoc(ref).then((snap) => {
+      if (snap.exists()) setProfile({ id: snap.id, ...snap.data() });
+    }).catch(() => {});
+  }, [firestore, user]);
+
+  const profileData = profile;
 
   const handleLogout = async () => {
     if (auth) await signOut(auth);
     router.push('/');
   };
 
-  const initials = (profileData?.username || user?.displayName || user?.email || '?')
+  const displayName = profileData?.username || user?.displayName || user?.email?.split('@')[0] || 'Player';
+  const initials = displayName
     .split(' ')
     .map((n: string) => n[0])
     .join('')
@@ -158,7 +143,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   </Avatar>
                   <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-sm font-bold truncate">
-                      {profileData?.username || user?.displayName || 'Player'}
+                      {displayName}
                     </p>
                     <p className={cn('text-[10px] font-bold uppercase tracking-widest truncate', getTierColor(tier))}>
                       {tier}
@@ -218,6 +203,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       >
         <SidebarContent />
         <button
+          type="button"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="absolute bottom-4 left-1/2 -translate-x-1/2 p-1.5 rounded-full border border-border hover:bg-muted transition-colors hidden lg:block z-10 bg-card/80"
         >
@@ -236,6 +222,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             variant="ghost"
             size="icon"
             className="lg:hidden fixed top-4 left-4 z-50"
+            aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
           </Button>

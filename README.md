@@ -1,4 +1,4 @@
-# CodezArena — Competitive Coding Arena
+# DevRann — Competitive Coding Arena
 
 The ultimate esports-inspired competitive coding platform. Compete in 1v1 battles, climb the ELO ladder, solve challenges, and become a legendary architect.
 

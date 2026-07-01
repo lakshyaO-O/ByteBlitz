@@ -146,3 +146,78 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Mobile-specific fixes */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent elastic scroll / overscroll on mobile */
+html {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+}
+
+/* Use dynamic viewport height for mobile */
+.min-h-screen {
+  min-height: 100dvh;
+}
+.h-screen {
+  height: 100dvh;
+}
+
+/* Prevent text selection on UI elements */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Improve tap target sizes on mobile */
+@media (max-width: 640px) {
+  button, a, [role="button"], input, select, textarea {
+    min-height: 44px;
+  }
+  
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Fix for 100vw causing horizontal scroll on mobile */
+  .overflow-x-hidden-mobile {
+    overflow-x: hidden;
+  }
+}
+
+/* Fix for Android WebView input zoom */
+input, textarea, select {
+  font-size: 16px;
+}
+
+/* Prevent flash of white screen on dark mode pages */
+html {
+  background-color: #05070f;
+}
+
+/* Fix for Capacitor safe area */
+ion-content {
+  --offset-top: 0px;
+  --offset-bottom: 0px;
+}

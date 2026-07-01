@@ -1,7 +1,7 @@
-# ByteBlitz Multiplayer System Guide
+# DevRann Multiplayer System Guide
 
 ## Overview
-ByteBlitz now features a **complete real-time multiplayer competitive coding system** with matchmaking, synchronized battles, and ELO rating updates.
+DevRann now features a **complete real-time multiplayer competitive coding system** with matchmaking, synchronized battles, and ELO rating updates.
 
 ## Components Implemented
 

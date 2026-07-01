@@ -1,17 +1,37 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Inter, Space_Grotesk, Source_Code_Pro } from 'next/font/google';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { RootLayoutClient } from '@/components/RootLayoutClient';
-import { RoboticMascot } from '@/components/RoboticMascot';
-import { DynamicBackground } from '@/components/DynamicBackground';
-import { Toaster } from '@/components/ui/toaster';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { AppStoreProvider } from '@/store/app-store';
-import { OfflineStatusBar } from '@/components/offline/OfflineStatusBar';
+import { SessionCookieSync } from '@/components/auth/SessionCookieSync';
+import { GlobalErrorHandler } from '@/components/GlobalErrorHandler';
+import { AppStartupDecorations } from '@/components/AppStartupDecorations';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-headline',
+  display: 'swap',
+});
+
+const sourceCodePro = Source_Code_Pro({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-code',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'CodezArena | Competitive Coding Arena',
+  title: 'DevRann | Competitive Coding Arena',
   description: 'The ultimate esports-inspired competitive coding platform.',
   manifest: '/manifest.webmanifest',
   icons: {
@@ -20,9 +40,21 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'CodezArena',
+    title: 'DevRann',
     statusBarStyle: 'black-translucent',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#05070f',
 };
 
 export default function RootLayout({
@@ -33,26 +65,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet" />
-        <meta name="theme-color" content="#05070f" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta httpEquiv="Accept-CH" content="DPR, Width, Viewport-Width" />
         <Script
           id="service-worker"
           strategy="afterInteractive"
         >{`if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); }); }`}</Script>
       </head>
-      <body className="font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} ${sourceCodePro.variable} font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary`}>
         <FirebaseClientProvider>
+          <GlobalErrorHandler />
+          <SessionCookieSync />
           <AppStoreProvider>
-            <OfflineStatusBar />
-            <FirebaseErrorListener />
-            <DynamicBackground />
+            <AppStartupDecorations />
             <RootLayoutClient>
               {children}
             </RootLayoutClient>
-            <RoboticMascot />
-            <Toaster />
           </AppStoreProvider>
         </FirebaseClientProvider>
       </body>

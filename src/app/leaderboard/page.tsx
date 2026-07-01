@@ -3,12 +3,13 @@ import React from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Trophy, ChevronUp, ChevronDown, User, Zap, Loader2, Medal, Crown, Star } from 'lucide-react';
+import { Trophy, Loader2, Medal, Crown, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/premium/EmptyState';
 import { cn, getTier, getTierColor } from '@/lib/utils';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useUser } from '@/firebase/auth/use-user';
+import { useFirestore } from '@/firebase/provider';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const MEDAL_ICONS = [Crown, Medal, Star];
@@ -111,7 +112,7 @@ function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rat
             isFirst ? 'border-primary neon-glow' : 'border-secondary'
           )}>
             <Avatar className="w-full h-full rounded-full">
-              <AvatarImage src="" />
+              <AvatarImage />
               <AvatarFallback className="bg-muted text-2xl font-headline font-bold text-primary rounded-full">
                 {initials || '?'}
               </AvatarFallback>
@@ -161,7 +162,7 @@ function LeaderRow({ rank, name, rating, wins, games, isCurrentUser, isTop3 }: {
           'w-9 h-9 shrink-0',
           isCurrentUser && 'ring-2 ring-primary'
         )}>
-          <AvatarImage src="" />
+          <AvatarImage />
           <AvatarFallback className={cn(
             'text-xs font-headline font-bold',
             isCurrentUser ? 'bg-primary/20 text-primary' : 'bg-muted text-primary'

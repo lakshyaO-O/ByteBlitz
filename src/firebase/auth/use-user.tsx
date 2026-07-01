@@ -12,23 +12,34 @@ export function useUser() {
 
   useEffect(() => {
     if (!auth) {
+      setUser(null);
+      setError(null);
       setLoading(false);
       return;
     }
 
+    let active = true;
+    setLoading(true);
+    setError(null);
+
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
+        if (!active) return;
         setUser(firebaseUser);
         setLoading(false);
       },
       (err) => {
+        if (!active) return;
         setError(err.message || 'Authentication error');
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [auth]);
 
   return { user, loading, error };

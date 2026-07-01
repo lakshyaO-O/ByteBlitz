@@ -70,8 +70,7 @@ export default function AnalyticsPage() {
       setHeatmapData(heatmap);
       setStats(prev => ({ ...prev, weeklyCodingTime: Math.round(weeklyTime / 60), languageStats: langStats }));
 
-      if (heatmapData) {
-        const days = Object.keys(heatmap).length;
+      if (Object.keys(heatmap).length > 0) {
         setWeeklySummary({
           weekStart: weekAgo.toISOString(),
           totalCodingTime: weeklyTime,

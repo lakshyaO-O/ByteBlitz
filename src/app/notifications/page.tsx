@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bell, UserPlus, Swords, Trophy, Zap, Loader2, Clock, Star, TrendingUp, Calendar, Gift, Crown, Megaphone } from 'lucide-react';
+import { Bell, UserPlus, Swords, Trophy, Zap, Loader2, Clock, Star, TrendingUp, Calendar, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/firebase';
+import Link from 'next/link';
+import { useUser } from '@/firebase/auth/use-user';
 import { useNotifications } from '@/hooks/use-notifications';
 
 const NOTIFICATION_ICONS: Record<string, React.ReactNode> = {
@@ -28,7 +28,6 @@ export default function NotificationsPage() {
   const { notifications, loading, unreadCount, markAsRead } = useNotifications(user?.uid || null);
 
   return (
-    <Shell>
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-3xl">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
@@ -84,10 +83,14 @@ export default function NotificationsPage() {
             <Bell className="w-16 h-16 mx-auto mb-4 opacity-20" />
             <p className="font-bold uppercase tracking-widest text-lg">No notifications</p>
             <p className="text-sm mt-2">You&apos;ll see match invites, friend requests, and battle results here.</p>
+            <Link href="/arena">
+              <Button variant="outline" className="mt-4 gap-2">
+                <Swords className="w-4 h-4" /> Explore the Arena
+              </Button>
+            </Link>
           </div>
         )}
       </div>
-    </Shell>
   );
 }
 

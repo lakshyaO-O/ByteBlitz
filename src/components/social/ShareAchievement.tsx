@@ -17,7 +17,7 @@ export function ShareAchievement({ title, description, icon }: ShareAchievementP
   const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = `I unlocked "${title}" on CodezArena! ${description}\n\nJoin me at https://codezarena.app`;
+    const shareText = `I unlocked "${title}" on DevRann! ${description}\n\nJoin me at https://devrann.app`;
 
   const handleCopy = async () => {
     try {
@@ -30,7 +30,7 @@ export function ShareAchievement({ title, description, icon }: ShareAchievementP
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title, text: shareText, url: 'https://codezarena.app' });
+        await navigator.share({ title, text: shareText, url: 'https://devrann.app' });
       } catch (e) { console.warn('[Share] Failed to share:', e); }
     } else {
       setShowShare(!showShare);

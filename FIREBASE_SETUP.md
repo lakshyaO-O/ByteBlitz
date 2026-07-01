@@ -5,7 +5,7 @@ To use real multiplayer features, you need to set up Firebase:
 ## 1. Create Firebase Project
 - Go to https://console.firebase.google.com
 - Click "Create a project"
-- Name it "ByteBlitz"
+- Name it "DevRann"
 - Enable Google Analytics (optional)
 
 ## 2. Get Your Credentials

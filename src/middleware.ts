@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = new Set([
   '/manifest.webmanifest',
   '/icons',
   '/api/auth',
+  '/api/ai',
   '/sw.js',
   '/dashboard',
   '/arena',

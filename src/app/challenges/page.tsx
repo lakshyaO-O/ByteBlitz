@@ -5,9 +5,11 @@ import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, Flame, Timer, Trophy, ChevronRight, Lock, CheckCircle2, Loader2, Calendar } from 'lucide-react';
+import { Target, Flame, Timer, Trophy, ChevronRight, Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCollection, useFirestore, useUser } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useUser } from '@/firebase/auth/use-user';
+import { useFirestore } from '@/firebase/provider';
 import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { EmptyState } from '@/components/premium/EmptyState';
 

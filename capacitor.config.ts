@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.codezarena.app',
-  appName: 'CodezArena',
+  appId: 'com.devrann.app',
+  appName: 'DevRann',
   webDir: 'out',
   server: {
     androidScheme: 'https',
@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   android: {
     buildOptions: {
       keystorePath: 'release-keystore.jks',
-      keystoreAlias: 'codezarena',
+      keystoreAlias: 'devrann',
     },
   },
   plugins: {

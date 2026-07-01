@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Shell } from '@/components/layout/Shell';
 import { MatchReplay } from '@/components/replay/MatchReplay';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ export default function ReplayPage() {
   };
 
   return (
+    <Shell>
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Video className="w-6 h-6 text-primary" />
@@ -55,5 +57,6 @@ export default function ReplayPage() {
         />
       )}
     </div>
+    </Shell>
   );
 }

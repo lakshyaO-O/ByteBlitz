@@ -4,7 +4,7 @@ export type RoomStatus = 'waiting' | 'in-progress' | 'finished';
 export type MatchResult = 'WIN' | 'LOSS' | 'DRAW';
 export type OnlineStatus = 'online' | 'offline' | 'in-game';
 export type FriendStatus = 'none' | 'pending_sent' | 'pending_received' | 'friends';
-export type NotificationType = 'friend_request' | 'friend_online' | 'match_invitation' | 'match_started' | 'match_finished' | 'contest_reminder' | 'challenge_invitation' | 'achievement_unlock' | 'rank_change' | 'announcement';
+export type NotificationType = 'friend_request' | 'friend_online' | 'match_invitation' | 'match_started' | 'match_finished' | 'contest_reminder' | 'challenge_invitation' | 'achievement_unlock' | 'rank_change' | 'announcement' | 'room_invite' | 'xp_gained';
 export type LearningGoal = 'DSA' | 'Competitive Programming' | 'Interviews' | 'Web Development' | 'AI/ML';
 export type EditorTheme = 'vs-dark' | 'vs-light' | 'hc-black' | 'monokai' | 'dracula' | 'nord';
 export type CodingLanguage = 'javascript' | 'typescript' | 'python' | 'java' | 'cpp' | 'go' | 'rust';
@@ -15,6 +15,7 @@ export type Difficulty = 'Easy' | 'Medium' | 'Hard';
 export interface UserProfile {
   id: string;
   uid: string;
+  publicId: string;
   username: string;
   email: string;
   photoURL: string;
@@ -52,6 +53,7 @@ export interface UserProfile {
   totalCodingTime?: number;
   problemsSolved?: number;
   accuracy?: number;
+  activeRoomId?: string;
 }
 
 export interface GameRoom {
@@ -70,6 +72,8 @@ export interface GameRoom {
   updatedAt: string;
   startedAt?: string;
   finishedAt?: string;
+  inviteCode?: string;
+  blockedUserIds?: string[];
 }
 
 export interface MatchRecord {
@@ -111,6 +115,7 @@ export interface FriendDoc {
   tier: Tier;
   rating: number;
   onlineStatus: OnlineStatus;
+  publicId?: string;
   addedAt: string;
 }
 
@@ -121,6 +126,24 @@ export interface FriendRequest {
   fromPhotoURL: string;
   toUserId: string;
   status: 'pending' | 'accepted' | 'rejected';
+  createdAt: string;
+}
+
+export interface BlockDoc {
+  blockedUserId: string;
+  username: string;
+  photoURL?: string;
+  blockedAt: string;
+}
+
+export interface RoomInvite {
+  id: string;
+  roomId: string;
+  roomCode: string;
+  fromUserId: string;
+  fromUsername: string;
+  toUserId: string;
+  status: 'pending' | 'accepted' | 'declined';
   createdAt: string;
 }
 
@@ -148,6 +171,7 @@ export interface Problem {
   inputFormat?: string;
   outputFormat?: string;
   examples?: Array<{ input: string; output: string; explanation?: string }>;
+  testCases?: Array<{ input: string; expected: string }>;
   tags?: string[];
   starterCode?: Record<string, string>;
 }
@@ -299,6 +323,82 @@ export interface Announcement {
   expiresAt?: string;
 }
 
+export type Verdict = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Compilation Error' | 'Time Limit Exceeded' | 'Memory Limit Exceeded';
+
+export type SubmissionStatus = 'pending' | 'running' | 'completed' | 'error';
+
+export interface TestCaseResult {
+  passed: boolean;
+  input: string;
+  expectedOutput: string;
+  actualOutput: string;
+  executionTimeMs: number;
+  memoryUsedKb: number;
+  error?: string;
+}
+
+export interface SubmissionResult {
+  verdict: Verdict;
+  passedTestCases: number;
+  totalTestCases: number;
+  executionTimeMs: number;
+  memoryUsedKb: number;
+  testCaseResults: TestCaseResult[];
+  stdout?: string;
+  stderr?: string;
+}
+
+export interface PracticeProblemDocument {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: Difficulty;
+  category: string;
+  points: number;
+  starterCode: Record<CodingLanguage, string>;
+  examples: Array<{ input: string; output: string; explanation?: string }>;
+  testCases: Array<{ input: string; expected: string; isHidden?: boolean }>;
+  topics: string[];
+  hints: string[];
+  editorial: string;
+  solutionCode: Record<CodingLanguage, string>;
+  constraints: string[];
+  timeLimitMs: number;
+  memoryLimitKb: number;
+}
+
+export interface PracticeSubmission {
+  id: string;
+  userId: string;
+  problemId: string;
+  language: CodingLanguage;
+  code: string;
+  verdict: Verdict;
+  passedTestCases: number;
+  totalTestCases: number;
+  executionTimeMs: number;
+  memoryUsedKb: number;
+  submittedAt: string;
+}
+
+export interface UserPracticeProgress {
+  problemId: string;
+  solved: boolean;
+  bestSubmissionId?: string;
+  submissionsCount: number;
+  lastSubmittedAt?: string;
+  bookmarked: boolean;
+  notes?: string;
+  rating?: number;
+}
+
+export interface RecentlyViewedProblem {
+  problemId: string;
+  title: string;
+  difficulty: Difficulty;
+  viewedAt: string;
+}
+
 export interface FeatureFlags {
   id: string;
   [key: string]: boolean | string;
@@ -310,4 +410,91 @@ export interface ReferralReward {
   uses: number;
   xpReward: number;
   coinReward: number;
+}
+
+export type BattlePhase = 'countdown' | 'coding' | 'submitting' | 'scoring' | 'finished';
+
+export type MatchType = 'quick' | 'ranked' | 'private';
+
+export type TimeControlPreset = '1+0' | '2+1' | '3+0' | '5+0' | '10+0';
+
+export type Region = 'us-east' | 'us-west' | 'eu-west' | 'eu-central' | 'asia-south' | 'asia-east' | 'asia-southeast' | 'oceania' | 'auto';
+
+export interface ArenaSettings {
+  preferredLanguage: CodingLanguage;
+  rated: boolean;
+  difficulty: Difficulty;
+  category: string;
+  timeControl: TimeControlPreset;
+  region: Region;
+  eloRange: number;
+  editorTheme: EditorTheme;
+  editorFontSize: number;
+  editorMinimap: boolean;
+  editorWordWrap: boolean;
+  editorTabSize: number;
+  soundEnabled: boolean;
+  musicEnabled: boolean;
+  showOpponentProgress: boolean;
+  autoAcceptRematch: boolean;
+  confirmBeforeSubmit: boolean;
+  privacyShowActivity: boolean;
+  privacyShowRating: boolean;
+  privacyShowStats: boolean;
+  notificationsMatchFound: boolean;
+  notificationsBattleStart: boolean;
+  notificationsRoundEnd: boolean;
+  notificationsFriendInvite: boolean;
+}
+
+export interface MatchmakingEntry {
+  userId: string;
+  username: string;
+  rating: number;
+  tier: Tier;
+  preferredLanguage: CodingLanguage;
+  rated: boolean;
+  difficulty: Difficulty;
+  category: string;
+  timeControl: TimeControlPreset;
+  region: Region;
+  eloRange: number;
+  joinedAt: string;
+  status: 'searching' | 'matched';
+  matchedWith?: string;
+}
+
+export interface PlayerBattleProgress {
+  userId: string;
+  username: string;
+  rating: number;
+  tier: string;
+  code: string;
+  language: CodingLanguage;
+  passedTestCases: number;
+  totalTestCases: number;
+  submissionCount: number;
+  lastSubmittedAt?: string;
+  result: 'pending' | 'win' | 'loss' | 'draw';
+  eloChange: number;
+  finishedAt?: string;
+}
+
+export interface BattleDocument {
+  id: string;
+  roomId?: string;
+  players: PlayerBattleProgress[];
+  problemId: string;
+  problem: Problem;
+  phase: BattlePhase;
+  matchType: MatchType;
+  timeControl: TimeControlPreset;
+  totalTimeMs: number;
+  rated: boolean;
+  countdownStartedAt: string;
+  codingStartedAt: string;
+  winnerIds: string[];
+  status: 'pending' | 'active' | 'completed';
+  createdAt: string;
+  updatedAt: string;
 }

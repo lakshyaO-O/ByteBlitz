@@ -1,44 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search as SearchIcon, User, Code2, Loader2, X } from 'lucide-react';
+import { Search as SearchIcon, User, Code2, Loader2, X, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import { collection, query as firestoreQuery, orderBy, limit } from 'firebase/firestore';
+import { PRACTICE_PROBLEMS } from '@/data/practice-problems';
 
 export default function SearchPage() {
   const db = useFirestore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState<'all' | 'users' | 'problems'>('all');
 
-  const usersQuery = React.useMemo(() => {
+  const usersQuery = useMemo(() => {
     if (!db || !searchQuery) return null;
     return firestoreQuery(collection(db, 'users'), orderBy('rating', 'desc'), limit(20));
   }, [db, searchQuery]);
 
-  const problemsQuery = React.useMemo(() => {
-    if (!db || !searchQuery) return null;
-    return firestoreQuery(collection(db, 'problems'), orderBy('title', 'asc'), limit(20));
-  }, [db, searchQuery]);
-
   const { data: users, loading: usersLoading } = useCollection(usersQuery);
-  const { data: problems, loading: problemsLoading } = useCollection(problemsQuery);
 
   const filteredUsers = (users || []).filter((u: any) =>
     u.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const filteredProblems = (problems || []).filter((p: any) =>
-    p.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProblems = PRACTICE_PROBLEMS.filter((p) =>
+    p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const hasResults = filteredUsers.length > 0 || filteredProblems.length > 0;
-  const loading = usersLoading || problemsLoading;
 
   return (
     <Shell>
@@ -87,13 +83,13 @@ export default function SearchPage() {
           </CardContent>
         </Card>
 
-        {loading && (
+        {usersLoading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
         )}
 
-        {!loading && searchQuery.length > 0 && (
+        {!usersLoading && searchQuery.length > 0 && (
           <div className="space-y-6">
             {!hasResults && (
               <div className="text-center py-20 text-muted-foreground">
@@ -138,7 +134,7 @@ export default function SearchPage() {
                 </h2>
                 <div className="space-y-2">
                   {filteredProblems.map((problem: any) => (
-                    <Link key={problem.id} href={`/arena`}>
+                    <Link key={problem.id} href={`/practice`}>
                       <Card className="bg-card/50 border-border hover:border-primary/30 transition-all cursor-pointer">
                         <CardContent className="p-4 flex items-center gap-4">
                           <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
@@ -146,13 +142,21 @@ export default function SearchPage() {
                           </div>
                           <div className="flex-1">
                             <p className="font-bold">{problem.title}</p>
-                            <span className={cn(
-                              'text-[10px] font-bold uppercase tracking-widest',
-                              problem.difficulty === 'Easy' ? 'text-emerald-400' :
-                              problem.difficulty === 'Medium' ? 'text-yellow-400' : 'text-destructive'
-                            )}>
-                              {problem.difficulty}
-                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={cn(
+                                'text-[10px] font-bold uppercase tracking-widest',
+                                problem.difficulty === 'Easy' ? 'text-emerald-400' :
+                                problem.difficulty === 'Medium' ? 'text-yellow-400' : 'text-destructive'
+                              )}>
+                                {problem.difficulty}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">•</span>
+                              <span className="text-[10px] text-muted-foreground">{problem.category}</span>
+                              <span className="text-[10px] text-muted-foreground">•</span>
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Zap className="w-3 h-3" /> {problem.points} pts
+                              </span>
+                            </div>
                           </div>
                           <Button variant="ghost" size="sm">Solve</Button>
                         </CardContent>
@@ -165,7 +169,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {!loading && searchQuery.length === 0 && (
+        {!usersLoading && searchQuery.length === 0 && (
           <div className="text-center py-20 text-muted-foreground">
             <SearchIcon className="w-16 h-16 mx-auto mb-4 opacity-20" />
             <p className="text-sm font-bold uppercase tracking-widest">Start typing to search</p>

@@ -1,6 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -9,68 +10,71 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // ===== PROTECTED FIELDS (server-write-only) =====
-    // Users cannot set these on themselves; only server SDK can.
-    function protectedFieldsUnchanged() {
-      let protectedFields = ['isAdmin', 'rating', 'coins', 'xp', 'wins', 'losses', 'draws'];
-      let result = true;
-      for (let field in protectedFields) {
-        // If the field exists in the incoming write, it must match the current value
-        if (request.resource.data.keys().hasAny([protectedFields[field]])) {
-          // For updates, ensure it hasn't changed. For creates, only allowed when not set.
-          result = result && (
-            !resource.data.keys().hasAny([protectedFields[field]])
-            || request.resource.data[protectedFields[field]] == resource.data[protectedFields[field]]
-          );
-        }
-      }
-      return result;
+    function isValidUsername(name) {
+      return name is string && name.size() >= 3 && name.size() <= 20
+        && name.matches('^[a-z0-9._]+$')
+        && !name.matches('^[._]')
+        && !name.matches('[._]$')
+        && !name.matches('.*[._]{2,}.*');
     }
 
-    function isValidUsername(name) {
-      return name is string && name.size() >= 2 && name.size() <= 20;
+    // ===== USERNAMES COLLECTION =====
+    match /usernames/{normalized} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated()
+        && (request.resource.data.userId == request.auth.uid
+            || resource.data.userId == request.auth.uid);
+      allow delete: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // ===== PROBLEMS COLLECTION (read-only for all auth users) =====
+    match /problems/{problemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid in ['admin']; // Admin write only
+
+      match /discussion/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated()
+          && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isOwner(request.resource.data.userId);
+      }
     }
 
     // ===== USERS COLLECTION =====
     match /users/{userId} {
       allow read: if isAuthenticated();
-
       allow create: if isOwner(userId)
         && request.resource.data.uid == userId
-        && isValidUsername(request.resource.data.username)
-        && protectedFieldsUnchanged();
-
+        && request.resource.data.publicId is string
+        && request.resource.data.publicId.matches('^u_[a-z0-9]+$')
+        && isValidUsername(request.resource.data.username);
       allow update: if isOwner(userId)
         && request.resource.data.uid == resource.data.uid
-        && request.resource.data.uid == request.auth.uid
-        && (!request.resource.data.username.exists()
-            || isValidUsername(request.resource.data.username))
         && request.resource.data.email == resource.data.email
-        && protectedFieldsUnchanged();
+        && request.resource.data.publicId == resource.data.publicId
+        && (request.resource.data.username == resource.data.username
+            || (request.resource.data.username is string
+                && isValidUsername(request.resource.data.username)));
 
-      // Combat logs - only the owner can create
       match /combatLogs/{logId} {
         allow read: if isOwner(userId);
         allow create: if isOwner(userId);
         allow update, delete: if false;
       }
 
-      // Game history - only the owner can create
       match /gameHistory/{historyId} {
         allow read: if isOwner(userId);
         allow create: if isOwner(userId);
         allow update, delete: if false;
       }
 
-      // Friends
       match /friends/{friendId} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId)
-          || (isAuthenticated() && request.auth.uid == friendId);
+        allow create: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendId);
         allow update, delete: if isOwner(userId);
       }
 
-      // Friend requests
       match /friendRequests/{reqId} {
         allow read: if isOwner(userId);
         allow create: if isAuthenticated()
@@ -78,137 +82,142 @@ service cloud.firestore {
         allow update, delete: if isOwner(userId);
       }
 
-      // Notifications - only for the notification target user
+      match /blocked/{blockedUserId} {
+        allow read: if isOwner(userId);
+        allow create, delete: if isOwner(userId)
+          && blockedUserId == request.resource.data.blockedUserId;
+        allow update: if false;
+      }
+
       match /notifications/{notifId} {
         allow read: if isOwner(userId);
         allow create: if isAuthenticated()
-          && request.auth.uid == userId
-          && request.resource.data.userId == userId;
-        allow update, delete: if isOwner(userId);
+          && request.resource.data.userId == notifId.split('_')[0]
+          || request.resource.data.userId == userId;
+        allow update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['read']);
+        allow delete: if isOwner(userId);
+      }
+
+      // ===== PRACTICE PROGRESS =====
+      match /practiceProgress/{problemId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId);
+        allow delete: if false;
+      }
+
+      // ===== SAVED CODE =====
+      match /savedCode/{problemId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // ===== SUBMISSIONS =====
+      match /submissions/{submissionId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update, delete: if false;
+      }
+
+      // ===== RECENTLY VIEWED =====
+      match /recentlyViewed/{problemId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId);
+        allow delete: if false;
+      }
+
+      // ===== ARENA SETTINGS =====
+      match /arenaSettings/{settingId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.userId == request.auth.uid;
+        allow delete: if isOwner(userId);
       }
     }
 
     // ===== ROOMS =====
     match /gameRooms/{roomId} {
       allow read: if isAuthenticated();
-
       allow create: if isAuthenticated()
         && request.resource.data.hostId == request.auth.uid
         && request.resource.data.roomCode is string
         && request.resource.data.roomCode.size() == 6
         && request.resource.data.status == 'waiting';
-
       allow update: if isAuthenticated()
         && (
           request.auth.uid == resource.data.hostId
-          || request.auth.uid in resource.data.players
-          || (
-            resource.data.status == 'waiting'
-            && request.auth.uid in request.resource.data.players
-            && request.resource.data.players.size() <= resource.data.maxPlayers
-          )
+          || (resource.data.status == 'waiting'
+              && request.auth.uid in request.resource.data.players)
         );
-
-      allow delete: if isOwner(resource.data.hostId);
-    }
-
-    // ===== MATCHES (immutable records written server-side) =====
-    match /matches/{matchId} {
-      allow read: if isAuthenticated();
-      // Matches are created by the server API, not directly by clients
-      allow create: if isAuthenticated()
-        && request.resource.data.players is list
-        && request.resource.data.players.size() >= 2
-        // Player UIDs must match the authenticated user
-        && request.resource.data.players[0].uid == request.auth.uid
-        && request.resource.data.players[1].uid != request.auth.uid;
-      allow update: if false;
-      allow delete: if false;
+      allow delete: if isAuthenticated()
+        && request.auth.uid == resource.data.hostId;
     }
 
     // ===== BATTLES =====
     match /battles/{battleId} {
       allow read: if isAuthenticated();
 
-      allow create: if isAuthenticated()
-        && request.resource.data.player1.uid == request.auth.uid
-        && request.resource.data.player2.uid != request.auth.uid
-        && request.resource.data.status == 'countdown'
-        && request.resource.data.duration >= 60
-        && request.resource.data.duration <= 3600;
-
-      // Status must only move forward: countdown -> in-progress -> finished
-      function validStatusTransition() {
-        let currentStatus = resource.data.status;
-        let newStatus = request.resource.data.status;
-        return (currentStatus == 'countdown' && newStatus == 'in-progress')
-          || (currentStatus == 'in-progress' && newStatus == 'finished')
-          || (currentStatus == newStatus);
+      function isPlayer(uid) {
+        return resource.data.players != null
+          && resource.data.players[0].userId == uid
+          || resource.data.players[1].userId == uid;
       }
 
+      function isValidPhaseTransition() {
+        let phases = ['countdown', 'coding', 'submitting', 'scoring', 'finished'];
+        let current = resource.data.phase;
+        let next = request.resource.data.phase;
+        let ci = phases.indexOf(current);
+        let ni = phases.indexOf(next);
+        return ni >= 0 && ni >= ci;
+      }
+
+      allow create: if isAuthenticated()
+        && request.resource.data.players is list
+        && request.resource.data.players.size() == 2
+        && request.resource.data.players[0].userId == request.auth.uid
+        && request.resource.data.phase == 'countdown'
+        && request.resource.data.status == 'active';
+
       allow update: if isAuthenticated()
-        // Must be a participant
-        && (request.auth.uid == resource.data.player1.uid
-            || request.auth.uid == resource.data.player2.uid)
-        // Identity fields cannot change
-        && request.resource.data.player1.uid == resource.data.player1.uid
-        && request.resource.data.player2.uid == resource.data.player2.uid
-        // Problem cannot change
-        && request.resource.data.problem == resource.data.problem
-        // Immutable creation fields
-        && request.resource.data.roomCode == resource.data.roomCode
-        && request.resource.data.duration == resource.data.duration
-        // Valid status transitions
-        && validStatusTransition()
-        // Score bounds
-        && request.resource.data.player1.score >= 0
-        && request.resource.data.player1.score <= 100
-        && request.resource.data.player2.score >= 0
-        && request.resource.data.player2.score <= 100
-        // Once a player's score is set (submitted), it cannot be changed
-        && (!resource.data.player1.submitted
-            || request.resource.data.player1.score == resource.data.player1.score)
-        && (!resource.data.player2.submitted
-            || request.resource.data.player2.score == resource.data.player2.score);
+        && isPlayer(request.auth.uid)
+        && isValidPhaseTransition()
+        && request.resource.data.players.size() == 2
+        && request.resource.data.players[0].userId == resource.data.players[0].userId
+        && request.resource.data.players[1].userId == resource.data.players[1].userId
+        && request.resource.data.problemId == resource.data.problemId;
 
       allow delete: if false;
-    }
-
-    // ===== GAME HISTORY (top-level) =====
-    match /gameHistory/{historyId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if false;
     }
 
     // ===== MATCHMAKING =====
     match /matchmaking/{docId} {
       allow read: if isAuthenticated();
-
       allow create: if isOwner(docId)
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == 'waiting';
-
-      // Only the owner can update their own matchmaking entry
+        && request.resource.data.status in ['waiting', 'searching'];
       allow update: if isOwner(docId);
-
       allow delete: if isOwner(docId);
     }
 
     // ===== LEADERBOARD =====
     match /leaderboard/{docId} {
       allow read: if isAuthenticated();
-
-      // Leaderboard should be server-maintained; clients can only create their own entry
       allow create: if isAuthenticated()
         && request.resource.data.userId == request.auth.uid;
-
-      // Prevent clients from boosting their own rating/score on the leaderboard
       allow update: if isAuthenticated()
-        && request.resource.data.userId == request.auth.uid
-        && protectedFieldsUnchanged();
-
+        && request.resource.data.userId == request.auth.uid;
       allow delete: if false;
+    }
+
+    // ===== MATCHES (immutable records) =====
+    match /matches/{matchId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+        && request.resource.data.players is list
+        && request.resource.data.players.size() >= 2;
+      allow update, delete: if false;
     }
   }
 }

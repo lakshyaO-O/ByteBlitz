@@ -16,18 +16,33 @@ const nullServices: FirebaseServices = { app: null, firestore: null, auth: null 
 let appInstance: FirebaseApp | null = null;
 let firestoreInstance: Firestore | null = null;
 let authInstance: Auth | null = null;
+let hasAttemptedInitialization = false;
 
 export function initializeFirebase(): FirebaseServices {
+  if (typeof window === 'undefined') {
+    return nullServices;
+  }
+
+  if (appInstance && firestoreInstance && authInstance) {
+    return { app: appInstance, firestore: firestoreInstance, auth: authInstance };
+  }
+
   if (!isFirebaseConfigured()) {
+    hasAttemptedInitialization = true;
     if (typeof window !== 'undefined') {
       console.warn('[Firebase] Not configured — set NEXT_PUBLIC_FIREBASE_* env vars.');
     }
     return nullServices;
   }
 
+  if (hasAttemptedInitialization && !appInstance) {
+    return nullServices;
+  }
+
   try {
-    appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig as any);
+    appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig as Record<string, string>);
   } catch (err) {
+    hasAttemptedInitialization = true;
     console.error('[Firebase] App initialization failed:', err);
     return nullServices;
   }
@@ -47,6 +62,7 @@ export function initializeFirebase(): FirebaseServices {
     console.error('[Firebase] Auth initialization failed:', err);
   }
 
+  hasAttemptedInitialization = true;
   return { app: appInstance, firestore: firestoreInstance, auth: authInstance };
 }
 
@@ -55,10 +71,5 @@ export function getFirebaseServices(): FirebaseServices {
   return { app: appInstance, firestore: firestoreInstance, auth: authInstance };
 }
 
-export * from './provider';
-export * from './client-provider';
-export * from './auth/use-user';
-export * from './firestore/use-collection';
-export * from './firestore/use-doc';
 export { errorEmitter } from './error-emitter';
 export { FirestorePermissionError } from './errors';
