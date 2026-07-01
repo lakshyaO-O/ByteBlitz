@@ -27,10 +27,14 @@ export interface BeginnerState {
   xp: number;
   coins: number;
   streak: number;
+  lastStreakDate: string;
   dailyGoal: string;
   dailyXpGoal: number;
   dailyXpEarned: number;
   isBeginnerMode: boolean;
+  correctSubmissions: number;
+  totalSubmissions: number;
+  problemsSolved: number;
 }
 
 interface AppState {
@@ -56,6 +60,8 @@ interface AppStoreContextType {
   markChallengePassed: (lessonId: number) => void;
   completeLessonFull: (lessonId: number, xp: number, coins: number) => void;
   incrementStreak: () => void;
+  recordSubmission: (correct: boolean) => void;
+  recordPracticeSolved: () => void;
   syncBeginnerToFirebase: () => Promise<void>;
   loadBeginnerFromFirebase: (userId?: string) => Promise<void>;
 }
@@ -74,10 +80,14 @@ const defaultBeginnerState: BeginnerState = {
   xp: 0,
   coins: 0,
   streak: 0,
+  lastStreakDate: '',
   dailyGoal: 'Complete your first lesson',
   dailyXpGoal: 50,
   dailyXpEarned: 0,
   isBeginnerMode: true,
+  correctSubmissions: 0,
+  totalSubmissions: 0,
+  problemsSolved: 0,
 };
 
 const defaultState: AppState = {
@@ -103,6 +113,8 @@ const AppStoreContext = createContext<AppStoreContextType>({
   markChallengePassed: () => {},
   completeLessonFull: () => {},
   incrementStreak: () => {},
+  recordSubmission: () => {},
+  recordPracticeSolved: () => {},
   syncBeginnerToFirebase: async () => {},
   loadBeginnerFromFirebase: async (_userId?: string) => {},
 });
@@ -146,7 +158,11 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
               xp: data.xp ?? prev.beginner.xp,
               coins: data.coins ?? prev.beginner.coins,
               currentLesson: data.currentLesson || prev.beginner.currentLesson,
-              streak: data.streak ?? prev.beginner.streak,
+          streak: data.streak ?? prev.beginner.streak,
+          lastStreakDate: data.lastStreakDate ?? prev.beginner.lastStreakDate,
+          correctSubmissions: data.correctSubmissions ?? prev.beginner.correctSubmissions,
+          totalSubmissions: data.totalSubmissions ?? prev.beginner.totalSubmissions,
+          problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
             };
             persistBeginner(newBeginner);
             return { ...prev, beginner: newBeginner, firebaseProgressLoaded: true };
@@ -165,7 +181,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     const { firestore: db } = initializeFirebase();
     if (!db) return;
     const beginner = state.beginner;
-    const { hasCompletedOnboarding, lessonsCompleted, lessonProgress, xp, coins, currentLesson, streak } = beginner;
+    const { hasCompletedOnboarding, lessonsCompleted, lessonProgress, xp, coins, currentLesson, streak, lastStreakDate, correctSubmissions, totalSubmissions, problemsSolved } = beginner;
     await setDoc(doc(db, 'learning', 'progress'), {
       hasCompletedOnboarding,
       lessonsCompleted,
@@ -174,6 +190,10 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       coins,
       currentLesson,
       streak,
+      lastStreakDate,
+      correctSubmissions,
+      totalSubmissions,
+      problemsSolved,
       lastSynced: serverTimestamp(),
     }, { merge: true });
   }, [state.beginner]);
@@ -194,6 +214,10 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
           coins: data.coins ?? prev.beginner.coins,
           currentLesson: data.currentLesson || prev.beginner.currentLesson,
           streak: data.streak ?? prev.beginner.streak,
+          lastStreakDate: data.lastStreakDate ?? prev.beginner.lastStreakDate,
+          correctSubmissions: data.correctSubmissions ?? prev.beginner.correctSubmissions,
+          totalSubmissions: data.totalSubmissions ?? prev.beginner.totalSubmissions,
+          problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
         };
         persistBeginner(newBeginner);
         return { ...prev, beginner: newBeginner };
@@ -318,7 +342,32 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   const incrementStreak = useCallback(() => {
     setState(prev => {
-      const newBeginner = { ...prev.beginner, streak: prev.beginner.streak + 1 };
+      const today = new Date().toISOString().slice(0, 10);
+      const lastDate = prev.beginner.lastStreakDate;
+      if (lastDate === today && prev.beginner.streak > 0) return prev;
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const newStreak = lastDate === yesterday ? prev.beginner.streak + 1 : 1;
+      const newBeginner = { ...prev.beginner, streak: newStreak, lastStreakDate: today };
+      persistBeginner(newBeginner);
+      return { ...prev, beginner: newBeginner };
+    });
+  }, []);
+
+  const recordSubmission = useCallback((correct: boolean) => {
+    setState(prev => {
+      const newBeginner = {
+        ...prev.beginner,
+        totalSubmissions: prev.beginner.totalSubmissions + 1,
+        correctSubmissions: prev.beginner.correctSubmissions + (correct ? 1 : 0),
+      };
+      persistBeginner(newBeginner);
+      return { ...prev, beginner: newBeginner };
+    });
+  }, []);
+
+  const recordPracticeSolved = useCallback(() => {
+    setState(prev => {
+      const newBeginner = { ...prev.beginner, problemsSolved: prev.beginner.problemsSolved + 1 };
       persistBeginner(newBeginner);
       return { ...prev, beginner: newBeginner };
     });
@@ -339,6 +388,8 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     markChallengePassed,
     completeLessonFull,
     incrementStreak,
+    recordSubmission,
+    recordPracticeSolved,
     syncBeginnerToFirebase,
     loadBeginnerFromFirebase,
   }), [
@@ -356,6 +407,8 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     markChallengePassed,
     completeLessonFull,
     incrementStreak,
+    recordSubmission,
+    recordPracticeSolved,
     syncBeginnerToFirebase,
     loadBeginnerFromFirebase,
   ]);

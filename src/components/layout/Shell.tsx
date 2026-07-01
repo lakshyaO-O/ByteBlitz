@@ -6,8 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Swords, Trophy, BookOpen, Settings, Zap, Menu, LogOut,
   Users, Target, Calendar, BarChart3, UserCircle, Bell, Search, Gamepad2,
-  Medal, ChevronLeft, Code2, LogIn, UserPlus, Eye, Shield, GraduationCap,
-  Crown, Video,
+  Medal, ChevronLeft, Code2, LogIn, UserPlus, Eye, GraduationCap,
+  Crown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -37,8 +37,6 @@ const NAV_ITEMS = [
   { href: '/achievements', label: 'Achievements', icon: Medal },
   { href: '/profile', label: 'Profile', icon: UserCircle },
   { href: '/search', label: 'Search', icon: Search },
-  { href: '/replay', label: 'Replays', icon: Video },
-  { href: '/admin', label: 'Admin', icon: Shield },
   { href: '/monetization', label: 'Premium', icon: Crown },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -101,11 +99,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border shrink-0">
-        <Link href="/" className="flex items-center gap-2">
-          <Zap className="w-6 h-6 text-primary fill-primary" />
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <img src="/icons/icon.svg" alt="DevRann logo" className="h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
           {!sidebarCollapsed && (
             <span className="text-lg font-headline font-bold tracking-tight">
-              CODEZ<span className="text-primary">ARENA</span>
+              Dev<span className="text-primary">Rann</span>
             </span>
           )}
         </Link>

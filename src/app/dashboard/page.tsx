@@ -44,7 +44,7 @@ const dailyChallenges = [
 export default function BeginnerDashboard() {
   const { user, loading: authLoading } = useUser();
   const db = useFirestore();
-  const { state } = useAppStore();
+  const { state, incrementStreak } = useAppStore();
   const { beginner, firebaseProgressLoaded } = state;
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -56,6 +56,12 @@ export default function BeginnerDashboard() {
       setShowOnboarding(!beginner.hasCompletedOnboarding);
     }
   }, [firebaseProgressLoaded, beginner.hasCompletedOnboarding]);
+
+  useEffect(() => {
+    if (firebaseProgressLoaded && user) {
+      incrementStreak();
+    }
+  }, [firebaseProgressLoaded, user]);
 
   const userProfileQuery = user && db ? `users/${user.uid}` : null;
   const { data: profile } = useDoc(userProfileQuery);

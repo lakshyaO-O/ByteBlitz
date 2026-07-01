@@ -18,6 +18,7 @@ import { usePracticeSession } from '@/hooks/use-practice-session';
 import { useUserProgress } from '@/hooks/use-practice-problems';
 import { useRecentlyViewed } from '@/hooks/use-practice-problems';
 import { toggleBookmark } from '@/services/practice.service';
+import { useAppStore } from '@/store/app-store';
 import type { PracticeProblemDocument, CodingLanguage } from '@/types';
 
 interface PracticeWorkbenchProps {
@@ -48,6 +49,17 @@ export function PracticeWorkbench({ problem, onBack, userId, username }: Practic
   useEffect(() => {
     if (session.verdict) setActiveTab('submission');
   }, [session.verdict]);
+
+  const { recordSubmission, recordPracticeSolved } = useAppStore();
+
+  useEffect(() => {
+    if (session.verdict) {
+      recordSubmission(session.verdict === 'Accepted');
+      if (session.verdict === 'Accepted' && session.passedTestCases === session.totalTestCases) {
+        recordPracticeSolved();
+      }
+    }
+  }, [session.verdict, session.passedTestCases, session.totalTestCases]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {

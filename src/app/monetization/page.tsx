@@ -1,32 +1,22 @@
 'use client';
 
 import React from 'react';
-import { MonetizationSection } from '@/components/premium/MonetizationSection';
-import { useUser } from '@/firebase/auth/use-user';
-import { Crown } from 'lucide-react';
-import { EmptyState } from '@/components/premium/EmptyState';
-import { User } from 'lucide-react';
+import { Crown, Construction } from 'lucide-react';
 
 export default function MonetizationPage() {
-  const { user } = useUser();
-
-  if (!user) {
-    return (
-      <EmptyState
-        icon={User}
-        title="Sign in required"
-        description="Sign in to view subscription plans and manage your account."
-      />
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Crown className="w-6 h-6 text-yellow-400" />
-        <h1 className="text-2xl font-headline font-bold">Premium</h1>
+    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-4">
+      <div className="relative">
+        <Crown className="w-16 h-16 text-yellow-400/40" />
+        <Construction className="w-8 h-8 text-yellow-400 absolute -top-1 -right-1" />
       </div>
-      <MonetizationSection userId={user.uid} />
+      <h1 className="text-3xl font-headline font-bold">Premium</h1>
+      <p className="text-muted-foreground max-w-md">
+        Membership plans are coming soon. Stay tuned for exclusive features, AI credits, and more!
+      </p>
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 text-sm font-medium">
+        <Construction className="w-4 h-4" /> Coming Soon
+      </div>
     </div>
   );
 }
