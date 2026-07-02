@@ -17,7 +17,7 @@ import { ShortcutHint } from './ShortcutHint';
 import { usePracticeSession } from '@/hooks/use-practice-session';
 import { useUserProgress } from '@/hooks/use-practice-problems';
 import { useRecentlyViewed } from '@/hooks/use-practice-problems';
-import { toggleBookmark } from '@/services/practice.service';
+import { toggleBookmark } from '@/services/practice';
 import { useAppStore } from '@/store/app-store';
 import type { PracticeProblemDocument, CodingLanguage } from '@/types';
 

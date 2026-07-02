@@ -7,7 +7,7 @@ import { ArenaHeader } from '@/components/arena/ArenaHeader';
 import { PlayerStatsCard } from '@/components/arena/PlayerStatsCard';
 import { PrivateRoomPanel } from '@/components/arena/PrivateRoomPanel';
 import { useUser } from '@/firebase/auth/use-user';
-import { fetchMatchHistory, fetchActiveBattleCount, fetchOnlinePlayerCount } from '@/services/arena.service';
+import { fetchMatchHistory, fetchActiveBattleCount, fetchOnlinePlayerCount } from '@/services/arena';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

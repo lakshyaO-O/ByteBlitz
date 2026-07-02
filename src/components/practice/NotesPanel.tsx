@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, FileText } from 'lucide-react';
-import { saveNotes } from '@/services/practice.service';
+import { saveNotes } from '@/services/practice';
 
 interface NotesPanelProps {
   userId: string | null;

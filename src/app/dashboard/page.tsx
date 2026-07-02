@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -10,6 +11,8 @@ import {
   Zap, Target, Flame, Trophy, BookOpen, Code2, Sparkles, GraduationCap,
   ArrowRight, CheckCircle2, Star, Gift, Clock, TrendingUp, Medal, Swords,
   Lightbulb, PartyPopper, Coins, Rocket, Brain, Heart, Quote, ChevronRight,
+  Briefcase, MessageCircle, Bug, Map, FileText, Globe, Users2,
+  Share2, Store, FolderGit2, Newspaper, CalendarDays, Sparkles as SparklesIcon,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -397,6 +400,24 @@ export default function BeginnerDashboard() {
                 </CardContent>
               </Card>
 
+              {/* Ecosystem Quick Links */}
+              <Card className="bg-card/50 border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-headline font-bold flex items-center gap-2">
+                    <Rocket className="w-3.5 h-3.5 text-primary" /> Ecosystem
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0 space-y-1">
+                  <EcoLink href="/ai-mentor" icon={SparklesIcon} label="AI Mentor" />
+                  <EcoLink href="/community" icon={MessageCircle} label="Community" />
+                  <EcoLink href="/career-hub" icon={Briefcase} label="Career Hub" />
+                  <EcoLink href="/hackathons" icon={Rocket} label="Hackathons" />
+                  <EcoLink href="/missions" icon={Lightbulb} label="Daily Missions" />
+                  <EcoLink href="/shop" icon={Store} label="Rewards Shop" />
+                  <EcoLink href="/projects" icon={FolderGit2} label="Project Showcase" />
+                </CardContent>
+              </Card>
+
               {/* Recommended Next */}
               <Button
                 variant="outline"
@@ -447,6 +468,19 @@ function AchievementBadgeSmall({ achieved, label, icon: Icon }: { achieved: bool
       </div>
       <span className="text-[8px] font-bold uppercase tracking-widest">{label}</span>
     </div>
+  );
+}
+
+function EcoLink({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all group"
+    >
+      <Icon className="w-3.5 h-3.5 shrink-0 text-primary/70 group-hover:text-primary" />
+      <span>{label}</span>
+      <ChevronRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+    </Link>
   );
 }
 

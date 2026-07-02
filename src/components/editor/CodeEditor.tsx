@@ -10,7 +10,7 @@ import { useOnlineStatus } from '@/hooks/use-online-status';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { saveCode as saveToFirebase } from '@/services/practice.service';
+import { saveCode as saveToFirebase } from '@/services/practice';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false, loading: () => (
   <div className="flex items-center justify-center h-full bg-[#011627]">

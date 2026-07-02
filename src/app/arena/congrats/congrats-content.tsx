@@ -9,7 +9,7 @@ import { Shell } from '@/components/layout/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { fetchBattle } from '@/services/arena.service';
+import { fetchBattle } from '@/services/arena';
 import type { BattleDocument } from '@/types';
 
 function CongratsContent() {

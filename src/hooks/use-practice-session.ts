@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { CodingLanguage, PracticeProblemDocument, TestCaseResult, Verdict, SubmissionStatus } from '@/types';
-import { saveCode, loadSavedCode, submitSolution } from '@/services/practice.service';
+import { saveCode, loadSavedCode, submitSolution } from '@/services/practice';
 
 interface SessionState {
   code: string;

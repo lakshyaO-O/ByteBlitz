@@ -146,7 +146,8 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     const auth = getAuth(firebaseApp);
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const snap = await getDoc(doc(db, 'learning', 'progress'));
+        const progressRef = doc(db, 'learning', user.uid);
+        const snap = await getDoc(progressRef);
         if (snap.exists()) {
           const data = snap.data();
           setState(prev => {
@@ -177,12 +178,14 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     return () => unsub();
   }, []);
 
-  const syncBeginnerToFirebase = useCallback(async () => {
-    const { firestore: db } = initializeFirebase();
+  const syncBeginnerToFirebase = useCallback(async (userId?: string) => {
+    const { firestore: db, auth } = initializeFirebase();
     if (!db) return;
+    const uid = userId || auth?.currentUser?.uid;
+    if (!uid) return;
     const beginner = state.beginner;
     const { hasCompletedOnboarding, lessonsCompleted, lessonProgress, xp, coins, currentLesson, streak, lastStreakDate, correctSubmissions, totalSubmissions, problemsSolved } = beginner;
-    await setDoc(doc(db, 'learning', 'progress'), {
+    await setDoc(doc(db, 'learning', uid), {
       hasCompletedOnboarding,
       lessonsCompleted,
       lessonProgress,
@@ -199,9 +202,12 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   }, [state.beginner]);
 
   const loadBeginnerFromFirebase = useCallback(async (userId?: string) => {
-    const { firestore: db } = initializeFirebase();
+    const { firestore: db, auth } = initializeFirebase();
     if (!db) return;
-    const snap = await getDoc(doc(db, 'learning', 'progress'));
+    const uid = userId || auth?.currentUser?.uid;
+    if (!uid) return;
+    const progressRef = doc(db, 'learning', uid);
+    const snap = await getDoc(progressRef);
     if (snap.exists()) {
       const data = snap.data();
       setState(prev => {

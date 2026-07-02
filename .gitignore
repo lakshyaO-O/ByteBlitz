@@ -40,11 +40,16 @@ yarn-error.log*
 next-env.d.ts
 
 .genkit/*
-.env*
+
+# local env files (contain secrets)
+.env
+.env.local
 
 # firebase
 firebase-debug.log
 firestore-debug.log
 
-.vercel
-.env*
+.env.production
+.env.vercel
+dev-server.log
+public1/

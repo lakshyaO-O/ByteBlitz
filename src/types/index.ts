@@ -4,7 +4,6 @@ export type RoomStatus = 'waiting' | 'in-progress' | 'finished';
 export type MatchResult = 'WIN' | 'LOSS' | 'DRAW';
 export type OnlineStatus = 'online' | 'offline' | 'in-game';
 export type FriendStatus = 'none' | 'pending_sent' | 'pending_received' | 'friends';
-export type NotificationType = 'friend_request' | 'friend_online' | 'match_invitation' | 'match_started' | 'match_finished' | 'contest_reminder' | 'challenge_invitation' | 'achievement_unlock' | 'rank_change' | 'announcement' | 'room_invite' | 'xp_gained';
 export type LearningGoal = 'DSA' | 'Competitive Programming' | 'Interviews' | 'Web Development' | 'AI/ML';
 export type EditorTheme = 'vs-dark' | 'vs-light' | 'hc-black' | 'monokai' | 'dracula' | 'nord';
 export type CodingLanguage = 'javascript' | 'typescript' | 'python' | 'java' | 'cpp' | 'go' | 'rust';
@@ -419,6 +418,404 @@ export type MatchType = 'quick' | 'ranked' | 'private';
 export type TimeControlPreset = '1+0' | '2+1' | '3+0' | '5+0' | '10+0';
 
 export type Region = 'us-east' | 'us-west' | 'eu-west' | 'eu-central' | 'asia-south' | 'asia-east' | 'asia-southeast' | 'oceania' | 'auto';
+
+// ===== NEW ECOSYSTEM TYPES =====
+
+export type PostType = 'code_share' | 'project_showcase' | 'discussion' | 'achievement' | 'question' | 'tip' | 'mentorship';
+export type ReactionType = 'like' | 'love' | 'fire' | 'clap' | 'rocket';
+
+export interface CommunityPost {
+  id: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  type: PostType;
+  title: string;
+  content: string;
+  code?: string;
+  codeLanguage?: CodingLanguage;
+  tags: string[];
+  likes: number;
+  comments: number;
+  likedBy?: string[];
+  userReaction?: ReactionType;
+  createdAt: string;
+  updatedAt: string;
+  isPinned?: boolean;
+  isEdited?: boolean;
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  content: string;
+  likes: number;
+  createdAt: string;
+  parentId?: string;
+  isEdited?: boolean;
+}
+
+export interface StudyGroup {
+  id: string;
+  name: string;
+  description: string;
+  topic: string;
+  coverImage?: string;
+  createdBy: string;
+  adminIds: string[];
+  memberIds: string[];
+  memberCount: number;
+  maxMembers: number;
+  isPublic: boolean;
+  joinCode?: string;
+  tags: string[];
+  schedule: string;
+  resources: Array<{ title: string; url: string }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudyGroupMessage {
+  id: string;
+  groupId: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  content: string;
+  code?: string;
+  codeLanguage?: CodingLanguage;
+  createdAt: string;
+}
+
+export interface MentorProfile {
+  id: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  title: string;
+  bio: string;
+  expertise: string[];
+  rating: number;
+  reviewCount: number;
+  hourlyRate: number;
+  available: boolean;
+  availability: Array<{ day: string; slots: string[] }>;
+  languages: CodingLanguage[];
+  menteeCount: number;
+  totalSessions: number;
+  createdAt: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
+}
+
+export interface MentorReview {
+  id: string;
+  mentorId: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+}
+
+export interface CodeShare {
+  id: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  title: string;
+  description: string;
+  code: string;
+  language: CodingLanguage;
+  tags: string[];
+  likes: number;
+  forks: number;
+  views: number;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  forkedFrom?: string;
+}
+
+export interface Hackathon {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  bannerUrl?: string;
+  startDate: string;
+  endDate: string;
+  registrationDeadline: string;
+  organizer: string;
+  organizerLogo?: string;
+  prizePool: string;
+  prizes: Array<{ rank: string; reward: string }>;
+  sponsors: Array<{ name: string; logo?: string }>;
+  rules: string[];
+  judgingCriteria: string[];
+  categories: string[];
+  maxTeamSize: number;
+  minTeamSize: number;
+  participants: number;
+  status: 'upcoming' | 'active' | 'completed';
+  difficulty: Difficulty;
+  tags: string[];
+  createdAt: string;
+}
+
+export interface HackathonTeam {
+  id: string;
+  hackathonId: string;
+  name: string;
+  leaderId: string;
+  members: Array<{ userId: string; username: string; photoURL: string }>;
+  projectName?: string;
+  projectDescription?: string;
+  projectUrl?: string;
+  createdAt: string;
+}
+
+export interface CareerListing {
+  id: string;
+  title: string;
+  company: string;
+  companyLogo?: string;
+  location: string;
+  type: 'full-time' | 'part-time' | 'internship' | 'contract' | 'remote';
+  category: 'internship' | 'job' | 'freelance';
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  skills: string[];
+  salaryRange?: string;
+  experienceLevel: 'entry' | 'mid' | 'senior' | 'lead';
+  applyUrl: string;
+  postedAt: string;
+  expiresAt?: string;
+  featured: boolean;
+  createdAt: string;
+}
+
+export interface CompanyPrep {
+  id: string;
+  company: string;
+  companyLogo?: string;
+  description: string;
+  difficulty: Difficulty;
+  process: string[];
+  topics: string[];
+  averageRating: number;
+  totalReviews: number;
+  problems: Array<{ id: string; title: string; difficulty: Difficulty }>;
+  tips: string[];
+  salaryRange?: string;
+  interviewQuestions: Array<{ question: string; category: string }>;
+  createdAt: string;
+}
+
+export interface DailyMission {
+  id: string;
+  title: string;
+  description: string;
+  type: 'practice' | 'arena' | 'learning' | 'social' | 'streak' | 'challenge';
+  requirement: number;
+  progress: number;
+  xpReward: number;
+  coinReward: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  expiresAt: string;
+  completed: boolean;
+  claimed: boolean;
+}
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  type: 'theme' | 'badge' | 'title' | 'avatar' | 'boost' | 'cosmetic';
+  price: number;
+  currency: 'coins' | 'xp' | 'gems';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  imageUrl?: string;
+  color?: string;
+  effect?: string;
+  available: boolean;
+  limited?: boolean;
+  expiresAt?: string;
+}
+
+export interface UserInventory {
+  userId: string;
+  items: string[];
+  equipped: Record<string, string>;
+}
+
+export interface ProjectShowcase {
+  id: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  screenshots: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  featured: boolean;
+  likes: number;
+  views: number;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GitHubIntegration {
+  connected: boolean;
+  githubUsername?: string;
+  accessToken?: string;
+  repos: Array<{
+    name: string;
+    description: string;
+    url: string;
+    language: string;
+    stars: number;
+    forks: number;
+    updatedAt: string;
+  }>;
+  lastSynced: string;
+}
+
+export interface AIUsage {
+  mentor: { daily: number; total: number; lastUsed: string };
+  codeReview: { daily: number; total: number; lastUsed: string };
+  debugger: { daily: number; total: number; lastUsed: string };
+  interviewer: { daily: number; total: number; lastUsed: string };
+  roadmap: { daily: number; total: number; lastUsed: string };
+  resumeReview: { daily: number; total: number; lastUsed: string };
+}
+
+export interface DailyFeed {
+  entries: Array<{
+    id: string;
+    type: 'news' | 'coding_tip' | 'community_post' | 'challenge' | 'achievement' | 'contest';
+    title: string;
+    description: string;
+    url?: string;
+    source?: string;
+    imageUrl?: string;
+    createdAt: string;
+  }>;
+}
+
+export interface ContestCalendarEntry {
+  id: string;
+  title: string;
+  platform: 'codeforces' | 'codechef' | 'leetcode' | 'atcoder' | 'hackerrank' | 'other';
+  url: string;
+  startDate: string;
+  endDate: string;
+  duration: string;
+  type: 'contest' | 'hackathon' | 'meetup';
+  registrationUrl?: string;
+  description?: string;
+}
+
+export interface DiscussionForum {
+  id: string;
+  title: string;
+  content: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  category: string;
+  tags: string[];
+  views: number;
+  replies: number;
+  lastActivity: string;
+  isPinned: boolean;
+  isSolved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumReply {
+  id: string;
+  threadId: string;
+  userId: string;
+  username: string;
+  photoURL: string;
+  content: string;
+  code?: string;
+  codeLanguage?: CodingLanguage;
+  isSolution: boolean;
+  likes: number;
+  createdAt: string;
+  updatedAt: string;
+  parentId?: string;
+}
+
+export interface PublicProfile {
+  userId: string;
+  username: string;
+  photoURL: string;
+  bio: string;
+  title: string;
+  badges: string[];
+  rating: number;
+  tier: Tier;
+  level: number;
+  xp: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  streak: number;
+  memberSince: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  websiteUrl?: string;
+  skills: string[];
+  projects: ProjectShowcase[];
+  achievements: string[];
+  learningGoals: LearningGoal[];
+  preferredLanguage: CodingLanguage;
+  isMentor: boolean;
+  socialLinks: Array<{ platform: string; url: string }>;
+}
+
+export interface LearningStreakReward {
+  day: number;
+  xp: number;
+  coins: number;
+  reward: string;
+  claimed: boolean;
+}
+
+export const AI_DAILY_LIMITS: Record<string, { free: number; pro: number; elite: number }> = {
+  mentor: { free: 5, pro: 20, elite: 50 },
+  codeReview: { free: 3, pro: 15, elite: 40 },
+  debugger: { free: 5, pro: 25, elite: 60 },
+  interviewer: { free: 1, pro: 5, elite: 15 },
+  roadmap: { free: 2, pro: 10, elite: 30 },
+  resumeReview: { free: 1, pro: 5, elite: 20 },
+};
+
+export const STREAK_REWARDS: Record<number, LearningStreakReward> = {
+  1: { day: 1, xp: 10, coins: 5, reward: 'Bronze Streak Badge', claimed: false },
+  3: { day: 3, xp: 30, coins: 15, reward: '3-Day Streak Badge', claimed: false },
+  7: { day: 7, xp: 75, coins: 30, reward: 'Weekly Warrior Badge', claimed: false },
+  14: { day: 14, xp: 150, coins: 75, reward: 'Fortnight Fighter Badge', claimed: false },
+  30: { day: 30, xp: 400, coins: 200, reward: 'Monthly Master Badge', claimed: false },
+  60: { day: 60, xp: 1000, coins: 500, reward: 'Iron Will Badge', claimed: false },
+  100: { day: 100, xp: 2500, coins: 1000, reward: 'Century Legend Badge', claimed: false },
+};
+
+export type NotificationType = 'friend_request' | 'friend_online' | 'match_invitation' | 'match_started' | 'match_finished' | 'contest_reminder' | 'challenge_invitation' | 'achievement_unlock' | 'rank_change' | 'announcement' | 'room_invite' | 'xp_gained' | 'mentor_request' | 'study_group_invite' | 'hackathon_reminder' | 'comment_post' | 'like_post' | 'career_alert' | 'mission_complete' | 'streak_milestone' | 'forum_reply';
 
 export interface ArenaSettings {
   preferredLanguage: CodingLanguage;

@@ -7,7 +7,9 @@ import {
   LayoutDashboard, Swords, Trophy, BookOpen, Settings, Zap, Menu, LogOut,
   Users, Target, Calendar, BarChart3, UserCircle, Bell, Search, Gamepad2,
   Medal, ChevronLeft, Code2, LogIn, UserPlus, Eye, GraduationCap,
-  Crown,
+  Crown, Sparkles, Bug, Brain, Map, FileText, Briefcase, MessageCircle,
+  Share2, Globe, Users2, CalendarDays, Gift, Rocket, Store, FolderGit2,
+  ChevronDown, ChevronRight, Lightbulb, Newspaper,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -22,23 +24,101 @@ import { Badge } from '@/components/ui/badge';
 import { SettingsModal } from '@/components/settings/SettingsModal';
 import { getTier, getTierColor } from '@/lib/utils';
 
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/arena', label: 'Arena', icon: Swords },
-  { href: '/practice', label: 'Practice', icon: Code2 },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-  { href: '/contests', label: 'Contests', icon: Calendar },
-  { href: '/challenges', label: 'Challenges', icon: Target },
-  { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
-  { href: '/learning', label: 'Learning', icon: GraduationCap },
-  { href: '/friends', label: 'Friends', icon: Users },
-  { href: '/notifications', label: 'Notifications', icon: Bell },
-  { href: '/progress', label: 'Progress', icon: BarChart3 },
-  { href: '/achievements', label: 'Achievements', icon: Medal },
-  { href: '/profile', label: 'Profile', icon: UserCircle },
-  { href: '/search', label: 'Search', icon: Search },
-  { href: '/monetization', label: 'Premium', icon: Crown },
-  { href: '/settings', label: 'Settings', icon: Settings },
+interface NavSection {
+  label?: string;
+  items: Array<{
+    href: string;
+    label: string;
+    icon: any;
+    badge?: string;
+  }>;
+  collapsible?: boolean;
+}
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'CODING',
+    items: [
+      { href: '/arena', label: 'Arena', icon: Swords },
+      { href: '/practice', label: 'Practice', icon: Code2 },
+      { href: '/learning', label: 'Learning', icon: GraduationCap },
+      { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+      { href: '/weekly-challenges', label: 'Challenges', icon: Target },
+    ],
+  },
+  {
+    label: 'AI TOOLS',
+    items: [
+      { href: '/ai-mentor', label: 'AI Mentor', icon: Sparkles },
+      { href: '/ai-code-review', label: 'Code Review', icon: Code2 },
+      { href: '/ai-debugger', label: 'AI Debugger', icon: Bug },
+      { href: '/ai-interviewer', label: 'AI Interviewer', icon: Brain },
+      { href: '/ai-roadmap', label: 'AI Roadmap', icon: Map },
+      { href: '/resume-reviewer', label: 'Resume Review', icon: FileText },
+    ],
+  },
+  {
+    label: 'COMMUNITY',
+    items: [
+      { href: '/feed', label: 'Daily Feed', icon: Newspaper },
+      { href: '/community', label: 'Community', icon: MessageCircle },
+      { href: '/forum', label: 'Forum', icon: Globe },
+      { href: '/code-share', label: 'Code Share', icon: Share2 },
+      { href: '/study-groups', label: 'Study Groups', icon: Users2 },
+      { href: '/mentors', label: 'Mentors', icon: GraduationCap },
+    ],
+  },
+  {
+    label: 'CAREER',
+    items: [
+      { href: '/career-hub', label: 'Career Hub', icon: Briefcase },
+      { href: '/career-hub/company-wise', label: 'Company Prep', icon: Target },
+    ],
+  },
+  {
+    label: 'EVENTS',
+    items: [
+      { href: '/hackathons', label: 'Hackathons', icon: Rocket },
+      { href: '/contest-calendar', label: 'Contests', icon: CalendarDays },
+    ],
+  },
+  {
+    label: 'GAMIFICATION',
+    items: [
+      { href: '/missions', label: 'Missions', icon: Lightbulb },
+      { href: '/shop', label: 'Shop', icon: Store },
+      { href: '/progress', label: 'Progress', icon: BarChart3 },
+      { href: '/progress/streaks', label: 'Streaks', icon: Zap },
+      { href: '/achievements', label: 'Achievements', icon: Medal },
+    ],
+  },
+  {
+    label: 'SOCIAL',
+    items: [
+      { href: '/friends', label: 'Friends', icon: Users },
+      { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
+      { href: '/notifications', label: 'Notifications', icon: Bell },
+    ],
+  },
+  {
+    label: 'PORTFOLIO',
+    items: [
+      { href: '/profile', label: 'My Profile', icon: UserCircle },
+      { href: '/projects', label: 'Projects', icon: FolderGit2 },
+    ],
+  },
+  {
+    items: [
+      { href: '/monetization', label: 'Premium', icon: Crown },
+      { href: '/search', label: 'Search', icon: Search },
+      { href: '/settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -77,21 +157,30 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   const tier = profileData ? getTier(profileData.rating) : 'Beginner';
 
-  const NavLink = ({ item }: { item: typeof NAV_ITEMS[number] }) => {
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (label: string) => {
+    setCollapsedSections(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const NavLink = ({ item }: { item: NavSection['items'][number] }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
     return (
       <Link
         href={item.href}
         onClick={() => setIsMobileMenuOpen(false)}
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
+          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group',
           isActive
             ? 'bg-primary/15 text-primary border-l-2 border-primary shadow-sm'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/40 border-l-2 border-transparent'
         )}
       >
-        <item.icon className={cn('w-5 h-5 shrink-0', isActive && 'text-primary')} />
-        {!sidebarCollapsed && <span>{item.label}</span>}
+        <item.icon className={cn('w-4 h-4 shrink-0', isActive && 'text-primary')} />
+        {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+        {item.badge && !sidebarCollapsed && (
+          <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/20 text-primary">{item.badge}</span>
+        )}
       </Link>
     );
   };
@@ -100,7 +189,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border shrink-0">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <img src="/icons/icon.svg" alt="DevRann logo" className="h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
+          <img src="/logo.png" alt="DevRann logo" className="h-8 w-8 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
           {!sidebarCollapsed && (
             <span className="text-lg font-headline font-bold tracking-tight">
               Dev<span className="text-primary">Rann</span>
@@ -118,10 +207,38 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
-        {NAV_ITEMS.map((item) => (
-          <NavLink key={item.href} item={item} />
-        ))}
+      <nav className="flex-1 overflow-y-auto p-2 space-y-0.5 scrollbar-thin">
+        {NAV_SECTIONS.map((section, idx) => {
+          const sectionLabel = section.label || `section-${idx}`;
+          const isCollapsed = collapsedSections[sectionLabel];
+          return (
+            <div key={sectionLabel} className="mb-1">
+              {section.label && !sidebarCollapsed && (
+                <button
+                  onClick={() => toggleSection(sectionLabel)}
+                  className="flex items-center justify-between w-full px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground/80 transition-colors"
+                >
+                  <span>{section.label}</span>
+                  {isCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </button>
+              )}
+              {(!sidebarCollapsed || !section.label) && (!section.label || !isCollapsed) && (
+                <div className={cn('space-y-0.5', section.label && !sidebarCollapsed ? 'mt-0' : '')}>
+                  {section.items.map((item) => (
+                    <NavLink key={item.href} item={item} />
+                  ))}
+                </div>
+              )}
+              {sidebarCollapsed && !section.label && (
+                <div className="space-y-0.5">
+                  {section.items.map((item) => (
+                    <NavLink key={item.href} item={item} />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       <div className={cn(

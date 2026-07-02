@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import {
   subscribeBattle, updateBattlePhase, submitBattleCode, updatePlayerProgress,
-} from '@/services/arena.service';
+} from '@/services/arena';
 import type { BattleDocument, CodingLanguage } from '@/types';
 
 export function useArenaBattle(battleId: string | null) {
@@ -65,7 +65,7 @@ export function useArenaBattle(battleId: string | null) {
     setResult(null);
     try {
       const battle = await subscribeBattle(battleId, () => {});
-      const testCases = (await import('@/services/arena.service')).fetchBattle;
+      const testCases = (await import('@/services/arena')).fetchBattle;
       const res = await submitBattleCode(
         battleId, user.uid, code, language,
         [{ input: 'test', expected: 'test' }],

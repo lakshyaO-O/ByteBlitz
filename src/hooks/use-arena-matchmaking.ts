@@ -8,8 +8,8 @@ import { useArenaSettings } from '@/hooks/use-arena-settings';
 import {
   joinMatchmakingQueue, leaveMatchmakingQueue, subscribeMatchmaking,
   findMatch, createBattle, fetchBattle,
-} from '@/services/arena.service';
-import { fetchProblem } from '@/services/practice.service';
+} from '@/services/arena';
+import { fetchProblem } from '@/services/practice';
 import type { MatchmakingEntry, BattleDocument, Problem, Tier } from '@/types';
 
 type MatchmakingStatus =

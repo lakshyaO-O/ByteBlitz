@@ -79,7 +79,7 @@
         { "fieldPath": "toUserId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
-    }
+    },
     {
       "collectionGroup": "usernames",
       "queryScope": "COLLECTION",
@@ -128,6 +128,160 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "title", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "communityPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "communityPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "communityPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "studyGroups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "topic", "order": "ASCENDING" },
+        { "fieldPath": "memberCount", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "studyGroups",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isPublic", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "mentorProfiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "available", "order": "ASCENDING" },
+        { "fieldPath": "rating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "codeShares",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "codeShares",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "language", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "codeShares",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "hackathons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "hackathons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "difficulty", "order": "ASCENDING" },
+        { "fieldPath": "prizePool", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "careerListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "postedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "careerListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "postedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "forum",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lastActivity", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "forum",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "lastActivity", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "forum",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "dailyFeed",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "contestCalendar",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "startDate", "order": "ASCENDING" }
       ]
     }
   ]

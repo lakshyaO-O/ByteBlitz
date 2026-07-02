@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquare, Send, User, Loader2 } from 'lucide-react';
-import { fetchDiscussion, postDiscussion } from '@/services/practice.service';
+import { fetchDiscussion, postDiscussion } from '@/services/practice';
 
 interface DiscussionPanelProps {
   problemId: string;

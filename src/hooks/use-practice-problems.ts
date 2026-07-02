@@ -9,7 +9,7 @@ import type { PracticeProblemDocument, UserPracticeProgress, Difficulty } from '
 import {
   fetchProblems, getAllUserProgress, toggleBookmark as fbToggleBookmark,
   fetchRecentlyViewed, trackRecentlyViewed,
-} from '@/services/practice.service';
+} from '@/services/practice';
 
 export function usePracticeProblems() {
   const [problems, setProblems] = useState<PracticeProblemDocument[]>([]);

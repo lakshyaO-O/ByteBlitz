@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Send, User, Search, Loader2, Check, X, UserPlus } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useFriends } from '@/hooks/use-friends';
-import { sendRoomInvite } from '@/services/arena.service';
+import { sendRoomInvite } from '@/services/arena';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 

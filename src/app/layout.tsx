@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   description: 'The ultimate esports-inspired competitive coding platform.',
   manifest: '/manifest.webmanifest',
   icons: {
-    icon: '/icons/icon.svg',
-    apple: '/icons/icon.svg',
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
   appleWebApp: {
     capable: true,

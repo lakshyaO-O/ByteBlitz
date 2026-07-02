@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@/firebase/auth/use-user';
-import { fetchArenaSettings, saveArenaSettings } from '@/services/arena.service';
+import { fetchArenaSettings, saveArenaSettings } from '@/services/arena';
 import type { ArenaSettings } from '@/types';
 
 const DEFAULT_SETTINGS: ArenaSettings = {
