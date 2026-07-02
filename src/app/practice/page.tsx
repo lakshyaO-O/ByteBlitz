@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -31,10 +31,6 @@ export default function PracticePage() {
   const { recent: recentlyViewed } = useRecentlyViewed(user?.uid || null);
 
   const username = user?.displayName || user?.email?.split('@')[0] || 'Player';
-
-  useEffect(() => {
-    if (selectedProblem) window.scrollTo(0, 0);
-  }, [selectedProblem]);
 
   const categories = useMemo(() => {
     if (!problems) return ['All'];
