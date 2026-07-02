@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 170" role="img" aria-label="DevRann">
+  <!-- Helmet icon -->
+  <g transform="translate(42, 28)">
+    <!-- Left horn -->
+    <path d="M 22 28 C 10 14 4 4 10 0" fill="none" stroke="#28f7a5" stroke-width="4" stroke-linecap="round"/>
+    <!-- Right horn -->
+    <path d="M 58 28 C 70 14 76 4 70 0" fill="none" stroke="#28f7a5" stroke-width="4" stroke-linecap="round"/>
+    <!-- Helmet dome -->
+    <path d="M 8 48 C 8 8 72 8 72 48 Z" fill="#0d1321" stroke="#28f7a5" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- Eyebrow ridge -->
+    <path d="M 14 38 L 66 38" fill="none" stroke="#7c5cff" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Nose guard -->
+    <path d="M 40 38 L 40 62" fill="none" stroke="#7c5cff" stroke-width="3" stroke-linecap="round"/>
+    <!-- Eye slits -->
+    <rect x="26" y="42" width="9" height="3.5" rx="1.75" fill="#28f7a5"/>
+    <rect x="45" y="42" width="9" height="3.5" rx="1.75" fill="#28f7a5"/>
+  </g>
+
+  <!-- DEVRANN text -->
+  <text x="130" y="100" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="48px" letter-spacing="4px">DEVRANN</text>
+  <text x="133" y="120" fill="#7c5cff" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="12px" letter-spacing="6px">COMPETITIVE CODING</text>
+</svg>

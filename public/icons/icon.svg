@@ -1,8 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DevRann app icon">
-  <rect width="512" height="512" rx="108" fill="#05070f"/>
-  <path d="M104 192 64 256l40 64" fill="none" stroke="#28f7a5" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="m408 192 40 64-40 64" fill="none" stroke="#28f7a5" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="m296 136-80 240" fill="none" stroke="#7c5cff" stroke-width="34" stroke-linecap="round"/>
-  <circle cx="256" cy="256" r="62" fill="#11182a" stroke="#ffffff" stroke-opacity=".9" stroke-width="18"/>
-  <path d="M229 256h54M256 229v54" stroke="#28f7a5" stroke-width="20" stroke-linecap="round"/>
+  <!-- Background circle for contrast -->
+  <circle cx="256" cy="256" r="230" fill="#0d1321"/>
+  <!-- Helmet dome -->
+  <path d="M 120 290 C 120 90 392 90 392 290 Z" fill="#0d1321" stroke="#28f7a5" stroke-width="18" stroke-linejoin="round"/>
+  <!-- Left horn -->
+  <path d="M 144 150 C 106 84 72 42 86 28" fill="none" stroke="#28f7a5" stroke-width="20" stroke-linecap="round"/>
+  <!-- Right horn -->
+  <path d="M 368 150 C 406 84 440 42 426 28" fill="none" stroke="#28f7a5" stroke-width="20" stroke-linecap="round"/>
+  <!-- Eyebrow ridge -->
+  <path d="M 158 242 L 354 242" fill="none" stroke="#7c5cff" stroke-width="16" stroke-linecap="round"/>
+  <!-- Nose guard -->
+  <path d="M 256 242 L 256 348" fill="none" stroke="#7c5cff" stroke-width="14" stroke-linecap="round"/>
+  <!-- Eye slits -->
+  <rect x="202" y="256" width="24" height="8" rx="4" fill="#28f7a5"/>
+  <rect x="286" y="256" width="24" height="8" rx="4" fill="#28f7a5"/>
 </svg>

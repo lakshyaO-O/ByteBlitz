@@ -189,7 +189,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border shrink-0">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <img src="/logo.png" alt="DevRann logo" className="h-10 w-10 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
+          <img src="/logo.svg" alt="DevRann logo" className="h-10 w-10 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
           {!sidebarCollapsed && (
             <span className="text-lg font-headline font-bold tracking-tight">
               Dev<span className="text-primary">Rann</span>

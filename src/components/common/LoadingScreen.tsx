@@ -58,7 +58,7 @@ export function LoadingScreen({
             <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-30" />
             <div className="absolute inset-2 rounded-full border-2 border-primary/30 animate-spin" />
             <div className="absolute inset-3 rounded-full bg-primary/10 flex items-center justify-center p-2">
-              <img src="/logo.png" alt="DevRann logo" className="h-14 w-14 object-contain" />
+              <img src="/logo.svg" alt="DevRann logo" className="h-14 w-14 object-contain" />
             </div>
           </div>
         </div>
