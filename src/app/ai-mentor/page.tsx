@@ -88,7 +88,10 @@ export default function AIMentorPage() {
       const res = await fetch('/api/ai/mentor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history: messages }),
+        body: JSON.stringify({
+          question: text,
+          context: JSON.stringify(messages.slice(-10).map(m => `${m.role}: ${m.content}`)),
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to get response');
@@ -96,7 +99,7 @@ export default function AIMentorPage() {
       const data = await res.json();
       const assistantMsg: ChatMessage = {
         role: 'assistant',
-        content: data.response || data.message || 'No response',
+        content: data.answer || data.response || data.message || 'No response',
         id: (Date.now() + 1).toString(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
