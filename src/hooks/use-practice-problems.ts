@@ -10,27 +10,42 @@ import {
   fetchProblems, getAllUserProgress, toggleBookmark as fbToggleBookmark,
   fetchRecentlyViewed, trackRecentlyViewed,
 } from '@/services/practice';
+import { enrichAllProblems } from '@/lib/problem-utils';
 
 export function usePracticeProblems() {
   const [problems, setProblems] = useState<PracticeProblemDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
+    const staticData = enrichAllProblems();
     const { firestore: db } = initializeFirebase();
-    if (!db) { setLoading(false); return; }
+    if (!db) {
+      setProblems(staticData);
+      setUsingFallback(true);
+      setLoading(false);
+      return;
+    }
     const q = query(collection(db, 'problems'), orderBy('title', 'asc'));
     const unsub = onSnapshot(q, (snap) => {
-      setProblems(snap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeProblemDocument)));
+      const fbData = snap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeProblemDocument));
+      if (fbData.length > 0) {
+        setProblems(fbData);
+        setUsingFallback(false);
+      } else {
+        setProblems(staticData);
+        setUsingFallback(true);
+      }
       setLoading(false);
-    }, (err) => {
-      setError(err.message);
+    }, () => {
+      setProblems(staticData);
+      setUsingFallback(true);
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  return { problems, loading, error };
+  return { problems, loading, usingFallback };
 }
 
 export function useUserProgress(userId: string | null) {

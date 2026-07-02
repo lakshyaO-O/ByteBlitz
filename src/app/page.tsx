@@ -1,44 +1,22 @@
-'use client';
+import type { Metadata } from 'next';
+import HomeClient from './home-client';
 
-import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@/firebase/auth/use-user';
-import { LoadingScreen } from '@/components/common/LoadingScreen';
+export const metadata: Metadata = {
+  title: 'DevRann - Learn Coding, Practice DSA & Compete Live',
+  description: 'Learn programming from beginner to advanced, solve coding problems, compete in live coding arenas, track ELO, build projects, and grow with AI-powered learning.',
+  alternates: {
+    canonical: 'https://devrann.com',
+  },
+  openGraph: {
+    title: 'DevRann - Competitive Coding Platform',
+    description: 'Learn programming, practice DSA, compete in live arenas, and build your developer profile with AI-powered tools.',
+  },
+  twitter: {
+    title: 'DevRann - Competitive Coding Platform',
+    description: 'Learn programming, practice DSA, compete in live arenas, and build your developer profile with AI-powered tools.',
+  },
+};
 
-const LandingPage = dynamic(() => import('@/components/landing/LandingPage').then((mod) => mod.LandingPage), {
-  ssr: false,
-  loading: () => <LoadingScreen message="Preparing experience..." />,
-});
-
-export default function Home() {
-  const router = useRouter();
-  const { user, loading: authLoading, error } = useUser();
-  const [renderError, setRenderError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace('/dashboard');
-    }
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (error) {
-      setRenderError(error);
-    }
-  }, [error]);
-
-  if (authLoading) {
-    return <LoadingScreen message="Checking authentication..." />;
-  }
-
-  if (user) {
-    return <LoadingScreen message="Redirecting to dashboard..." />;
-  }
-
-  if (renderError) {
-    return <LandingPage />;
-  }
-
-  return <LandingPage />;
+export default function HomePage() {
+  return <HomeClient />;
 }

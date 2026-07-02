@@ -1,13 +1,15 @@
 {
-  "name": "DevRann",
+  "name": "DevRann - Competitive Coding Platform",
   "short_name": "DevRann",
-  "description": "Competitive coding battles on mobile and web.",
+  "description": "Learn programming, practice DSA, compete in live coding arenas, and build your developer profile with AI-powered tools.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#05070f",
   "theme_color": "#05070f",
+  "categories": ["education", "programming", "games"],
+  "lang": "en-US",
   "icons": [
     {
       "src": "/icons/icon.svg",
@@ -15,5 +17,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": []
 }

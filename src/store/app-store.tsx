@@ -148,29 +148,30 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         const progressRef = doc(db, 'learning', user.uid);
         const snap = await getDoc(progressRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          setState(prev => {
-            const newBeginner = {
-              ...prev.beginner,
+        const data = snap.exists() ? snap.data() : null;
+        setState(prev => {
+          const newBeginner = {
+            ...prev.beginner,
+            hasCompletedOnboarding: true,
+            ...(data ? {
               hasCompletedOnboarding: data.hasCompletedOnboarding ?? true,
               lessonsCompleted: data.lessonsCompleted || prev.beginner.lessonsCompleted,
               lessonProgress: data.lessonProgress || prev.beginner.lessonProgress,
               xp: data.xp ?? prev.beginner.xp,
               coins: data.coins ?? prev.beginner.coins,
               currentLesson: data.currentLesson || prev.beginner.currentLesson,
-          streak: data.streak ?? prev.beginner.streak,
-          lastStreakDate: data.lastStreakDate ?? prev.beginner.lastStreakDate,
-          correctSubmissions: data.correctSubmissions ?? prev.beginner.correctSubmissions,
-          totalSubmissions: data.totalSubmissions ?? prev.beginner.totalSubmissions,
-          problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
-            };
+              streak: data.streak ?? prev.beginner.streak,
+              lastStreakDate: data.lastStreakDate ?? prev.beginner.lastStreakDate,
+              correctSubmissions: data.correctSubmissions ?? prev.beginner.correctSubmissions,
+              totalSubmissions: data.totalSubmissions ?? prev.beginner.totalSubmissions,
+              problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
+            } : {}),
+          };
+          if (data || prev.beginner.xp > 0) {
             persistBeginner(newBeginner);
-            return { ...prev, beginner: newBeginner, firebaseProgressLoaded: true };
-          });
-        } else {
-          setState(prev => ({ ...prev, firebaseProgressLoaded: true }));
-        }
+          }
+          return { ...prev, beginner: newBeginner, firebaseProgressLoaded: true };
+        });
       } else {
         setState(prev => ({ ...prev, firebaseProgressLoaded: true }));
       }
@@ -208,12 +209,12 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     if (!uid) return;
     const progressRef = doc(db, 'learning', uid);
     const snap = await getDoc(progressRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      setState(prev => {
-        const newBeginner = {
-          ...prev.beginner,
-          hasCompletedOnboarding: data.hasCompletedOnboarding ?? true,
+    const data = snap.exists() ? snap.data() : null;
+    setState(prev => {
+      const newBeginner = {
+        ...prev.beginner,
+        hasCompletedOnboarding: true,
+        ...(data ? {
           lessonsCompleted: data.lessonsCompleted || prev.beginner.lessonsCompleted,
           lessonProgress: data.lessonProgress || prev.beginner.lessonProgress,
           xp: data.xp ?? prev.beginner.xp,
@@ -224,11 +225,13 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
           correctSubmissions: data.correctSubmissions ?? prev.beginner.correctSubmissions,
           totalSubmissions: data.totalSubmissions ?? prev.beginner.totalSubmissions,
           problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
-        };
+        } : {}),
+      };
+      if (data || prev.beginner.xp > 0) {
         persistBeginner(newBeginner);
-        return { ...prev, beginner: newBeginner };
-      });
-    }
+      }
+      return { ...prev, beginner: newBeginner };
+    });
   }, []);
 
   const setSidebarCollapsed = useCallback((collapsed: boolean) => {

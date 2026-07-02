@@ -347,6 +347,14 @@ export interface SubmissionResult {
   stderr?: string;
 }
 
+export type ProblemTopic =
+  | 'Arrays' | 'Strings' | 'Math' | 'Loops' | 'Functions' | 'Recursion'
+  | 'Sorting' | 'Searching' | 'Hashing' | 'Stack' | 'Queue' | 'Linked List'
+  | 'Trees' | 'Graphs' | 'Heap' | 'Greedy' | 'Dynamic Programming'
+  | 'Backtracking' | 'Bit Manipulation' | 'Binary Search' | 'Two Pointers'
+  | 'Sliding Window' | 'Prefix Sum' | 'Tries' | 'Union Find' | 'Segment Tree'
+  | 'SQL';
+
 export interface PracticeProblemDocument {
   id: string;
   title: string;
@@ -357,13 +365,57 @@ export interface PracticeProblemDocument {
   starterCode: Record<CodingLanguage, string>;
   examples: Array<{ input: string; output: string; explanation?: string }>;
   testCases: Array<{ input: string; expected: string; isHidden?: boolean }>;
-  topics: string[];
+  topics: ProblemTopic[];
   hints: string[];
   editorial: string;
   solutionCode: Record<CodingLanguage, string>;
   constraints: string[];
   timeLimitMs: number;
   memoryLimitKb: number;
+  estimatedTime?: number;
+  acceptanceRate?: number;
+  prerequisites?: string[];
+  companyTags?: string[];
+  relatedProblems?: string[];
+  difficultyRating?: number;
+}
+
+export interface DailyChallenge {
+  date: string;
+  problemId: string;
+  xpBonus: number;
+  completed: boolean;
+}
+
+export interface WeeklyChallenge {
+  week: string;
+  problemIds: string[];
+  xpBonus: number;
+  completed: boolean;
+}
+
+export interface TopicMastery {
+  topic: ProblemTopic;
+  solved: number;
+  total: number;
+  xpEarned: number;
+  streak: number;
+}
+
+export interface PracticeStats {
+  totalSolved: number;
+  totalAttempted: number;
+  totalXpEarned: number;
+  totalCoinsEarned: number;
+  currentStreak: number;
+  longestStreak: number;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  byTopic: Record<string, { solved: number; total: number }>;
+  recentSubmissions: PracticeSubmission[];
+  fastestSolutions: { problemId: string; time: number }[];
+  improvement: { date: string; accuracy: number }[];
 }
 
 export interface PracticeSubmission {
@@ -389,6 +441,11 @@ export interface UserPracticeProgress {
   bookmarked: boolean;
   notes?: string;
   rating?: number;
+  fastestRuntime?: number;
+  lowestMemory?: number;
+  firstAttempt?: boolean;
+  attemptsBeforeSolve?: number;
+  lastVerdict?: Verdict;
 }
 
 export interface RecentlyViewedProblem {
@@ -396,6 +453,30 @@ export interface RecentlyViewedProblem {
   title: string;
   difficulty: Difficulty;
   viewedAt: string;
+}
+
+export interface StaticPracticeProblem {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: Difficulty;
+  category: string;
+  points: number;
+  topics: ProblemTopic[];
+  examples: Array<{ input: string; output: string; explanation?: string }>;
+  testCases: Array<{ input: string; expected: string; isHidden?: boolean }>;
+  hints: string[];
+  editorial: string;
+  solutionApproach: string;
+  constraints: string[];
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  estimatedTime: number;
+  acceptanceRate: number;
+  prerequisites: string[];
+  companyTags: string[];
+  relatedProblems: string[];
+  difficultyRating: number;
 }
 
 export interface FeatureFlags {
