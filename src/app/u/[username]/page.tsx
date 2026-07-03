@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,6 +57,7 @@ const mockUser = {
 
 export default function PublicProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const user = mockUser;
   const [following, setFollowing] = useState(false);
 
@@ -111,7 +112,7 @@ export default function PublicProfilePage() {
                   <Button onClick={() => setFollowing(!following)} className={cn('gap-2', following ? 'variant-outline' : '')}>
                     <UserPlus className="w-4 h-4" /> {following ? 'Following' : 'Follow'}
                   </Button>
-                  <Button variant="outline" className="gap-2"><MessageCircle className="w-3 h-3" /> Message</Button>
+                  <Button variant="outline" className="gap-2" onClick={() => router.push('/chats')}><MessageCircle className="w-3 h-3" /> Message</Button>
                 </div>
                 <div className="flex items-center gap-3 mt-2">
                   {user.github && (

@@ -18,6 +18,7 @@ import { useUser } from '@/firebase/auth/use-user';
 import { useFirestore } from '@/firebase/provider';
 import { useFriends, useBlockedUsers, useSendFriendRequest, useAcceptFriendRequest, useRemoveFriend, useBlockUser, useUnblockUser } from '@/hooks/use-friends';
 import { useActiveRoom, useSendRoomInvite } from '@/hooks/use-rooms';
+import { createOrGetChat } from '@/services/chat';
 import { useToast } from '@/hooks/use-toast';
 import { GuestGate } from '@/components/auth/GuestGate';
 import { EmptyState } from '@/components/premium/EmptyState';
@@ -147,8 +148,17 @@ export default function FriendsPage() {
     if (success) toast({ title: 'Invite sent!', description: `${username} has been invited to your room.` });
   };
 
+  const handleMessage = async (targetId: string) => {
+    if (!user) return;
+    const chatId = await createOrGetChat(user.uid, targetId);
+    if (chatId) router.push('/chats');
+  };
+
   const FriendActions = ({ friend }: { friend: any }) => (
     <div className="flex gap-1">
+      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary" onClick={() => handleMessage(friend.friendId)} title="Message">
+        <MessageCircle className="w-4 h-4" />
+      </Button>
       {activeRoom && (
         <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary" onClick={() => handleInviteToRoom(friend.friendId, friend.username)} title="Invite to room">
           <Copy className="w-4 h-4" />
