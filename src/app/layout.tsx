@@ -8,6 +8,7 @@ import { AppStoreProvider } from '@/store/app-store';
 import { SessionCookieSync } from '@/components/auth/SessionCookieSync';
 import { GlobalErrorHandler } from '@/components/GlobalErrorHandler';
 import { AppStartupDecorations } from '@/components/AppStartupDecorations';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, SITE_KEYWORDS, TWITTER_HANDLE } from '@/lib/seo';
 
 const inter = Inter({
@@ -200,6 +201,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${sourceCodePro.variable} font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary`}>
+        <GoogleAnalytics />
         <FirebaseClientProvider>
           <GlobalErrorHandler />
           <SessionCookieSync />
