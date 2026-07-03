@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { UserProfile } from '@/app/lib/types';
+import { seedProblemsToFirestore } from '@/services/seed-data';
 
 export function AdminPanel() {
   const { user } = useUser();
@@ -76,8 +77,9 @@ export function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 md:grid-cols-7 gap-2 h-auto bg-muted/50 p-1">
+        <TabsList className="grid grid-cols-2 md:grid-cols-8 gap-2 h-auto bg-muted/50 p-1">
           <TabsTrigger value="users" className="text-xs gap-1"><Users className="w-3 h-3" /> Users</TabsTrigger>
+          <TabsTrigger value="problems" className="text-xs gap-1"><Zap className="w-3 h-3" /> Problems</TabsTrigger>
           <TabsTrigger value="challenges" className="text-xs gap-1"><Target className="w-3 h-3" /> Challenges</TabsTrigger>
           <TabsTrigger value="contests" className="text-xs gap-1"><Swords className="w-3 h-3" /> Contests</TabsTrigger>
           <TabsTrigger value="announcements" className="text-xs gap-1"><Bell className="w-3 h-3" /> Announcements</TabsTrigger>
@@ -88,6 +90,9 @@ export function AdminPanel() {
 
         <TabsContent value="users" className="mt-4">
           <UserManagement />
+        </TabsContent>
+        <TabsContent value="problems" className="mt-4">
+          <ProblemManagement />
         </TabsContent>
         <TabsContent value="challenges" className="mt-4">
           <ChallengeManagement />
@@ -502,5 +507,310 @@ function ReportsAnalytics() {
         <p className="text-muted-foreground">Platform analytics and reports dashboard.</p>
       </CardContent>
     </Card>
+  );
+}
+
+const ALL_LANGUAGES = ['javascript', 'typescript', 'python', 'java', 'cpp', 'go', 'rust'];
+const ALL_TOPIC_OPTIONS = [
+  'Arrays', 'Strings', 'Math', 'Loops', 'Functions', 'Recursion',
+  'Sorting', 'Searching', 'Hashing', 'Stack', 'Queue', 'Linked List',
+  'Trees', 'Graphs', 'Heap', 'Greedy', 'Dynamic Programming',
+  'Backtracking', 'Bit Manipulation', 'Binary Search', 'Two Pointers',
+  'Sliding Window', 'Prefix Sum', 'Tries', 'Union Find', 'Segment Tree', 'SQL',
+];
+
+function ProblemManagement() {
+  const [problems, setProblems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+
+  useEffect(() => { loadProblems(); }, []);
+
+  const loadProblems = async () => {
+    setLoading(true);
+    try {
+      const { firestore: db } = initializeFirebase();
+      if (!db) return;
+      const q = query(collection(db, 'problems'), orderBy('title', 'asc'));
+      const snap = await getDocs(q);
+      setProblems(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.warn('[Admin] Failed to load problems:', e); }
+    setLoading(false);
+  };
+
+  const [form, setForm] = useState({
+    title: '', difficulty: 'Easy', category: '', points: 100,
+    topics: [] as string[], companyTags: '' as string,
+    isPremium: false, isPublished: true, estimatedTime: 15,
+    description: '', constraints: '' as string,
+    examples: '' as string, hints: '' as string, editorial: '',
+    starterCode: '{}' as string, testCases: '' as string,
+  });
+
+  const resetForm = () => {
+    setForm({
+      title: '', difficulty: 'Easy', category: '', points: 100,
+      topics: [], companyTags: '', isPremium: false, isPublished: true, estimatedTime: 15,
+      description: '', constraints: '', examples: '', hints: '', editorial: '',
+      starterCode: '{}', testCases: '',
+    });
+  };
+
+  const startEdit = (p: any) => {
+    setForm({
+      title: p.title || '', difficulty: p.difficulty || 'Easy', category: p.category || '', points: p.points || 100,
+      topics: p.topics || [], companyTags: (p.companyTags || []).join(', '),
+      isPremium: p.isPremium || false, isPublished: p.isPublished !== false, estimatedTime: p.estimatedTime || 15,
+      description: p.description || '', constraints: (p.constraints || []).join('\n'),
+      examples: JSON.stringify(p.examples || [], null, 2),
+      hints: (p.hints || []).join('\n'), editorial: p.editorial || '',
+      starterCode: JSON.stringify(p.starterCode || {}, null, 2),
+      testCases: JSON.stringify(p.testCases || [], null, 2),
+    });
+    setEditing(p.id);
+    setShowNew(false);
+  };
+
+  const saveProblem = async () => {
+    const { firestore: db } = initializeFirebase();
+    if (!db) return;
+
+    let examples: any[] = [];
+    let testCases: any[] = [];
+    let starterCode: Record<string, string> = {};
+    try { examples = JSON.parse(form.examples || '[]'); } catch {}
+    try { testCases = JSON.parse(form.testCases || '[]'); } catch {}
+    try { starterCode = JSON.parse(form.starterCode || '{}'); } catch {}
+
+    const meta = {
+      title: form.title,
+      difficulty: form.difficulty,
+      category: form.category,
+      points: Number(form.points),
+      topics: form.topics,
+      companyTags: form.companyTags.split(',').map(t => t.trim()).filter(Boolean),
+      isPremium: form.isPremium,
+      isPublished: form.isPublished,
+      estimatedTime: Number(form.estimatedTime),
+      acceptanceRate: 75,
+      totalSubmissions: 0,
+      totalAccepted: 0,
+      difficultyRating: form.difficulty === 'Easy' ? 1 : form.difficulty === 'Medium' ? 3 : 5,
+      prerequisites: [],
+      relatedProblems: [],
+      searchTokens: [],
+      updatedAt: serverTimestamp(),
+    };
+
+    const content = {
+      description: form.description,
+      constraints: form.constraints.split('\n').filter(Boolean),
+      examples,
+      testCases,
+      hints: form.hints.split('\n').filter(Boolean),
+      editorial: form.editorial,
+      solutionCode: starterCode,
+      starterCode,
+      timeLimitMs: form.difficulty === 'Easy' ? 1000 : form.difficulty === 'Medium' ? 2000 : 3000,
+      memoryLimitKb: form.difficulty === 'Easy' ? 256000 : form.difficulty === 'Medium' ? 512000 : 1024000,
+    };
+
+    try {
+      if (editing) {
+        await setDoc(doc(db, 'problems', editing), meta, { merge: true });
+        await setDoc(doc(db, 'problemContent', editing), content, { merge: true });
+      } else {
+        const ref = await addDoc(collection(db, 'problems'), { ...meta, createdAt: serverTimestamp() });
+        await setDoc(doc(db, 'problemContent', ref.id), content);
+      }
+      resetForm();
+      setEditing(null);
+      setShowNew(false);
+      loadProblems();
+    } catch (e) { console.warn('[Admin] Failed to save problem:', e); }
+  };
+
+  const deleteProblem = async (id: string) => {
+    const { firestore: db } = initializeFirebase();
+    if (!db || !confirm('Delete this problem?')) return;
+    try {
+      await deleteDoc(doc(db, 'problems', id));
+      await deleteDoc(doc(db, 'problemContent', id));
+      loadProblems();
+    } catch (e) { console.warn('[Admin] Failed to delete problem:', e); }
+  };
+
+  const toggleTopic = (topic: string) => {
+    setForm(f => ({
+      ...f,
+      topics: f.topics.includes(topic) ? f.topics.filter(t => t !== topic) : [...f.topics, topic],
+    }));
+  };
+
+  if (loading) return <div className="text-center py-8"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" /></div>;
+
+  if (showNew || editing) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold">{editing ? 'Edit Problem' : 'New Problem'}</h3>
+          <Button variant="ghost" size="sm" onClick={() => { setShowNew(false); setEditing(null); resetForm(); }}>
+            Back
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-3">
+            <Input placeholder="Title" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+            <Select value={form.difficulty} onValueChange={v => setForm(f => ({ ...f, difficulty: v }))}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Easy">Easy</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input placeholder="Category" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
+            <Input type="number" placeholder="Points" value={form.points} onChange={e => setForm(f => ({ ...f, points: Number(e.target.value) }))} />
+            <Input type="number" placeholder="Est. time (min)" value={form.estimatedTime} onChange={e => setForm(f => ({ ...f, estimatedTime: Number(e.target.value) }))} />
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-xs"><Switch checked={form.isPremium} onCheckedChange={v => setForm(f => ({ ...f, isPremium: v }))} /> Premium</label>
+              <label className="flex items-center gap-2 text-xs"><Switch checked={form.isPublished} onCheckedChange={v => setForm(f => ({ ...f, isPublished: v }))} /> Published</label>
+            </div>
+          </div>
+          <div className="space-y-3 col-span-2">
+            <Textarea placeholder="Description (markdown)" className="min-h-[120px]" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            <Textarea placeholder="Constraints (one per line)" className="min-h-[60px]" value={form.constraints} onChange={e => setForm(f => ({ ...f, constraints: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Topics</p>
+            <div className="flex flex-wrap gap-1">
+              {ALL_TOPIC_OPTIONS.map(t => (
+                <button key={t} onClick={() => toggleTopic(t)}
+                  className={cn(
+                    'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest transition-colors',
+                    form.topics.includes(t) ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground border border-border',
+                  )}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <Input placeholder="Company tags (comma separated)" value={form.companyTags} onChange={e => setForm(f => ({ ...f, companyTags: e.target.value }))} />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Starter Code (JSON)</p>
+            <Textarea className="min-h-[80px] font-mono text-xs" value={form.starterCode} onChange={e => setForm(f => ({ ...f, starterCode: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Examples (JSON array)</p>
+            <Textarea className="min-h-[80px] font-mono text-xs" value={form.examples} onChange={e => setForm(f => ({ ...f, examples: e.target.value }))} />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Test Cases (JSON array)</p>
+            <Textarea className="min-h-[80px] font-mono text-xs" value={form.testCases} onChange={e => setForm(f => ({ ...f, testCases: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Textarea placeholder="Hints (one per line)" className="min-h-[60px]" value={form.hints} onChange={e => setForm(f => ({ ...f, hints: e.target.value }))} />
+          <Textarea placeholder="Editorial (markdown)" className="min-h-[60px]" value={form.editorial} onChange={e => setForm(f => ({ ...f, editorial: e.target.value }))} />
+        </div>
+
+        <Button onClick={saveProblem} className="gap-2"><Plus className="w-4 h-4" /> {editing ? 'Update' : 'Create'} Problem</Button>
+      </div>
+    );
+  }
+
+  const handleSeed = useCallback(async () => {
+    setSeeding(true);
+    try {
+      const result = await seedProblemsToFirestore();
+      alert(`Seeded ${result.created} problems. ${result.skipped} already existed.`);
+      loadProblems();
+    } catch (e) { console.warn('[Admin] Seed failed:', e); }
+    setSeeding(false);
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">{problems.length} problems</span>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={handleSeed} disabled={seeding} className="gap-2">
+            {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+            {seeding ? 'Seeding...' : 'Seed 55 Problems'}
+          </Button>
+          <Button size="sm" onClick={() => { resetForm(); setShowNew(true); }} className="gap-2">
+            <Plus className="w-4 h-4" /> New Problem
+          </Button>
+        </div>
+      </div>
+
+      {problems.length === 0 ? (
+        <Card className="bg-card/50 border-border">
+          <CardContent className="p-8 text-center">
+            <Zap className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground">No problems in Firestore yet. Create one.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Difficulty</TableHead>
+              <TableHead>Points</TableHead>
+              <TableHead>Topics</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {problems.map(p => (
+              <TableRow key={p.id}>
+                <TableCell className="font-medium">{p.title}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn(
+                    'text-[10px]',
+                    p.difficulty === 'Easy' ? 'text-emerald-400' : p.difficulty === 'Medium' ? 'text-yellow-400' : 'text-destructive',
+                  )}>{p.difficulty}</Badge>
+                </TableCell>
+                <TableCell>{p.points}</TableCell>
+                <TableCell>
+                  <div className="flex gap-1 flex-wrap">
+                    {(p.topics || []).slice(0, 2).map((t: string) => (
+                      <Badge key={t} variant="secondary" className="text-[8px]">{t}</Badge>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {p.isPremium && <Badge className="text-[8px] bg-amber-500/10 text-amber-400">Premium</Badge>}
+                    {!p.isPublished && <Badge variant="outline" className="text-[8px]">Draft</Badge>}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => startEdit(p)}>
+                      <Edit3 className="w-3 h-3" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => deleteProblem(p.id)}>
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

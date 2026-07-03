@@ -57,6 +57,13 @@ export function ProblemDescription({
         </div>
 
         <div className="flex flex-wrap gap-1.5">
+          {(problem as any).companyTags?.length > 0 && (
+            (problem as any).companyTags.map((tag: string) => (
+              <Badge key={tag} variant="secondary" className="text-[9px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-400 border-amber-500/20">
+                {tag}
+              </Badge>
+            ))
+          )}
           {problem.topics?.map((topic) => (
             <Badge key={topic} variant="outline" className="text-[9px] font-bold uppercase tracking-widest bg-muted/30">
               {topic}

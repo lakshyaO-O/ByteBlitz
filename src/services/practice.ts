@@ -9,7 +9,11 @@ import {
 import type {
   PracticeProblemDocument, PracticeSubmission, Verdict, SubmissionStatus,
   UserPracticeProgress, RecentlyViewedProblem, CodingLanguage,
+  ProblemContent, ProblemDocumentMeta, PracticeDraft,
 } from '@/types';
+import { createMockJudge } from '@/features/practice/services/mock-judge';
+
+const judge = createMockJudge();
 
 export async function fetchProblems(): Promise<PracticeProblemDocument[]> {
   const { firestore: db } = initializeFirebase();
@@ -108,67 +112,13 @@ export async function submitSolution(
   problemId: string, language: CodingLanguage, code: string,
   testCases: Array<{ input: string; expected: string; isHidden?: boolean }>,
 ): Promise<{ submission: PracticeSubmission; results: Array<{ passed: boolean; input: string; expectedOutput: string; actualOutput: string; executionTimeMs: number; memoryUsedKb: number; error?: string }> }> {
-  const totalCases = testCases.length;
-  const visibleCases = testCases.filter(tc => !tc.isHidden);
-  const results: Array<{ passed: boolean; input: string; expectedOutput: string; actualOutput: string; executionTimeMs: number; memoryUsedKb: number; error?: string }> = [];
+  const judgeResult = await judge.execute({
+    code, language, testCases,
+    timeLimitMs: 2000, memoryLimitKb: 256000,
+  });
 
-  let allPassed = true;
-  let totalTimeMs = 0;
-  let maxMemoryKb = 0;
-
-  for (const tc of testCases) {
-    const startTime = performance.now();
-    try {
-      const fn = new Function('input', `
-        const lines = input.trim().split('\\n');
-        const parse = (line) => {
-          try { return JSON.parse(line); } catch { return line; }
-        };
-        const parsed = lines.map(parse);
-        const result = (function() {
-          ${code}
-        }).apply(null, parsed.length === 1 ? [parsed[0]] : parsed);
-        return typeof result === 'object' ? JSON.stringify(result) : String(result);
-      `);
-
-      const actualOutput = fn(tc.input);
-      const elapsedMs = performance.now() - startTime;
-      totalTimeMs += elapsedMs;
-      const memoryKb = Math.round(Math.random() * 512 + 128);
-      maxMemoryKb = Math.max(maxMemoryKb, memoryKb);
-
-      const passed = actualOutput.trim() === tc.expected.trim();
-      if (!passed) allPassed = false;
-
-      results.push({
-        passed,
-        input: tc.input,
-        expectedOutput: tc.expected,
-        actualOutput,
-        executionTimeMs: Math.round(elapsedMs),
-        memoryUsedKb: memoryKb,
-      });
-    } catch (err: any) {
-      allPassed = false;
-      results.push({
-        passed: false,
-        input: tc.input,
-        expectedOutput: tc.expected,
-        actualOutput: '',
-        executionTimeMs: 0,
-        memoryUsedKb: 0,
-        error: err.message || 'Runtime Error',
-      });
-    }
-  }
-
-  const passedCount = results.filter(r => r.passed).length;
-  let verdict: Verdict = 'Accepted';
-  if (passedCount < totalCases) {
-    const hasError = results.some(r => r.error);
-    if (hasError) verdict = 'Runtime Error';
-    else verdict = 'Wrong Answer';
-  }
+  const { verdict, passedTestCases, totalTestCases, testCaseResults } = judgeResult;
+  const results = testCaseResults; // already in the right shape
 
   const { firestore: db } = initializeFirebase();
   let submissionId = '';
@@ -176,18 +126,19 @@ export async function submitSolution(
   if (db) {
     const subRef = await addDoc(collection(db, 'users', userId, 'submissions'), {
       userId, problemId, language, code,
-      verdict, passedTestCases: passedCount, totalTestCases: totalCases,
-      executionTimeMs: Math.round(totalTimeMs), memoryUsedKb: maxMemoryKb,
+      verdict, passedTestCases, totalTestCases,
+      executionTimeMs: judgeResult.executionTimeMs, memoryUsedKb: judgeResult.memoryUsedKb,
       submittedAt: serverTimestamp(),
     });
     submissionId = subRef.id;
 
-    await setDoc(doc(db, 'users', userId, 'practiceProgress', problemId), {
+    await setDoc(doc(db, 'users', userId, 'progress', problemId), {
       solved: verdict === 'Accepted',
+      attempted: true,
       bestSubmissionId: subRef.id,
       submissionsCount: increment(1),
       lastSubmittedAt: serverTimestamp(),
-      bookmarked: false,
+      lastVerdict: verdict,
     }, { merge: true });
 
     const userRef = doc(db, 'users', userId);
@@ -207,8 +158,8 @@ export async function submitSolution(
   const submission: PracticeSubmission = {
     id: submissionId || 'local',
     userId, problemId, language, code,
-    verdict, passedTestCases: passedCount, totalTestCases: totalCases,
-    executionTimeMs: Math.round(totalTimeMs), memoryUsedKb: maxMemoryKb,
+    verdict, passedTestCases, totalTestCases,
+    executionTimeMs: judgeResult.executionTimeMs, memoryUsedKb: judgeResult.memoryUsedKb,
     submittedAt: new Date().toISOString(),
   };
 
@@ -331,21 +282,44 @@ export async function getWeeklyChallengeProgress(userId: string): Promise<{ solv
 export async function getPracticeStats(userId: string) {
   const { firestore: db } = initializeFirebase();
   if (!db) return null;
-  const progressSnap = await getDocs(collection(db, 'users', userId, 'practiceProgress'));
-  const submissionsSnap = await getDocs(query(
-    collection(db, 'users', userId, 'submissions'),
-    orderBy('submittedAt', 'desc'), limit(500),
-  ));
+  const [progressSnap, submissionsSnap, problemsSnap] = await Promise.all([
+    getDocs(collection(db, 'users', userId, 'practiceProgress')),
+    getDocs(query(collection(db, 'users', userId, 'submissions'), orderBy('submittedAt', 'desc'), limit(500))),
+    getDocs(collection(db, 'problems')),
+  ]);
 
   const progressMap: Record<string, any> = {};
   progressSnap.docs.forEach(d => { progressMap[d.id] = d.data(); });
+
+  const problemsMap: Record<string, any> = {};
+  problemsSnap.docs.forEach(d => { problemsMap[d.id] = d.data(); });
 
   const submissions = submissionsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as PracticeSubmission[];
 
   const solved = Object.values(progressMap).filter((p: any) => p.solved).length;
   const total = Object.keys(progressMap).length;
-  const byDifficulty: Record<string, number> = { Easy: 0, Medium: 0, Hard: 0 };
+
+  let easySolved = 0, mediumSolved = 0, hardSolved = 0;
+
+  for (const [pid, p] of Object.entries(progressMap)) {
+    const prob = problemsMap[pid];
+    if (!prob) continue;
+    if ((p as any).solved) {
+      if (prob.difficulty === 'Easy') easySolved++;
+      else if (prob.difficulty === 'Medium') mediumSolved++;
+      else if (prob.difficulty === 'Hard') hardSolved++;
+    }
+  }
+
   const byTopic: Record<string, { solved: number; total: number }> = {};
+  for (const prob of Object.values(problemsMap) as any[]) {
+    const topics: string[] = prob.topics || [prob.category].filter(Boolean);
+    for (const t of topics) {
+      if (!byTopic[t]) byTopic[t] = { solved: 0, total: 0 };
+      byTopic[t].total++;
+      if (progressMap[prob.id]?.solved) byTopic[t].solved++;
+    }
+  }
 
   const userSnap = await getDoc(doc(db, 'users', userId));
   const userData = userSnap.exists() ? userSnap.data() : {};
@@ -368,17 +342,45 @@ export async function getPracticeStats(userId: string) {
     last7Days.push({ date: dayStr, accuracy: dayAcc });
   }
 
+  // Compute streak from submission dates
+  const submissionDates = new Set<string>();
+  submissions.forEach(s => {
+    const ts = (s as any).submittedAt;
+    const d = ts?.toDate?.()?.toISOString()?.slice(0, 10);
+    if (d) submissionDates.add(d);
+  });
+  const sortedDates = [...submissionDates].sort().reverse();
+  let streak = 0;
+  const today = new Date().toISOString().slice(0, 10);
+  let checkDate = new Date(today);
+  for (const dateStr of sortedDates) {
+    const expected = checkDate.toISOString().slice(0, 10);
+    if (dateStr === expected) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else if (dateStr < expected) {
+      break;
+    }
+  }
+
+  // Update Firestore streak if it changed
+  if (streak !== (userData.streak || 0)) {
+    try {
+      await updateDoc(doc(db, 'users', userId), { streak });
+    } catch { /* ignore */ }
+  }
+
   return {
     totalSolved: solved,
     totalAttempted: total,
     totalXpEarned: userData.xp || 0,
     totalCoinsEarned: userData.coins || 0,
-    currentStreak: userData.streak || 0,
-    longestStreak: userData.longestStreak || 0,
-    easySolved: 0,
-    mediumSolved: 0,
-    hardSolved: 0,
-    byTopic: {},
+    currentStreak: streak,
+    longestStreak: Math.max(streak, userData.longestStreak || 0),
+    easySolved,
+    mediumSolved,
+    hardSolved,
+    byTopic,
     recentSubmissions: submissions.slice(0, 20),
     fastestSolutions: [],
     improvement: last7Days,
@@ -478,4 +480,111 @@ export async function getUserProblemVerdicts(userId: string): Promise<Record<str
     if (!latest[data.problemId]) latest[data.problemId] = data.verdict;
   });
   return latest;
+}
+
+// ===== NEW SCHEMA: PROBLEM CONTENT (separate from metadata) =====
+
+export async function fetchProblemContent(problemId: string): Promise<ProblemContent | null> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const snap = await getDoc(doc(db, 'problemContent', problemId));
+  return snap.exists() ? (snap.data() as ProblemContent) : null;
+}
+
+export async function getFullProblem(problemId: string): Promise<PracticeProblemDocument | null> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const [metaSnap, contentSnap] = await Promise.all([
+    getDoc(doc(db, 'problems', problemId)),
+    getDoc(doc(db, 'problemContent', problemId)),
+  ]);
+  if (!metaSnap.exists()) return null;
+  const meta = { id: metaSnap.id, ...metaSnap.data() } as ProblemDocumentMeta;
+  if (!contentSnap.exists()) return null;
+  const content = contentSnap.data() as ProblemContent;
+  return {
+    ...meta,
+    description: content.description,
+    constraints: content.constraints,
+    examples: content.examples,
+    testCases: content.testCases,
+    hints: content.hints,
+    editorial: content.editorial,
+    solutionCode: Object.fromEntries(Object.entries(content.solutionCode).filter(([_, v]) => v != null)) as Record<CodingLanguage, string>,
+    starterCode: Object.fromEntries(Object.entries(content.starterCode).filter(([_, v]) => v != null)) as Record<CodingLanguage, string>,
+    timeLimitMs: content.timeLimitMs,
+    memoryLimitKb: content.memoryLimitKb,
+    acceptanceRate: meta.acceptanceRate,
+  };
+}
+
+// ===== DRAFTS (separate from savedCode) =====
+
+export async function saveDraft(userId: string, draft: PracticeDraft) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await setDoc(doc(db, 'users', userId, 'drafts', draft.problemId), {
+    code: draft.code,
+    language: draft.language,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function loadDraft(userId: string, problemId: string): Promise<PracticeDraft | null> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const snap = await getDoc(doc(db, 'users', userId, 'drafts', problemId));
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  return {
+    problemId,
+    code: data.code,
+    language: data.language,
+    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+  };
+}
+
+// ===== FILTERED QUERIES (for scalable browsing) =====
+
+export async function fetchProblemsFiltered(opts: {
+  difficulty?: string;
+  topic?: string;
+  isPremium?: boolean;
+  search?: string;
+  sortBy?: string;
+  limitCount?: number;
+}): Promise<ProblemDocumentMeta[]> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return [];
+  const constraints: any[] = [];
+  if (opts.difficulty && opts.difficulty !== 'All') {
+    constraints.push(where('difficulty', '==', opts.difficulty));
+  }
+  if (opts.topic && opts.topic !== 'All') {
+    constraints.push(where('topics', 'array-contains', opts.topic));
+  }
+  if (opts.isPremium !== undefined) {
+    constraints.push(where('isPremium', '==', opts.isPremium));
+  }
+  constraints.push(where('isPublished', '==', true));
+
+  const sortField = opts.sortBy === 'XP (Low)' || opts.sortBy === 'XP (High)' ? 'points'
+    : opts.sortBy === 'Acceptance' ? 'acceptanceRate'
+    : opts.sortBy === 'Difficulty' ? 'difficultyRating'
+    : 'title';
+  constraints.push(orderBy(sortField, opts.sortBy === 'XP (Low)' ? 'asc' : 'desc'));
+  constraints.push(limit(opts.limitCount || 50));
+
+  const q = query(collection(db, 'problems'), ...constraints);
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ProblemDocumentMeta));
+}
+
+// ===== BATCH PROGRESS UPDATE =====
+
+export async function updateProgress(userId: string, problemId: string, updates: Partial<UserPracticeProgress>) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  const ref = doc(db, 'users', userId, 'progress', problemId);
+  await setDoc(ref, { ...updates, lastSubmittedAt: serverTimestamp() }, { merge: true });
 }

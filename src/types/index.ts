@@ -356,6 +356,7 @@ export type ProblemTopic =
   | 'Sliding Window' | 'Prefix Sum' | 'Tries' | 'Union Find' | 'Segment Tree'
   | 'SQL';
 
+/** Full problem (metadata + content) – currently used everywhere */
 export interface PracticeProblemDocument {
   id: string;
   title: string;
@@ -379,6 +380,50 @@ export interface PracticeProblemDocument {
   companyTags?: string[];
   relatedProblems?: string[];
   difficultyRating?: number;
+  isPremium?: boolean;
+  isPublished?: boolean;
+  totalSubmissions?: number;
+  totalAccepted?: number;
+  searchTokens?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Lightweight problem metadata — stored in `problems/{id}` */
+export interface ProblemDocumentMeta {
+  id: string;
+  title: string;
+  difficulty: Difficulty;
+  category: string;
+  points: number;
+  topics: ProblemTopic[];
+  companyTags: string[];
+  acceptanceRate: number;
+  totalSubmissions: number;
+  totalAccepted: number;
+  isPremium: boolean;
+  isPublished: boolean;
+  estimatedTime: number;
+  difficultyRating: number;
+  prerequisites: string[];
+  relatedProblems: string[];
+  searchTokens: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Heavy problem content — stored in `problemContent/{id}` */
+export interface ProblemContent {
+  description: string;
+  constraints: string[];
+  examples: Array<{ input: string; output: string; explanation?: string }>;
+  testCases: Array<{ input: string; expected: string; isHidden?: boolean }>;
+  hints: string[];
+  editorial: string;
+  solutionCode: Partial<Record<CodingLanguage, string>>;
+  starterCode: Partial<Record<CodingLanguage, string>>;
+  timeLimitMs: number;
+  memoryLimitKb: number;
 }
 
 export interface DailyChallenge {
@@ -436,10 +481,11 @@ export interface PracticeSubmission {
 export interface UserPracticeProgress {
   problemId: string;
   solved: boolean;
-  bestSubmissionId?: string;
-  submissionsCount: number;
-  lastSubmittedAt?: string;
+  attempted: boolean;
   bookmarked: boolean;
+  submissionsCount: number;
+  bestSubmissionId?: string;
+  lastSubmittedAt?: string;
   notes?: string;
   rating?: number;
   fastestRuntime?: number;
@@ -447,6 +493,13 @@ export interface UserPracticeProgress {
   firstAttempt?: boolean;
   attemptsBeforeSolve?: number;
   lastVerdict?: Verdict;
+}
+
+export interface PracticeDraft {
+  problemId: string;
+  code: string;
+  language: CodingLanguage;
+  updatedAt: string;
 }
 
 export interface RecentlyViewedProblem {

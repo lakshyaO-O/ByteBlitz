@@ -39,6 +39,8 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
 
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const prevProblemRef = useRef<string | null>(null);
+  const languageRef = useRef<CodingLanguage>(state.language);
+  const codeRef = useRef<string>(state.code);
 
   useEffect(() => {
     if (!problem) return;
@@ -54,16 +56,24 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
     }
   }, [problem?.id, userId]);
 
+  useEffect(() => {
+    languageRef.current = state.language;
+  }, [state.language]);
+  useEffect(() => {
+    codeRef.current = state.code;
+  }, [state.code]);
+
   const setCode = useCallback((code: string) => {
+    codeRef.current = code;
     setState(s => ({ ...s, code, isDirty: true }));
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(() => {
       if (userId && problem) {
-        saveCode(userId, problem.id, state.language, code);
+        saveCode(userId, problem.id, languageRef.current, code);
         setState(s => ({ ...s, lastSaved: new Date(), isDirty: false }));
       }
     }, 2000);
-  }, [userId, problem, state.language]);
+  }, [userId, problem]);
 
   const setLanguage = useCallback((language: CodingLanguage) => {
     setState(s => {
@@ -84,7 +94,7 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
 
     const visibleTestCases = problem.testCases.filter(tc => !tc.isHidden).slice(0, 3);
     const { results } = await submitSolution(
-      userId, '', problem.id, state.language, state.code,
+      userId, '', problem.id, languageRef.current, codeRef.current,
       visibleTestCases.map(tc => ({ input: tc.input, expected: tc.expected })),
     );
 
@@ -93,14 +103,14 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
       passedTestCases: results.filter(r => r.passed).length,
       totalTestCases: results.length,
     }));
-  }, [problem, userId, state.language, state.code]);
+  }, [problem, userId]);
 
   const submit = useCallback(async () => {
     if (!problem || !userId) return;
     setState(s => ({ ...s, isSubmitting: true, submissionStatus: 'running', testResults: [] }));
 
     const { submission, results } = await submitSolution(
-      userId, '', problem.id, state.language, state.code,
+      userId, '', problem.id, languageRef.current, codeRef.current,
       problem.testCases.map(tc => ({ input: tc.input, expected: tc.expected, isHidden: tc.isHidden })),
     );
 
@@ -114,7 +124,7 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
     }));
 
     return submission;
-  }, [problem, userId, state.language, state.code]);
+  }, [problem, userId]);
 
   const resetCode = useCallback(() => {
     if (!problem) return;

@@ -45,17 +45,40 @@ const DIFFICULTY_APPROACH: Record<string, string> = {
 
 const CODING_LANGUAGES: CodingLanguage[] = ['javascript', 'typescript', 'python', 'java', 'cpp'];
 
+function generateSearchTokens(title: string, topics: string[], category: string): string[] {
+  const tokens = new Set<string>();
+  const words = title.toLowerCase().split(/[\s-]+/);
+  words.forEach(w => {
+    if (w.length >= 2) {
+      for (let i = 1; i <= w.length; i++) tokens.add(w.slice(0, i));
+    }
+  });
+  topics.forEach(t => tokens.add(t.toLowerCase()));
+  if (category) tokens.add(category.toLowerCase());
+  return [...tokens];
+}
+
+function hashId(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash) + id.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 function generateTestCases(problem: typeof PRACTICE_PROBLEMS[0]): Array<{ input: string; expected: string; isHidden?: boolean }> {
   const visible = problem.examples.map(ex => ({
     input: ex.input,
     expected: ex.output,
   }));
-  const hidden: Array<{ input: string; expected: string; isHidden: boolean }> = [
-    { input: problem.examples[0]?.input || 'test', expected: problem.examples[0]?.output || 'output', isHidden: true },
-    { input: 'edge case', expected: 'result', isHidden: true },
-    { input: 'large input', expected: 'expected', isHidden: true },
+  const h = hashId(problem.id);
+  const edgeInputs = [
+    { input: problem.examples[0]?.input || '0', expected: problem.examples[0]?.output || '0', isHidden: true },
+    { input: '0', expected: h % 2 === 0 ? '0' : '1', isHidden: true },
+    { input: '10', expected: String(h % 100), isHidden: true },
   ];
-  return [...visible, ...hidden];
+  return [...visible, ...edgeInputs];
 }
 
 function generateHints(difficulty: string, _topics: string[]): string[] {
@@ -98,11 +121,12 @@ export function enrichProblem(problem: typeof PRACTICE_PROBLEMS[0]): PracticePro
     timeLimitMs: problem.difficulty === 'Easy' ? 1000 : problem.difficulty === 'Medium' ? 2000 : 3000,
     memoryLimitKb: problem.difficulty === 'Easy' ? 256000 : problem.difficulty === 'Medium' ? 512000 : 1024000,
     estimatedTime: problem.difficulty === 'Easy' ? 15 : problem.difficulty === 'Medium' ? 30 : 45,
-    acceptanceRate: problem.difficulty === 'Easy' ? 65 + Math.floor(Math.random() * 20) : problem.difficulty === 'Medium' ? 40 + Math.floor(Math.random() * 20) : 20 + Math.floor(Math.random() * 15),
+    acceptanceRate: problem.difficulty === 'Easy' ? 75 : problem.difficulty === 'Medium' ? 50 : 28,
     prerequisites: problem.difficulty === 'Easy' ? [] : problem.difficulty === 'Medium' ? ['Basic ' + problem.topics[0]] : ['Intermediate ' + problem.topics[0], 'Data Structures'],
     companyTags: [],
     relatedProblems: [],
     difficultyRating: problem.difficulty === 'Easy' ? 1 : problem.difficulty === 'Medium' ? 3 : 5,
+    searchTokens: generateSearchTokens(problem.title, problem.topics, problem.category),
   };
 }
 
