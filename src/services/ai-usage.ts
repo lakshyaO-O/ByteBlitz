@@ -1,114 +1,207 @@
 'use client';
 
 import { initializeFirebase } from '@/firebase';
+import { doc, getDoc, setDoc, serverTimestamp, Timestamp, runTransaction } from 'firebase/firestore';
+import type {
+  AiFeature, AiFeatureLimit, AiLimitsConfig, SubscriptionTier,
+} from '@/config/ai-limits';
 import {
-  collection, doc, getDoc, getDocs, setDoc, updateDoc,
-  query, where, orderBy, serverTimestamp, increment, Timestamp,
-} from 'firebase/firestore';
-import type { AIUsage, UserProfile } from '@/types';
+  DEFAULT_AI_LIMITS, getLimitForTier, getCurrentPeriodKey,
+  getNextResetTime, isPremiumTier, AI_QUOTAS_CONFIG_DOC,
+} from '@/config/ai-limits';
 
-const DAILY_LIMITS: Record<string, { free: number; pro: number; elite: number }> = {
-  mentor: { free: 5, pro: 20, elite: 50 },
-  codeReview: { free: 3, pro: 15, elite: 40 },
-  debugger: { free: 5, pro: 25, elite: 60 },
-  interviewer: { free: 1, pro: 5, elite: 15 },
-  roadmap: { free: 2, pro: 10, elite: 30 },
-  resumeReview: { free: 1, pro: 5, elite: 20 },
-};
-
-function getDailyLimit(feature: string, subscriptionTier: string): number {
-  const limits = DAILY_LIMITS[feature];
-  if (!limits) return 0;
-  return limits[subscriptionTier as keyof typeof limits] || limits.free;
+export interface AiUsageDoc {
+  count: number;
+  period: string;
+  resetAt: Timestamp;
+  lastUsedAt: Timestamp | null;
 }
 
-function getTodayDateString(): string {
-  return new Date().toISOString().split('T')[0];
+export interface AiUsageCheck {
+  allowed: boolean;
+  remaining: number | null;
+  limit: number | null;
+  used: number;
+  percentage: number;
+  resetAt: Date | null;
+  isPremium: boolean;
+  isExhausted: boolean;
 }
 
-export async function getAIUsage(userId: string): Promise<AIUsage | null> {
+export interface AiUsageState {
+  remaining: number | null;
+  limit: number | null;
+  used: number;
+  percentage: number;
+  resetAt: Date | null;
+  isPremium: boolean;
+  isExhausted: boolean;
+}
+
+async function loadConfigOverride(): Promise<Partial<AiLimitsConfig> | null> {
   const { firestore: db } = initializeFirebase();
   if (!db) return null;
-
-  const snap = await getDoc(doc(db, 'users', userId, 'aiUsage', 'stats'));
-  if (!snap.exists()) return null;
-
-  return snap.data() as AIUsage;
+  try {
+    const snap = await getDoc(doc(db, 'config', 'aiQuotas'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.features) return data.features as Partial<AiLimitsConfig>;
+    }
+  } catch { /* fallback to defaults */ }
+  return null;
 }
 
-export async function checkAILimit(
-  userId: string, feature: string,
-): Promise<{ allowed: boolean; remaining: number; limit: number }> {
+export async function fetchUserTier(userId: string): Promise<SubscriptionTier> {
   const { firestore: db } = initializeFirebase();
-  if (!db) return { allowed: false, remaining: 0, limit: 0 };
+  if (!db) return 'free';
+  const snap = await getDoc(doc(db, 'users', userId));
+  return (snap.data()?.subscriptionTier || 'free') as SubscriptionTier;
+}
 
-  const userSnap = await getDoc(doc(db, 'users', userId));
-  if (!userSnap.exists()) return { allowed: false, remaining: 0, limit: 0 };
+function usageDocRef(userId: string, feature: AiFeature) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  return doc(db, 'users', userId, 'aiUsage', feature);
+}
 
-  const userData = userSnap.data() as UserProfile;
-  const tier = userData.subscriptionTier || 'free';
+async function getOrCreateUsageDoc(
+  userId: string, feature: AiFeature,
+): Promise<{ doc: AiUsageDoc; isNew: boolean }> {
+  const ref = usageDocRef(userId, feature);
+  if (!ref) throw new Error('Firebase not available');
 
-  const featureLimit = getDailyLimit(feature, tier);
+  const snap = await getDoc(ref);
+  const expectedPeriod = getCurrentPeriodKey(feature);
 
-  const today = getTodayDateString();
-  const usageRef = doc(db, 'users', userId, 'aiUsage', 'stats');
-  const usageSnap = await getDoc(usageRef);
-
-  let dailyUsed = 0;
-  if (usageSnap.exists()) {
-    const data = usageSnap.data() as AIUsage;
-    const featureData = data[feature as keyof AIUsage];
-    if (featureData && (featureData as any).lastUsed?.startsWith?.(today)) {
-      dailyUsed = (featureData as any).daily || 0;
+  if (snap.exists()) {
+    const data = snap.data() as AiUsageDoc;
+    if (data.period === expectedPeriod) {
+      return { doc: data, isNew: false };
     }
+    const resetAt = Timestamp.fromDate(getNextResetTime(feature));
+    await setDoc(ref, { count: 0, period: expectedPeriod, resetAt, lastUsedAt: null });
+    return { doc: { count: 0, period: expectedPeriod, resetAt, lastUsedAt: null }, isNew: true };
   }
 
-  const remaining = Math.max(0, featureLimit - dailyUsed);
+  const resetAt = Timestamp.fromDate(getNextResetTime(feature));
+  await setDoc(ref, { count: 0, period: expectedPeriod, resetAt, lastUsedAt: null });
+  return { doc: { count: 0, period: expectedPeriod, resetAt, lastUsedAt: null }, isNew: true };
+}
+
+export async function checkAiUsage(
+  userId: string, feature: AiFeature,
+): Promise<AiUsageCheck> {
+  const tier = await fetchUserTier(userId);
+
+  if (isPremiumTier(tier)) {
+    return {
+      allowed: true, remaining: null, limit: null, used: 0,
+      percentage: 0, resetAt: null, isPremium: true, isExhausted: false,
+    };
+  }
+
+  const configOverride = await loadConfigOverride();
+  const featureLimit = getLimitForTier(feature, tier, configOverride || undefined);
+
+  if (!featureLimit) {
+    return {
+      allowed: true, remaining: null, limit: null, used: 0,
+      percentage: 0, resetAt: null, isPremium: false, isExhausted: false,
+    };
+  }
+
+  const maxCount = featureLimit.daily ?? featureLimit.monthly ?? Infinity;
+  const { doc: usageDoc } = await getOrCreateUsageDoc(userId, feature);
+  const used = usageDoc.count;
+  const remaining = Math.max(0, maxCount - used);
+  const percentage = maxCount > 0 ? Math.min(100, (used / maxCount) * 100) : 0;
+
   return {
     allowed: remaining > 0,
     remaining,
-    limit: featureLimit,
+    limit: maxCount,
+    used,
+    percentage,
+    resetAt: usageDoc.resetAt?.toDate() || null,
+    isPremium: false,
+    isExhausted: remaining <= 0,
   };
 }
 
-export async function incrementAILimit(userId: string, feature: string) {
+export async function incrementAiUsage(
+  userId: string, feature: AiFeature,
+): Promise<void> {
+  const ref = usageDocRef(userId, feature);
+  if (!ref) return;
+
   const { firestore: db } = initializeFirebase();
   if (!db) return;
 
-  const ref = doc(db, 'users', userId, 'aiUsage', 'stats');
-  const snap = await getDoc(ref);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const expectedPeriod = getCurrentPeriodKey(feature);
+    let newCount = 1;
 
-  const today = getTodayDateString();
+    if (snap.exists()) {
+      const data = snap.data() as AiUsageDoc;
+      if (data.period === expectedPeriod) {
+        newCount = (data.count || 0) + 1;
+      }
+    }
 
-  if (snap.exists()) {
-    const data = snap.data() as AIUsage;
-    const current = data[feature as keyof AIUsage] || { daily: 0, total: 0, lastUsed: '' };
-    const isNewDay = !(current as any).lastUsed?.startsWith?.(today);
+    tx.set(ref, {
+      count: newCount,
+      period: expectedPeriod,
+      resetAt: Timestamp.fromDate(getNextResetTime(feature)),
+      lastUsedAt: serverTimestamp(),
+    }, { merge: true });
+  });
+}
 
-    await updateDoc(ref, {
-      [`${feature}.daily`]: isNewDay ? 1 : increment(1),
-      [`${feature}.total`]: increment(1),
-      [`${feature}.lastUsed`]: new Date().toISOString(),
-    });
-  } else {
-    const initialUsage: AIUsage = {
-      mentor: { daily: 0, total: 0, lastUsed: '' },
-      codeReview: { daily: 0, total: 0, lastUsed: '' },
-      debugger: { daily: 0, total: 0, lastUsed: '' },
-      interviewer: { daily: 0, total: 0, lastUsed: '' },
-      roadmap: { daily: 0, total: 0, lastUsed: '' },
-      resumeReview: { daily: 0, total: 0, lastUsed: '' },
-    };
-    initialUsage[feature as keyof AIUsage] = {
-      daily: 1,
-      total: 1,
-      lastUsed: new Date().toISOString(),
-    };
-    await setDoc(ref, initialUsage);
+export async function getAiUsageState(
+  userId: string, feature: AiFeature,
+): Promise<AiUsageState> {
+  const check = await checkAiUsage(userId, feature);
+  return {
+    remaining: check.remaining,
+    limit: check.limit,
+    used: check.used,
+    percentage: check.percentage,
+    resetAt: check.resetAt,
+    isPremium: check.isPremium,
+    isExhausted: check.isExhausted,
+  };
+}
+
+export async function resetAiUsage(userId: string, feature: AiFeature): Promise<void> {
+  const ref = usageDocRef(userId, feature);
+  if (!ref) return;
+  const expectedPeriod = getCurrentPeriodKey(feature);
+  await setDoc(ref, {
+    count: 0,
+    period: expectedPeriod,
+    resetAt: Timestamp.fromDate(getNextResetTime(feature)),
+    lastUsedAt: null,
+  });
+}
+
+export async function resetAllAiUsage(userId: string): Promise<void> {
+  const { AI_FEATURES } = await import('@/config/ai-limits');
+  for (const feature of AI_FEATURES) {
+    await resetAiUsage(userId, feature as AiFeature);
   }
 }
 
-export async function getRemainingCredits(userId: string, feature: string): Promise<number> {
-  const result = await checkAILimit(userId, feature);
-  return result.remaining;
+// Backward-compatible aliases for existing AI pages
+export async function checkAILimit(userId: string, feature: string): Promise<{ allowed: boolean; remaining: number; limit: number }> {
+  const result = await checkAiUsage(userId, feature as AiFeature);
+  return { allowed: result.allowed, remaining: result.remaining ?? 0, limit: result.limit ?? 0 };
 }
+export async function incrementAILimit(userId: string, feature: string): Promise<void> {
+  await incrementAiUsage(userId, feature as AiFeature);
+}
+export async function getRemainingCredits(userId: string, feature: string): Promise<number> {
+  const result = await checkAiUsage(userId, feature as AiFeature);
+  return result.remaining ?? Infinity;
+}
+

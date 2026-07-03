@@ -49,7 +49,7 @@ export default function AICodeReviewPage() {
 
   useEffect(() => {
     if (user) {
-      checkAILimit(user.uid, 'codeReview').then((r) => {
+      checkAILimit(user.uid, 'codeReview').then((r: any) => {
         setUsage({ remaining: r.remaining, limit: r.limit });
       });
     }

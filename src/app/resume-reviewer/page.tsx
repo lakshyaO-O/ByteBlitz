@@ -51,7 +51,7 @@ export default function ResumeReviewerPage() {
 
   useEffect(() => {
     if (user) {
-      checkAILimit(user.uid, 'resumeReview').then((r) => {
+      checkAILimit(user.uid, 'resumeReview').then((r: any) => {
         setUsage({ remaining: r.remaining, limit: r.limit });
       });
     }

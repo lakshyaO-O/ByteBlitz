@@ -2,21 +2,21 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Shell } from '@/components/layout/Shell';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
   Send, Bot, User, Sparkles, Zap, Loader2, Crown, Code2,
-  MessageSquare, Hash, BookOpen, Cpu, Globe, Database,
-  BarChart3, AlertCircle,
+  Hash, BookOpen, Cpu, Globe, Database,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
-import { checkAILimit, incrementAILimit } from '@/services/ai-usage';
+import { useAiUsage } from '@/hooks/use-ai-usage';
+import { UsageDisplay } from '@/components/ai/UsageDisplay';
+import { PremiumUpgradeModal } from '@/components/ai/PremiumUpgradeModal';
 import { toast } from '@/hooks/use-toast';
 import { useFirestore } from '@/firebase/provider';
 
@@ -47,20 +47,9 @@ export default function AIMentorPage() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [usage, setUsage] = useState<{ remaining: number; limit: number } | null>(null);
-  const [checkingUsage, setCheckingUsage] = useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { remaining, isExhausted, isPremium, refresh, consume } = useAiUsage(user?.uid || null, 'aiMentor');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (user) {
-      checkAILimit(user.uid, 'mentor').then((result) => {
-        setUsage({ remaining: result.remaining, limit: result.limit });
-        setCheckingUsage(false);
-      }).catch(() => setCheckingUsage(false));
-    } else {
-      setCheckingUsage(false);
-    }
-  }, [user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -70,12 +59,8 @@ export default function AIMentorPage() {
     const text = input.trim();
     if (!text || isLoading) return;
 
-    if (usage && usage.remaining <= 0) {
-      toast({
-        title: 'Daily limit reached',
-        description: 'Upgrade to Pro for more daily queries.',
-        variant: 'destructive',
-      });
+    if (isExhausted && !isPremium) {
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -85,6 +70,15 @@ export default function AIMentorPage() {
     setIsLoading(true);
 
     try {
+      if (user) {
+        const allowed = await consume();
+        if (!allowed) {
+          setShowUpgradeModal(true);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch('/api/ai/mentor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,12 +97,7 @@ export default function AIMentorPage() {
         id: (Date.now() + 1).toString(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
-
-      if (user) {
-        await incrementAILimit(user.uid, 'mentor');
-        const updated = await checkAILimit(user.uid, 'mentor');
-        setUsage({ remaining: updated.remaining, limit: updated.limit });
-      }
+      refresh();
     } catch (err) {
       toast({
         title: 'Error',
@@ -150,35 +139,15 @@ export default function AIMentorPage() {
             <p className="text-muted-foreground text-sm">Your personal coding assistant — ask anything.</p>
           </div>
           <div className="flex items-center gap-3">
-            {usage && (
-              <Badge
-                variant="outline"
-                className={cn(
-                  'text-xs gap-1.5 px-3 py-1.5',
-                  usage.remaining > 0 ? 'border-primary/30 text-primary' : 'border-destructive/30 text-destructive'
-                )}
-              >
-                <Zap className="w-3.5 h-3.5" />
-                {usage.remaining}/{usage.limit} today
-              </Badge>
-            )}
+            <UsageDisplay
+              userId={user?.uid || null}
+              feature="aiMentor"
+              showLabel={false}
+              showProgressBar={false}
+              showCountdown
+            />
           </div>
         </div>
-
-        {usage && usage.remaining <= 0 && (
-          <Card className="border-destructive/30 bg-destructive/5">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Crown className="w-5 h-5 text-destructive shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-bold">Daily limit reached</p>
-                <p className="text-xs text-muted-foreground">Upgrade to Pro for extended daily limits.</p>
-              </div>
-              <Button variant="default" size="sm" className="gap-1.5 shrink-0">
-                <Crown className="w-4 h-4" /> Upgrade
-              </Button>
-            </CardContent>
-          </Card>
-        )}
 
         <Card className="bg-card/50 border-border overflow-hidden flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
           <ScrollArea className="flex-1 p-4">
@@ -293,6 +262,12 @@ export default function AIMentorPage() {
           </div>
         </Card>
       </div>
+
+      <PremiumUpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="aiMentor"
+      />
     </Shell>
   );
 }

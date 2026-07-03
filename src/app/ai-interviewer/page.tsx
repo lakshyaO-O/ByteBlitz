@@ -77,7 +77,7 @@ export default function AIInterviewerPage() {
 
   useEffect(() => {
     if (user) {
-      checkAILimit(user.uid, 'interviewer').then((r) => {
+      checkAILimit(user.uid, 'interviewer').then((r: any) => {
         setUsage({ remaining: r.remaining, limit: r.limit });
       });
     }

@@ -73,7 +73,7 @@ export default function AIRoadmapPage() {
 
   useEffect(() => {
     if (user) {
-      checkAILimit(user.uid, 'roadmap').then((r) => {
+      checkAILimit(user.uid, 'roadmap').then((r: any) => {
         setUsage({ remaining: r.remaining, limit: r.limit });
       });
     }

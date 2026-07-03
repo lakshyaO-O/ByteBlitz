@@ -167,9 +167,19 @@ service cloud.firestore {
         allow delete: if isOwner(userId);
       }
 
-      // ===== AI USAGE =====
+      // ===== AI USAGE QUOTA (per-feature docs) =====
       match /aiUsage/{feature} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['count', 'period', 'resetAt'])
+          && request.resource.data.count is number
+          && request.resource.data.count >= 0
+          && request.resource.data.period is string;
+        allow update: if isOwner(userId)
+          && resource.data.period == request.resource.data.period
+          && request.resource.data.count == resource.data.count + 1
+          && request.resource.data.keys().hasOnly(['count', 'period', 'resetAt', 'lastUsedAt']);
+        allow delete: if false;
       }
 
       // ===== DAILY MISSIONS =====

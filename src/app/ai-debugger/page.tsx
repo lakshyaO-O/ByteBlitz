@@ -50,7 +50,7 @@ export default function AIDebuggerPage() {
 
   useEffect(() => {
     if (user) {
-      checkAILimit(user.uid, 'debugger').then((r) => {
+      checkAILimit(user.uid, 'debugger').then((r: any) => {
         setUsage({ remaining: r.remaining, limit: r.limit });
       });
     }
