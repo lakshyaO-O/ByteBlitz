@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, Swords, Trophy, BookOpen, Settings, Zap, Menu, LogOut,
-  Users, Target, Calendar, BarChart3, UserCircle, Bell, Search, Gamepad2,
-  Medal, ChevronLeft, Code2, LogIn, UserPlus, Eye, GraduationCap,
-  Crown, Sparkles, Bug, Brain, Map, FileText, Briefcase, MessageCircle,
-  Share2, Globe, Users2, CalendarDays, Gift, Rocket, Store, FolderGit2,
-  ChevronDown, ChevronRight, Lightbulb, Newspaper,
+  LayoutDashboard, Swords, Trophy, Settings, Menu, LogOut,
+  Users, BarChart3, UserCircle, Bell, Search, Gamepad2,
+  ChevronLeft, Code2, LogIn, UserPlus, GraduationCap,
+  Crown, Sparkles, Bug, Brain, Briefcase, MessageCircle,
+  Share2, Globe, Rocket, Store, MessageSquare, Eye,
+  ChevronDown, ChevronRight, Lightbulb,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -48,7 +48,6 @@ const NAV_SECTIONS: NavSection[] = [
       { href: '/practice', label: 'Practice', icon: Code2 },
       { href: '/learning', label: 'Learning', icon: GraduationCap },
       { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-      { href: '/weekly-challenges', label: 'Challenges', icon: Target },
     ],
   },
   {
@@ -58,33 +57,26 @@ const NAV_SECTIONS: NavSection[] = [
       { href: '/ai-code-review', label: 'Code Review', icon: Code2 },
       { href: '/ai-debugger', label: 'AI Debugger', icon: Bug },
       { href: '/ai-interviewer', label: 'AI Interviewer', icon: Brain },
-      { href: '/ai-roadmap', label: 'AI Roadmap', icon: Map },
-      { href: '/resume-reviewer', label: 'Resume Review', icon: FileText },
     ],
   },
   {
     label: 'COMMUNITY',
     items: [
-      { href: '/feed', label: 'Daily Feed', icon: Newspaper },
       { href: '/community', label: 'Community', icon: MessageCircle },
       { href: '/forum', label: 'Forum', icon: Globe },
       { href: '/code-share', label: 'Code Share', icon: Share2 },
-      { href: '/study-groups', label: 'Study Groups', icon: Users2 },
-      { href: '/mentors', label: 'Mentors', icon: GraduationCap },
     ],
   },
   {
     label: 'CAREER',
     items: [
       { href: '/career-hub', label: 'Career Hub', icon: Briefcase },
-      { href: '/career-hub/company-wise', label: 'Company Prep', icon: Target },
     ],
   },
   {
     label: 'EVENTS',
     items: [
       { href: '/hackathons', label: 'Hackathons', icon: Rocket },
-      { href: '/contest-calendar', label: 'Contests', icon: CalendarDays },
     ],
   },
   {
@@ -93,27 +85,20 @@ const NAV_SECTIONS: NavSection[] = [
       { href: '/missions', label: 'Missions', icon: Lightbulb },
       { href: '/shop', label: 'Shop', icon: Store },
       { href: '/progress', label: 'Progress', icon: BarChart3 },
-      { href: '/progress/streaks', label: 'Streaks', icon: Zap },
-      { href: '/achievements', label: 'Achievements', icon: Medal },
     ],
   },
   {
     label: 'SOCIAL',
     items: [
+      { href: '/chats', label: 'Messages', icon: MessageSquare },
       { href: '/friends', label: 'Friends', icon: Users },
       { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
       { href: '/notifications', label: 'Notifications', icon: Bell },
     ],
   },
   {
-    label: 'PORTFOLIO',
     items: [
       { href: '/profile', label: 'My Profile', icon: UserCircle },
-      { href: '/projects', label: 'Projects', icon: FolderGit2 },
-    ],
-  },
-  {
-    items: [
       { href: '/monetization', label: 'Premium', icon: Crown },
       { href: '/search', label: 'Search', icon: Search },
       { href: '/settings', label: 'Settings', icon: Settings },
