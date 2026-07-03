@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -18,17 +18,30 @@ import {
 } from '@/components/ui/select';
 import { initializeFirebase } from '@/firebase';
 import {
-  collection, doc, getDocs, updateDoc, deleteDoc, addDoc, query, orderBy, limit, serverTimestamp, setDoc, getDoc,
+  collection, doc, getDocs, updateDoc, deleteDoc, addDoc, query, orderBy, limit, serverTimestamp, setDoc, getDoc, writeBatch,
 } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import {
   Shield, Users, Swords, Calendar, Bell, BarChart3, Flag, AlertTriangle,
   CheckCircle, XCircle, Search, Trash2, Plus, Edit3, Eye, EyeOff, Loader2,
-  Zap, Trophy, Target, UserCheck, UserX, Crown, Ban,
+  Zap, Trophy, Target, UserCheck, UserX, Crown, Ban, Upload,
 } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { UserProfile } from '@/app/lib/types';
 import { seedProblemsToFirestore } from '@/services/seed-data';
+
+function generateSearchTokens(title: string, topics: string[], category: string): string[] {
+  const tokens = new Set<string>();
+  const words = title.toLowerCase().split(/[\s-]+/);
+  words.forEach(w => {
+    if (w.length >= 2) {
+      for (let i = 1; i <= w.length; i++) tokens.add(w.slice(0, i));
+    }
+  });
+  topics.forEach(t => tokens.add(t.toLowerCase()));
+  if (category) tokens.add(category.toLowerCase());
+  return [...tokens];
+}
 
 export function AdminPanel() {
   const { user } = useUser();
@@ -525,6 +538,8 @@ function ProblemManagement() {
   const [editing, setEditing] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { loadProblems(); }, []);
 
@@ -600,7 +615,7 @@ function ProblemManagement() {
       difficultyRating: form.difficulty === 'Easy' ? 1 : form.difficulty === 'Medium' ? 3 : 5,
       prerequisites: [],
       relatedProblems: [],
-      searchTokens: [],
+      searchTokens: generateSearchTokens(form.title, form.topics, form.category),
       updatedAt: serverTimestamp(),
     };
 
@@ -738,6 +753,59 @@ function ProblemManagement() {
     setSeeding(false);
   }, []);
 
+  const handleImportJSON = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const problems = Array.isArray(data) ? data : data.problems || [];
+      const { firestore: db } = initializeFirebase();
+      if (!db) { alert('Firebase not available'); setImporting(false); return; }
+      let created = 0, skipped = 0;
+      for (let i = 0; i < problems.length; i += 20) {
+        const batch = writeBatch(db);
+        const slice = problems.slice(i, i + 20);
+        for (const p of slice) {
+          if (!p.id || !p.title) { skipped++; continue; }
+          const existing = await getDoc(doc(db, 'problems', p.id));
+          if (existing.exists()) { skipped++; continue; }
+          const meta = {
+            title: p.title, difficulty: p.difficulty || 'Easy',
+            category: p.category || p.topics?.[0] || 'General',
+            points: p.points || 10, topics: p.topics || [],
+            companyTags: p.companyTags || [],
+            acceptanceRate: p.acceptanceRate || 75,
+            totalSubmissions: 0, totalAccepted: 0,
+            isPremium: p.isPremium || false, isPublished: p.isPublished !== false,
+            estimatedTime: p.estimatedTime || 15,
+            difficultyRating: p.difficulty === 'Easy' ? 1 : p.difficulty === 'Medium' ? 3 : 5,
+            prerequisites: p.prerequisites || [], relatedProblems: p.relatedProblems || [],
+            searchTokens: generateSearchTokens(p.title, p.topics || [], p.category || ''),
+            createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+          };
+          const content = {
+            description: p.description || '', constraints: p.constraints || [],
+            examples: p.examples || [], testCases: p.testCases || [],
+            hints: p.hints || [], editorial: p.editorial || '',
+            solutionCode: p.solutionCode || p.starterCode || {},
+            starterCode: p.starterCode || {},
+            timeLimitMs: p.timeLimitMs || 2000, memoryLimitKb: p.memoryLimitKb || 256000,
+          };
+          batch.set(doc(db, 'problems', p.id), meta);
+          batch.set(doc(db, 'problemContent', p.id), content);
+          created++;
+        }
+        await batch.commit();
+      }
+      alert(`Imported ${created} problems. ${skipped} skipped.`);
+      loadProblems();
+    } catch (e) { console.warn('[Admin] Import failed:', e); alert('Import failed: ' + e); }
+    setImporting(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -745,7 +813,18 @@ function ProblemManagement() {
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={handleSeed} disabled={seeding} className="gap-2">
             {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-            {seeding ? 'Seeding...' : 'Seed 55 Problems'}
+            {seeding ? 'Seeding...' : 'Seed 55'}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImportJSON}
+          />
+          <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing} className="gap-2">
+            {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            {importing ? 'Importing...' : 'Import JSON'}
           </Button>
           <Button size="sm" onClick={() => { resetForm(); setShowNew(true); }} className="gap-2">
             <Plus className="w-4 h-4" /> New Problem
