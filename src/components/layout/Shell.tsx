@@ -175,14 +175,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className={cn('border-b border-border shrink-0', sidebarCollapsed ? 'p-3' : 'p-3')}>
         <Link href="/" className={cn(
           'flex items-center group',
-          sidebarCollapsed ? 'justify-center' : 'gap-2'
+          sidebarCollapsed ? 'justify-center' : 'justify-center'
         )}>
-          <img src="/icons/icon.svg" alt="DevRann" className="h-[30px] w-[30px] shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
-          {!sidebarCollapsed && (
-            <span className="text-[17px] font-headline font-bold tracking-tight leading-none">
-              Dev<span className="text-primary">Rann</span>
-            </span>
-          )}
+          <img src="/icons/icon.svg" alt="DevRann" className="h-[34px] w-[34px] shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]" />
         </Link>
       </div>
 
