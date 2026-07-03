@@ -4,8 +4,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, BookmarkCheck, Clock, Brain, Shuffle, Sparkles, SlidersHorizontal, CheckCircle2, Lock } from 'lucide-react';
+import { Loader2, BookmarkCheck, Clock, Brain, Shuffle, CheckCircle2, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
 import { PracticeWorkbench } from '@/components/practice/PracticeWorkbench';
@@ -20,13 +19,7 @@ import { useAppStore } from '@/store/app-store';
 import { enrichAllProblems, getStaticProblemById, getStaticRecommendations } from '@/lib/problem-utils';
 import type { PracticeProblemDocument, Difficulty, ProblemTopic } from '@/types';
 
-const ALL_TOPICS = [
-  'Arrays', 'Strings', 'Math', 'Loops', 'Functions', 'Recursion',
-  'Sorting', 'Searching', 'Hashing', 'Stack', 'Queue', 'Linked List',
-  'Trees', 'Graphs', 'Heap', 'Greedy', 'Dynamic Programming',
-  'Backtracking', 'Bit Manipulation', 'Binary Search', 'Two Pointers',
-  'Sliding Window', 'Prefix Sum', 'Tries', 'Union Find', 'Segment Tree', 'SQL',
-];
+import { ALL_TOPICS } from '@/features/practice/components/ProblemFilters';
 
 export default function PracticePage() {
   const { user, loading: authLoading } = useUser();
@@ -165,7 +158,7 @@ export default function PracticePage() {
   return (
     <Shell>
       <AchievementPopupContainer
-        achievements={newAchievements as any}
+        achievements={newAchievements}
         onDismiss={dismissNewAchievement}
       />
 
@@ -314,7 +307,6 @@ export default function PracticePage() {
             unlockedDifficulties={unlockedDifficulties}
             canAccess={canAccess}
           onStartProblem={handleStartProblem}
-            onResetFilters={() => {}}
           />
         )}
       </div>

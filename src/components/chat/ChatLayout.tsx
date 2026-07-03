@@ -45,7 +45,7 @@ export function ChatLayout() {
   }, []);
 
   const handleViewProfile = useCallback((userId: string) => {
-    router.push(`/u/${userId}`);
+    router.push(`/profile/${userId}`);
   }, [router]);
 
   const handleDeleteChat = useCallback(async (chatId: string) => {

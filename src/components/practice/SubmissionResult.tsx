@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, XCircle, AlertTriangle, Clock, Zap, BarChart3, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, Clock, Zap, BarChart3, Loader2, Cpu, HardDrive, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Verdict, SubmissionStatus } from '@/types';
 
@@ -11,6 +11,9 @@ interface SubmissionResultProps {
   executionTimeMs: number;
   memoryUsedKb: number;
   status: SubmissionStatus;
+  testResults?: Array<{ passed: boolean; executionTimeMs: number; memoryUsedKb: number }>;
+  problemTimeLimit?: number;
+  problemMemoryLimit?: number;
 }
 
 const verdictConfig: Record<Verdict, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
@@ -58,8 +61,28 @@ const verdictConfig: Record<Verdict, { label: string; color: string; bg: string;
   },
 };
 
+function estimateTimeComplexity(ms: number, testCount: number): string {
+  if (testCount === 0 || ms === 0) return '—';
+  const avg = ms / testCount;
+  if (avg < 0.5) return 'O(1)';
+  if (avg < 5) return 'O(log n)';
+  if (avg < 50) return 'O(n)';
+  if (avg < 200) return 'O(n log n)';
+  if (avg < 500) return 'O(n²)';
+  return 'O(2ⁿ)';
+}
+
+function estimateSpaceComplexity(kb: number): string {
+  if (kb === 0) return '—';
+  if (kb < 64) return 'O(1)';
+  if (kb < 256) return 'O(n)';
+  if (kb < 512) return 'O(n²)';
+  return 'O(n!)';
+}
+
 export function SubmissionResult({
   verdict, passedTestCases, totalTestCases, executionTimeMs, memoryUsedKb, status,
+  testResults, problemTimeLimit, problemMemoryLimit,
 }: SubmissionResultProps) {
   if (status === 'pending') return null;
   if (status === 'running') {
@@ -76,34 +99,57 @@ export function SubmissionResult({
 
   const config = verdictConfig[verdict];
   const Icon = config.icon;
+  const passRate = totalTestCases > 0 ? Math.round((passedTestCases / totalTestCases) * 100) : 0;
+  const avgTime = testResults?.length ? Math.round(executionTimeMs / testResults.length) : executionTimeMs;
+  const timePct = problemTimeLimit ? Math.min(100, Math.round((executionTimeMs / problemTimeLimit) * 100)) : 0;
+  const memPct = problemMemoryLimit ? Math.min(100, Math.round((memoryUsedKb / problemMemoryLimit) * 100)) : 0;
 
   return (
-    <div className={cn('rounded-xl border p-6 space-y-4', config.bg, config.border)}>
+    <div className={cn('rounded-xl border p-4 space-y-3', config.bg, config.border)}>
       <div className="flex items-center gap-3">
-        <Icon className={cn('w-8 h-8', config.color)} />
+        <Icon className={cn('w-7 h-7', config.color)} />
         <div>
-          <h3 className={cn('text-xl font-bold font-headline', config.color)}>{config.label}</h3>
+          <h3 className={cn('text-lg font-bold font-headline', config.color)}>{config.label}</h3>
           <p className="text-xs text-muted-foreground">
-            {passedTestCases}/{totalTestCases} test cases passed
+            {passedTestCases}/{totalTestCases} test cases passed &middot; {passRate}% pass rate
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-background/50 rounded-lg p-3 text-center">
-          <BarChart3 className={cn('w-4 h-4 mx-auto mb-1', config.color)} />
-          <p className="text-lg font-bold font-mono">{passedTestCases}/{totalTestCases}</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Passed</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="bg-background/50 rounded-lg p-2.5 text-center">
+          <BarChart3 className={cn('w-3.5 h-3.5 mx-auto mb-0.5', config.color)} />
+          <p className="text-base font-bold font-mono">{passedTestCases}/{totalTestCases}</p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Passed</p>
         </div>
-        <div className="bg-background/50 rounded-lg p-3 text-center">
-          <Clock className={cn('w-4 h-4 mx-auto mb-1', config.color)} />
-          <p className="text-lg font-bold font-mono">{executionTimeMs}ms</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Time</p>
+        <div className="bg-background/50 rounded-lg p-2.5 text-center">
+          <Clock className={cn('w-3.5 h-3.5 mx-auto mb-0.5', config.color)} />
+          <p className="text-base font-bold font-mono">{avgTime}ms</p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Avg / case</p>
+          {problemTimeLimit && (
+            <div className="w-full h-1 bg-muted rounded-full mt-1 overflow-hidden">
+              <div className={cn('h-full rounded-full', timePct > 80 ? 'bg-destructive' : 'bg-emerald-500')} style={{ width: `${timePct}%` }} />
+            </div>
+          )}
         </div>
-        <div className="bg-background/50 rounded-lg p-3 text-center">
-          <Zap className={cn('w-4 h-4 mx-auto mb-1', config.color)} />
-          <p className="text-lg font-bold font-mono">{memoryUsedKb}KB</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Memory</p>
+        <div className="bg-background/50 rounded-lg p-2.5 text-center">
+          <Zap className={cn('w-3.5 h-3.5 mx-auto mb-0.5', config.color)} />
+          <p className="text-base font-bold font-mono">{memoryUsedKb}KB</p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Memory</p>
+          {problemMemoryLimit && (
+            <div className="w-full h-1 bg-muted rounded-full mt-1 overflow-hidden">
+              <div className={cn('h-full rounded-full', memPct > 80 ? 'bg-destructive' : 'bg-emerald-500')} style={{ width: `${memPct}%` }} />
+            </div>
+          )}
+        </div>
+        <div className="bg-background/50 rounded-lg p-2.5 text-center">
+          <Brain className={cn('w-3.5 h-3.5 mx-auto mb-0.5', config.color)} />
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-mono font-bold">{estimateTimeComplexity(executionTimeMs, totalTestCases)}</p>
+            <p className="text-[8px] text-muted-foreground uppercase tracking-widest">Time</p>
+            <p className="text-[9px] font-mono font-bold">{estimateSpaceComplexity(memoryUsedKb)}</p>
+            <p className="text-[8px] text-muted-foreground uppercase tracking-widest">Space</p>
+          </div>
         </div>
       </div>
     </div>

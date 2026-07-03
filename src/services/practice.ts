@@ -111,14 +111,16 @@ export async function submitSolution(
   userId: string, username: string,
   problemId: string, language: CodingLanguage, code: string,
   testCases: Array<{ input: string; expected: string; isHidden?: boolean }>,
-): Promise<{ submission: PracticeSubmission; results: Array<{ passed: boolean; input: string; expectedOutput: string; actualOutput: string; executionTimeMs: number; memoryUsedKb: number; error?: string }> }> {
+): Promise<{ submission: PracticeSubmission; results: Array<{ passed: boolean; input: string; expectedOutput: string; actualOutput: string; executionTimeMs: number; memoryUsedKb: number; error?: string; stdout?: string }> }> {
+  const problem = await fetchProblem(problemId);
   const judgeResult = await judge.execute({
-    code, language, testCases,
-    timeLimitMs: 2000, memoryLimitKb: 256000,
+    code, language, testCases, problemId,
+    timeLimitMs: problem?.timeLimitMs || 2000,
+    memoryLimitKb: problem?.memoryLimitKb || 256000,
   });
 
   const { verdict, passedTestCases, totalTestCases, testCaseResults } = judgeResult;
-  const results = testCaseResults; // already in the right shape
+  const results = testCaseResults;
 
   const { firestore: db } = initializeFirebase();
   let submissionId = '';
@@ -127,11 +129,25 @@ export async function submitSolution(
     const subRef = await addDoc(collection(db, 'users', userId, 'submissions'), {
       userId, problemId, language, code,
       verdict, passedTestCases, totalTestCases,
-      executionTimeMs: judgeResult.executionTimeMs, memoryUsedKb: judgeResult.memoryUsedKb,
+      executionTimeMs: judgeResult.executionTimeMs,
+      memoryUsedKb: judgeResult.memoryUsedKb,
       submittedAt: serverTimestamp(),
     });
     submissionId = subRef.id;
 
+    // Write to practiceProgress (used by useUserProgress hook)
+    const ppRef = doc(db, 'users', userId, 'practiceProgress', problemId);
+    await setDoc(ppRef, {
+      solved: verdict === 'Accepted',
+      attempted: true,
+      bestSubmissionId: subRef.id,
+      submissionsCount: increment(1),
+      lastSubmittedAt: serverTimestamp(),
+      lastVerdict: verdict,
+      bookmarked: false,
+    }, { merge: true });
+
+    // Also write to progress (legacy collection)
     await setDoc(doc(db, 'users', userId, 'progress', problemId), {
       solved: verdict === 'Accepted',
       attempted: true,
@@ -145,12 +161,15 @@ export async function submitSolution(
     await runTransaction(db, async (tx) => {
       const snap = await tx.get(userRef);
       if (snap.exists()) {
-        tx.update(userRef, {
+        const updates: Record<string, any> = {
           xp: increment(verdict === 'Accepted' ? 50 : 10),
-          problemsSolved: increment(verdict === 'Accepted' ? 1 : 0),
           totalSubmissions: increment(1),
           lastActive: serverTimestamp(),
-        });
+        };
+        if (verdict === 'Accepted') {
+          updates.problemsSolved = increment(1);
+        }
+        tx.update(userRef, updates);
       }
     });
   }
@@ -159,7 +178,8 @@ export async function submitSolution(
     id: submissionId || 'local',
     userId, problemId, language, code,
     verdict, passedTestCases, totalTestCases,
-    executionTimeMs: judgeResult.executionTimeMs, memoryUsedKb: judgeResult.memoryUsedKb,
+    executionTimeMs: judgeResult.executionTimeMs,
+    memoryUsedKb: judgeResult.memoryUsedKb,
     submittedAt: new Date().toISOString(),
   };
 

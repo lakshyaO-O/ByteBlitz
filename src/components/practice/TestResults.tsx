@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, Loader2, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TestCaseResult } from '@/types';
 
@@ -60,13 +60,19 @@ export function TestResults({ results, isRunning }: TestResultsProps) {
               {result.executionTimeMs}ms &middot; {result.memoryUsedKb}KB
             </span>
           </div>
+          {result.stdout && (
+            <div className="flex items-start gap-1.5 pt-1 text-[10px] text-muted-foreground border-t border-border/30 mt-1">
+              <Terminal className="w-3 h-3 mt-0.5 shrink-0" />
+              <pre className="whitespace-pre-wrap flex-1">{result.stdout}</pre>
+            </div>
+          )}
           {!result.passed && (
             <div className="space-y-1 pt-1">
               {result.error ? (
                 <div className="text-destructive">Error: {result.error}</div>
               ) : (
                 <>
-                  <div>Expected: <span className="text-emerald-400">{result.expectedOutput}</span></div>
+                  <div>Expected: <span className="text-emerald-400">{result.expectedOutput || '(empty)'}</span></div>
                   <div>Actual: <span className="text-destructive">{result.actualOutput || '(empty)'}</span></div>
                 </>
               )}

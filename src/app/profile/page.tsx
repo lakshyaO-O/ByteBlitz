@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   User, Zap, Trophy, BookOpen, Target, Medal, Calendar, Edit3, Loader2,
   Activity, Gift, Share2, Flame, Star, CheckCircle2, Sword, Sparkles,
-  GraduationCap, Code2, Swords, Clock, TrendingUp,
+  GraduationCap, Code2, Swords, Clock, TrendingUp, Gem,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -178,6 +178,7 @@ export default function ProfilePage() {
                     <StatBox label="Total Games" value={(stats.wins || 0) + (stats.losses || 0) + (stats.draws || 0)} color="text-foreground" />
                     <StatBox label="Total XP" value={stats.xp || beginner.xp || 0} color="text-orange-400" />
                     <StatBox label="Rank" value={`#${stats.rank || '—'}`} color="text-muted-foreground" />
+                    <StatBox label="DevCoins" value={(stats.devcoins || 0).toLocaleString()} color="text-yellow-400" />
                   </div>
                 </TabsContent>
 

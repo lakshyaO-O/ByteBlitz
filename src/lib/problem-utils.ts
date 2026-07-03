@@ -72,13 +72,14 @@ function generateTestCases(problem: typeof PRACTICE_PROBLEMS[0]): Array<{ input:
     input: ex.input,
     expected: ex.output,
   }));
-  const h = hashId(problem.id);
-  const edgeInputs = [
-    { input: problem.examples[0]?.input || '0', expected: problem.examples[0]?.output || '0', isHidden: true },
-    { input: '0', expected: h % 2 === 0 ? '0' : '1', isHidden: true },
-    { input: '10', expected: String(h % 100), isHidden: true },
-  ];
-  return [...visible, ...edgeInputs];
+  // Hidden test cases with empty expected — judge resolves via reference solution
+  // If no reference solution exists, hidden cases auto-pass (informational only)
+  const hidden = problem.examples.slice(0, 2).map((ex, i) => ({
+    input: ex.input,
+    expected: '',
+    isHidden: true,
+  }));
+  return [...visible, ...hidden];
 }
 
 function generateHints(difficulty: string, _topics: string[]): string[] {

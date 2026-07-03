@@ -20,6 +20,7 @@ import {
   Star, Target, Gamepad2, Scroll, Loader2, Sword, BookOpen, Lock, Code2,
   GraduationCap, Sparkles, CheckCircle2, ArrowRight, Flame,
 } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { MatchRecord } from '@/types';
 
@@ -411,7 +412,7 @@ export default function ArenaPage() {
                   </div>
                 </Card>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Card className="bg-card/60 border-border/80 hover:border-emerald-500/30 transition-all group cursor-pointer"
                     onClick={() => setView('matchmaking')}>
                     <div className="p-6">
@@ -435,6 +436,25 @@ export default function ArenaPage() {
                       <Badge variant="outline" className="text-[10px] text-purple-400 border-purple-500/30 bg-purple-500/5">Available</Badge>
                     </div>
                   </Card>
+
+                  <Link
+                    href="/arena/custom-study"
+                    className="block"
+                  >
+                    <Card className="bg-card/60 border-border/80 hover:border-emerald-500/30 transition-all group cursor-pointer h-full">
+                      <div className="p-6">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                          <BookOpen className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <h3 className="font-headline font-bold text-sm uppercase tracking-wider mb-1">Study Room</h3>
+                        <p className="text-muted-foreground text-xs mb-3">Collaborative coding rooms. Solve problems together — no ELO pressure.</p>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 bg-emerald-500/5">Available</Badge>
+                          <Badge variant="outline" className="text-[10px] text-secondary border-secondary/30 bg-secondary/5">No ELO</Badge>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,6 +19,7 @@ const MEDAL_COLORS = ['text-yellow-400', 'text-gray-300', 'text-orange-400'];
 export default function LeaderboardPage() {
   const db = useFirestore();
   const { user } = useUser();
+  const router = useRouter();
 
   const leadersQuery = React.useMemo(() => {
     if (!db) return null;
@@ -54,9 +56,9 @@ export default function LeaderboardPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-              {leaders.length > 1 && <TopPlayerCard rank={2} name={leaders[1].username} rating={leaders[1].rating} />}
-              {leaders.length > 0 && <TopPlayerCard rank={1} name={leaders[0].username} rating={leaders[0].rating} />}
-              {leaders.length > 2 && <TopPlayerCard rank={3} name={leaders[2].username} rating={leaders[2].rating} />}
+              {leaders.length > 1 && <TopPlayerCard rank={2} name={leaders[1].username} rating={leaders[1].rating} userId={leaders[1].id} />}
+              {leaders.length > 0 && <TopPlayerCard rank={1} name={leaders[0].username} rating={leaders[0].rating} userId={leaders[0].id} />}
+              {leaders.length > 2 && <TopPlayerCard rank={3} name={leaders[2].username} rating={leaders[2].rating} userId={leaders[2].id} />}
             </div>
 
             <Card className="bg-card/50 border-border overflow-hidden">
@@ -74,12 +76,14 @@ export default function LeaderboardPage() {
                     <LeaderRow
                       key={player.id}
                       rank={index + 1}
+                      userId={player.id}
                       name={player.username}
                       rating={player.rating}
                       wins={player.wins}
                       games={player.wins + player.losses}
                       isCurrentUser={isCurrentUser}
                       isTop3={isTop3}
+                      onViewProfile={() => router.push(`/profile/${player.id}`)}
                     />
                   );
                 })}
@@ -92,7 +96,8 @@ export default function LeaderboardPage() {
   );
 }
 
-function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rating: number }) {
+function TopPlayerCard({ rank, name, rating, userId }: { rank: number; name: string; rating: number; userId?: string }) {
+  const router = useRouter();
   const isFirst = rank === 1;
   const tier = getTier(rating);
   const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -100,8 +105,10 @@ function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rat
   const medalColor = MEDAL_COLORS[rank - 1];
 
   return (
-    <Card className={cn(
-      'relative border-border bg-card/50 overflow-hidden group',
+    <Card
+      onClick={() => userId && router.push(`/profile/${userId}`)}
+      className={cn(
+      'relative border-border bg-card/50 overflow-hidden group cursor-pointer',
       isFirst ? 'order-first md:order-none scale-110 z-10 border-primary/40 bg-primary/5 neon-border shadow-2xl' : 'scale-95 opacity-80'
     )}>
       <CardContent className="p-8 text-center space-y-4">
@@ -137,14 +144,16 @@ function TopPlayerCard({ rank, name, rating }: { rank: number; name: string; rat
   );
 }
 
-function LeaderRow({ rank, name, rating, wins, games, isCurrentUser, isTop3 }: { rank: number; name: string; rating: number; wins: number; games: number; isCurrentUser: boolean; isTop3: boolean }) {
+function LeaderRow({ rank, name, rating, wins, games, isCurrentUser, isTop3, userId, onViewProfile }: { rank: number; name: string; rating: number; wins: number; games: number; isCurrentUser: boolean; isTop3: boolean; userId?: string; onViewProfile?: () => void }) {
   const winRate = games > 0 ? Math.round((wins / games) * 100) : 0;
   const tier = getTier(rating);
   const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   const RankIcon = isTop3 ? MEDAL_ICONS[rank - 1] : null;
 
   return (
-    <div className={cn(
+    <div
+      onClick={onViewProfile}
+      className={cn(
       'grid grid-cols-12 p-4 items-center transition-colors group',
       isCurrentUser ? 'bg-primary/10 border-l-2 border-primary' : 'hover:bg-muted/30 cursor-pointer border-l-2 border-transparent'
     )}>

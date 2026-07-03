@@ -19,6 +19,7 @@ export interface JudgeRequest {
   testCases: Array<{ input: string; expected: string; isHidden?: boolean }>;
   timeLimitMs: number;
   memoryLimitKb: number;
+  problemId?: string;
 }
 
 export interface Judge {

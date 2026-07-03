@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Play, Send, RotateCcw, ArrowLeft, Terminal, Loader2, BookOpen, ChevronLeft, ChevronRight,
+  Play, Send, RotateCcw, ArrowLeft, Loader2, BookOpen, ChevronLeft, ChevronRight,
   Share2, GripVertical,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,6 @@ import { ProblemDescription } from './ProblemDescription';
 import { ShortcutHint } from './ShortcutHint';
 import { usePracticeSession } from '@/hooks/use-practice-session';
 import { useUserProgress } from '@/hooks/use-practice-problems';
-import { useRecentlyViewed } from '@/hooks/use-practice-problems';
 import { toggleBookmark } from '@/services/practice';
 import { useAppStore } from '@/store/app-store';
 import type { PracticeProblemDocument, CodingLanguage } from '@/types';
@@ -42,14 +41,9 @@ export function PracticeWorkbench({
   const isDragging = useRef(false);
 
   const { progress } = useUserProgress(userId);
-  const { track } = useRecentlyViewed(userId);
   const userProgress = progress[problem.id];
 
-  const session = usePracticeSession(userId, problem);
-
-  useEffect(() => {
-    if (problem) track({ id: problem.id, title: problem.title, difficulty: problem.difficulty });
-  }, [problem?.id]);
+  const session = usePracticeSession(userId, username, problem);
 
   useEffect(() => {
     if (session.testResults.length > 0) setActiveTab('results');
@@ -70,18 +64,22 @@ export function PracticeWorkbench({
     }
   }, [session.verdict, session.passedTestCases, session.totalTestCases]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      if (e.shiftKey) session.submit();
-      else session.runTests();
-    }
-  }, [session]);
+  const runTestsRef = useRef(session.runTests);
+  const submitRef = useRef(session.submit);
+  runTestsRef.current = session.runTests;
+  submitRef.current = session.submit;
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) submitRef.current();
+        else runTestsRef.current();
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  }, []);
 
   const handleToggleBookmark = async () => {
     if (!userId) return;
@@ -212,6 +210,8 @@ export function PracticeWorkbench({
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             session={session}
+            timeLimitMs={problem.timeLimitMs}
+            memoryLimitKb={problem.memoryLimitKb}
           />
         </div>
       </div>
@@ -245,6 +245,8 @@ export function PracticeWorkbench({
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 session={session}
+                timeLimitMs={problem.timeLimitMs}
+                memoryLimitKb={problem.memoryLimitKb}
               />
             </>
           )}
@@ -270,7 +272,7 @@ function Toolbar({ session, problem }: { session: ReturnType<typeof usePracticeS
             <option key={lang} value={lang}>{lang}</option>
           ))}
         </select>
-        {session.isDirty && (
+        {false && (
           <span className="text-[10px] text-yellow-400 font-bold">Unsaved</span>
         )}
       </div>
@@ -301,11 +303,13 @@ function Toolbar({ session, problem }: { session: ReturnType<typeof usePracticeS
 }
 
 function ConsolePanel({
-  activeTab, setActiveTab, session,
+  activeTab, setActiveTab, session, timeLimitMs, memoryLimitKb,
 }: {
   activeTab: 'output' | 'results' | 'submission';
   setActiveTab: (t: 'output' | 'results' | 'submission') => void;
   session: ReturnType<typeof usePracticeSession>;
+  timeLimitMs?: number;
+  memoryLimitKb?: number;
 }) {
   return (
     <div className="h-[220px] border-t border-border bg-card/20 flex flex-col shrink-0">
@@ -337,9 +341,7 @@ function ConsolePanel({
           <div className="text-xs font-mono text-muted-foreground space-y-1">
             <p className="text-cyan-50/60">&gt; Ready. Click "Run" to test your code against sample cases, or "Submit" for full evaluation.</p>
             <p className="text-cyan-50/60">&gt; Use <kbd className="px-1 py-0.5 rounded bg-muted border border-border">Ctrl+Enter</kbd> to run, <kbd className="px-1 py-0.5 rounded bg-muted border border-border">Ctrl+Shift+Enter</kbd> to submit.</p>
-            {session.lastSaved && (
-              <p className="text-emerald-400/60">&gt; Auto-saved at {session.lastSaved.toLocaleTimeString()}</p>
-            )}
+            <p className="text-cyan-50/60">&gt; Code is auto-saved in your browser (IndexedDB).</p>
           </div>
         )}
         {activeTab === 'results' && (
@@ -353,6 +355,9 @@ function ConsolePanel({
             executionTimeMs={session.executionTimeMs}
             memoryUsedKb={session.memoryUsedKb}
             status={session.isSubmitting ? 'running' : session.verdict ? 'completed' : 'pending'}
+            testResults={session.testResults}
+            problemTimeLimit={timeLimitMs}
+            problemMemoryLimit={memoryLimitKb}
           />
         )}
       </ScrollArea>

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { CodingLanguage, PracticeProblemDocument, TestCaseResult, Verdict, SubmissionStatus } from '@/types';
-import { saveCode, loadSavedCode, submitSolution } from '@/services/practice';
+import { submitSolution } from '@/services/practice';
 
 interface SessionState {
   code: string;
@@ -14,13 +14,15 @@ interface SessionState {
   verdict: Verdict | null;
   passedTestCases: number;
   totalTestCases: number;
-  lastSaved: Date | null;
-  isDirty: boolean;
   executionTimeMs: number;
   memoryUsedKb: number;
 }
 
-export function usePracticeSession(userId: string | null, problem: PracticeProblemDocument | null) {
+export function usePracticeSession(
+  userId: string | null,
+  username: string,
+  problem: PracticeProblemDocument | null,
+) {
   const [state, setState] = useState<SessionState>({
     code: '',
     language: 'javascript',
@@ -31,13 +33,10 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
     verdict: null,
     passedTestCases: 0,
     totalTestCases: 0,
-    lastSaved: null,
-    isDirty: false,
     executionTimeMs: 0,
     memoryUsedKb: 0,
   });
 
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const prevProblemRef = useRef<string | null>(null);
   const languageRef = useRef<CodingLanguage>(state.language);
   const codeRef = useRef<string>(state.code);
@@ -48,13 +47,8 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
       prevProblemRef.current = problem.id;
       const starter = problem.starterCode[state.language] || problem.starterCode.javascript || '';
       setState(s => ({ ...s, code: starter, testResults: [], verdict: null }));
-      if (userId) {
-        loadSavedCode(userId, problem.id).then(saved => {
-          if (saved) setState(s => ({ ...s, code: saved }));
-        });
-      }
     }
-  }, [problem?.id, userId]);
+  }, [problem?.id]);
 
   useEffect(() => {
     languageRef.current = state.language;
@@ -65,15 +59,8 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
 
   const setCode = useCallback((code: string) => {
     codeRef.current = code;
-    setState(s => ({ ...s, code, isDirty: true }));
-    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-    autoSaveTimerRef.current = setTimeout(() => {
-      if (userId && problem) {
-        saveCode(userId, problem.id, languageRef.current, code);
-        setState(s => ({ ...s, lastSaved: new Date(), isDirty: false }));
-      }
-    }, 2000);
-  }, [userId, problem]);
+    setState(s => ({ ...s, code }));
+  }, []);
 
   const setLanguage = useCallback((language: CodingLanguage) => {
     setState(s => {
@@ -82,19 +69,13 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
     });
   }, [problem]);
 
-  useEffect(() => {
-    return () => {
-      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-    };
-  }, []);
-
   const runTests = useCallback(async () => {
     if (!problem || !userId) return;
     setState(s => ({ ...s, isRunning: true, testResults: [], verdict: null }));
 
     const visibleTestCases = problem.testCases.filter(tc => !tc.isHidden).slice(0, 3);
     const { results } = await submitSolution(
-      userId, '', problem.id, languageRef.current, codeRef.current,
+      userId, username, problem.id, languageRef.current, codeRef.current,
       visibleTestCases.map(tc => ({ input: tc.input, expected: tc.expected })),
     );
 
@@ -103,14 +84,14 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
       passedTestCases: results.filter(r => r.passed).length,
       totalTestCases: results.length,
     }));
-  }, [problem, userId]);
+  }, [problem, userId, username]);
 
   const submit = useCallback(async () => {
     if (!problem || !userId) return;
     setState(s => ({ ...s, isSubmitting: true, submissionStatus: 'running', testResults: [] }));
 
     const { submission, results } = await submitSolution(
-      userId, '', problem.id, languageRef.current, codeRef.current,
+      userId, username, problem.id, languageRef.current, codeRef.current,
       problem.testCases.map(tc => ({ input: tc.input, expected: tc.expected, isHidden: tc.isHidden })),
     );
 
@@ -124,7 +105,7 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
     }));
 
     return submission;
-  }, [problem, userId]);
+  }, [problem, userId, username]);
 
   const resetCode = useCallback(() => {
     if (!problem) return;
@@ -133,7 +114,6 @@ export function usePracticeSession(userId: string | null, problem: PracticeProbl
       code: problem.starterCode[s.language] || problem.starterCode.javascript || '',
       testResults: [],
       verdict: null,
-      isDirty: false,
     }));
   }, [problem]);
 

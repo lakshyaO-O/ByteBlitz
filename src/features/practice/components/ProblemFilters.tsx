@@ -5,7 +5,7 @@ import { Lock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Difficulty } from '@/types';
 
-const ALL_TOPICS = [
+export const ALL_TOPICS = [
   'Arrays', 'Strings', 'Math', 'Loops', 'Functions', 'Recursion',
   'Sorting', 'Searching', 'Hashing', 'Stack', 'Queue', 'Linked List',
   'Trees', 'Graphs', 'Heap', 'Greedy', 'Dynamic Programming',

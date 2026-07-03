@@ -18,7 +18,7 @@ interface ProblemBrowserProps {
   unlockedDifficulties: Difficulty[];
   canAccess: (d: Difficulty) => boolean;
   onStartProblem: (p: PracticeProblemDocument) => void;
-  onResetFilters: () => void;
+  onResetFilters?: () => void;
 }
 
 export function ProblemBrowser({
@@ -94,7 +94,7 @@ export function ProblemBrowser({
     setTab('all');
     setSortBy('Default');
     setPage(0);
-    onResetFilters();
+    onResetFilters?.();
   };
 
   const activeFilterCount = [difficulty !== 'All', topic !== 'All', sortBy !== 'Default', !!search].filter(Boolean).length;

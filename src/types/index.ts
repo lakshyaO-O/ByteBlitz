@@ -19,6 +19,7 @@ export interface UserProfile {
   email: string;
   photoURL: string;
   coins: number;
+  devcoins: number;
   xp: number;
   level: number;
   rating: number;
@@ -37,6 +38,7 @@ export interface UserProfile {
   badge?: string;
   learningGoals?: LearningGoal[];
   emailVerified?: boolean;
+  role?: string;
   isAdmin?: boolean;
   subscriptionTier?: SubscriptionTier;
   referralCode?: string;
@@ -54,6 +56,16 @@ export interface UserProfile {
   accuracy?: number;
   activeRoomId?: string;
   onboardingCompleted?: boolean;
+  privacySettings?: PrivacySettings;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  websiteUrl?: string;
+  badges?: string[];
+  achievements?: string[];
+  contestHistory?: string[];
+  activityLog?: ActivityEvent[];
+  topicMastery?: Record<string, { solved: number; total: number }>;
 }
 
 export interface GameRoom {
@@ -335,6 +347,7 @@ export interface TestCaseResult {
   executionTimeMs: number;
   memoryUsedKb: number;
   error?: string;
+  stdout?: string;
 }
 
 export interface SubmissionResult {
@@ -768,27 +781,109 @@ export interface DailyMission {
   claimed: boolean;
 }
 
+export type ShopItemType =
+  | 'avatar_frame'
+  | 'profile_theme'
+  | 'name_color'
+  | 'badge'
+  | 'title'
+  | 'code_ace_skin'
+  | 'loading_theme'
+  | 'chat_emoji'
+  | 'arena_effect'
+  | 'profile_background'
+  | 'seasonal_collectible';
+
+export type ShopRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
 export interface ShopItem {
   id: string;
   name: string;
   description: string;
-  type: 'theme' | 'badge' | 'title' | 'avatar' | 'boost' | 'cosmetic';
+  type: ShopItemType;
   price: number;
-  currency: 'coins' | 'xp' | 'gems';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  currency: 'devcoins';
+  rarity: ShopRarity;
   imageUrl?: string;
   color?: string;
   effect?: string;
+  previewUrl?: string;
   available: boolean;
   limited?: boolean;
+  seasonal?: boolean;
+  featured?: boolean;
   expiresAt?: string;
+  sortOrder?: number;
+  createdAt: string;
 }
 
 export interface UserInventory {
   userId: string;
   items: string[];
-  equipped: Record<string, string>;
+  equipped: Partial<Record<ShopItemType, string>>;
 }
+
+export interface PurchaseRecord {
+  id: string;
+  userId: string;
+  itemId: string;
+  itemName: string;
+  itemType: ShopItemType;
+  itemRarity: ShopRarity;
+  price: number;
+  purchasedAt: string;
+}
+
+export interface DevCoinEarning {
+  id: string;
+  userId: string;
+  amount: number;
+  source: DevCoinSource;
+  description: string;
+  earnedAt: string;
+  metadata?: Record<string, any>;
+}
+
+export type DevCoinSource =
+  | 'problem_solved_medium'
+  | 'problem_solved_hard'
+  | 'streak_milestone'
+  | 'arena_win'
+  | 'arena_streak'
+  | 'weekly_challenge'
+  | 'monthly_challenge'
+  | 'learning_path_complete'
+  | 'achievement_earned'
+  | 'contest_performance'
+  | 'hackathon_participation'
+  | 'community_contribution'
+  | 'seasonal_event'
+  | 'login_bonus';
+
+export interface EarningLimit {
+  source: DevCoinSource;
+  dailyMax: number;
+  weeklyMax: number;
+  amountPerEvent: number;
+  cooldownMinutes?: number;
+}
+
+export const EARNING_LIMITS: EarningLimit[] = [
+  { source: 'problem_solved_medium', dailyMax: 3, weeklyMax: 15, amountPerEvent: 10, cooldownMinutes: 0 },
+  { source: 'problem_solved_hard', dailyMax: 3, weeklyMax: 15, amountPerEvent: 25, cooldownMinutes: 0 },
+  { source: 'streak_milestone', dailyMax: 1, weeklyMax: 3, amountPerEvent: 50, cooldownMinutes: 0 },
+  { source: 'arena_win', dailyMax: 5, weeklyMax: 25, amountPerEvent: 15, cooldownMinutes: 5 },
+  { source: 'arena_streak', dailyMax: 1, weeklyMax: 3, amountPerEvent: 100, cooldownMinutes: 0 },
+  { source: 'weekly_challenge', dailyMax: 0, weeklyMax: 1, amountPerEvent: 150, cooldownMinutes: 0 },
+  { source: 'monthly_challenge', dailyMax: 0, weeklyMax: 0, amountPerEvent: 500, cooldownMinutes: 0 },
+  { source: 'learning_path_complete', dailyMax: 0, weeklyMax: 1, amountPerEvent: 200, cooldownMinutes: 0 },
+  { source: 'achievement_earned', dailyMax: 2, weeklyMax: 10, amountPerEvent: 30, cooldownMinutes: 0 },
+  { source: 'contest_performance', dailyMax: 0, weeklyMax: 1, amountPerEvent: 100, cooldownMinutes: 0 },
+  { source: 'hackathon_participation', dailyMax: 0, weeklyMax: 0, amountPerEvent: 300, cooldownMinutes: 0 },
+  { source: 'community_contribution', dailyMax: 1, weeklyMax: 3, amountPerEvent: 40, cooldownMinutes: 60 },
+  { source: 'seasonal_event', dailyMax: 0, weeklyMax: 0, amountPerEvent: 75, cooldownMinutes: 0 },
+  { source: 'login_bonus', dailyMax: 1, weeklyMax: 7, amountPerEvent: 5, cooldownMinutes: 1440 },
+];
 
 export interface ProjectShowcase {
   id: string;
@@ -894,17 +989,32 @@ export interface ForumReply {
   parentId?: string;
 }
 
+export interface PrivacySettings {
+  showActivity: boolean;
+  showRating: boolean;
+  showStats: boolean;
+  showAchievements: boolean;
+  showFriends: boolean;
+  showSocialLinks: boolean;
+  showMatchHistory: boolean;
+  showTopicMastery: boolean;
+  showBadges: boolean;
+}
+
 export interface PublicProfile {
   userId: string;
+  uid?: string;
   username: string;
   photoURL: string;
   bio: string;
   title: string;
   badges: string[];
   rating: number;
+  highestRating?: number;
   tier: Tier;
   level: number;
   xp: number;
+  coins?: number;
   wins: number;
   losses: number;
   draws: number;
@@ -921,6 +1031,10 @@ export interface PublicProfile {
   preferredLanguage: CodingLanguage;
   isMentor: boolean;
   socialLinks: Array<{ platform: string; url: string }>;
+  privacySettings?: PrivacySettings;
+  onlineStatus?: OnlineStatus;
+  accuracy?: number;
+  problemsSolved?: number;
 }
 
 export interface LearningStreakReward {
