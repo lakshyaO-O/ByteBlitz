@@ -47,27 +47,33 @@ const dailyChallenges = [
 export default function BeginnerDashboard() {
   const { user, loading: authLoading } = useUser();
   const db = useFirestore();
-  const { state, incrementStreak } = useAppStore();
+  const { state, incrementStreak, updateBeginnerState } = useAppStore();
   const { beginner, firebaseProgressLoaded } = state;
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [motivation] = useState(() => dailyMotivations[Math.floor(Math.random() * dailyMotivations.length)]);
   const [dailyChallenge] = useState(() => dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)]);
+  const userProfileQuery = user && db ? `users/${user.uid}` : null;
+  const { data: profile } = useDoc(userProfileQuery);
 
   useEffect(() => {
-    if (firebaseProgressLoaded) {
-      setShowOnboarding(!beginner.hasCompletedOnboarding);
+    if (firebaseProgressLoaded && !authLoading) {
+      if (profile?.onboardingCompleted) {
+        setShowOnboarding(false);
+        if (!beginner.hasCompletedOnboarding) {
+          updateBeginnerState({ hasCompletedOnboarding: true });
+        }
+      } else {
+        setShowOnboarding(!beginner.hasCompletedOnboarding);
+      }
     }
-  }, [firebaseProgressLoaded, beginner.hasCompletedOnboarding]);
+  }, [firebaseProgressLoaded, authLoading, beginner.hasCompletedOnboarding, profile?.onboardingCompleted, updateBeginnerState]);
 
   useEffect(() => {
     if (firebaseProgressLoaded && user) {
       incrementStreak();
     }
   }, [firebaseProgressLoaded, user]);
-
-  const userProfileQuery = user && db ? `users/${user.uid}` : null;
-  const { data: profile } = useDoc(userProfileQuery);
 
   const handleCompleteOnboarding = () => {
     setShowOnboarding(false);

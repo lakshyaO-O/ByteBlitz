@@ -152,7 +152,6 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
         setState(prev => {
           const newBeginner = {
             ...prev.beginner,
-            hasCompletedOnboarding: true,
             ...(data ? {
               hasCompletedOnboarding: data.hasCompletedOnboarding ?? true,
               lessonsCompleted: data.lessonsCompleted || prev.beginner.lessonsCompleted,
@@ -213,7 +212,6 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     setState(prev => {
       const newBeginner = {
         ...prev.beginner,
-        hasCompletedOnboarding: true,
         ...(data ? {
           lessonsCompleted: data.lessonsCompleted || prev.beginner.lessonsCompleted,
           lessonProgress: data.lessonProgress || prev.beginner.lessonProgress,
@@ -254,10 +252,22 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const completeOnboarding = useCallback(() => {
+  const completeOnboarding = useCallback(async () => {
     updateBeginnerState({ hasCompletedOnboarding: true });
-    syncBeginnerToFirebase();
-  }, [updateBeginnerState, syncBeginnerToFirebase]);
+    const { firestore: db, auth } = initializeFirebase();
+    if (db && auth?.currentUser?.uid) {
+      const uid = auth.currentUser.uid;
+      await Promise.all([
+        setDoc(doc(db, 'learning', uid), {
+          hasCompletedOnboarding: true,
+          lastSynced: serverTimestamp(),
+        }, { merge: true }),
+        setDoc(doc(db, 'users', uid), {
+          onboardingCompleted: true,
+        }, { merge: true }),
+      ]);
+    }
+  }, [updateBeginnerState]);
 
   const addXp = useCallback((amount: number) => {
     setState(prev => {

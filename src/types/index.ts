@@ -53,6 +53,7 @@ export interface UserProfile {
   problemsSolved?: number;
   accuracy?: number;
   activeRoomId?: string;
+  onboardingCompleted?: boolean;
 }
 
 export interface GameRoom {
