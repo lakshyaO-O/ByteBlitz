@@ -265,7 +265,7 @@ export default function ArenaPage() {
 
         {/* Arena unlocked congratulations */}
         {completedLessons >= MIN_LESSONS_FOR_ARENA && completedLessons < 16 && (
-          <Card className="bg-gradient-to-r from-yellow-500/10 via-primary/10 to-transparent border-yellow-500/30">
+          <Card className="bg-yellow-500/10 border-yellow-500/30">
             <CardContent className="p-4 flex items-center gap-4">
               <Sparkles className="w-6 h-6 text-yellow-400 shrink-0" />
               <div className="flex-1">
@@ -296,7 +296,7 @@ export default function ArenaPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 space-y-6">
                 <Card className="bg-card/60 border-border/80 overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
                   <div className="p-6 relative z-10">
                     <div className="flex items-center gap-4 mb-5">
                       <div className={cn("w-14 h-14 rounded-xl border-2 flex items-center justify-center", tier.border, tier.bg)}>
@@ -382,7 +382,7 @@ export default function ArenaPage() {
               </div>
 
               <div className="lg:col-span-2 space-y-6">
-                <Card className="relative overflow-hidden group cursor-pointer border-primary/30 bg-gradient-to-br from-primary/10 via-transparent to-transparent"
+                <Card className="relative overflow-hidden group cursor-pointer border-primary/30 bg-primary/10"
                   onClick={() => setView('matchmaking')}>
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(6,182,212,0.08),transparent_60%)] pointer-events-none" />
                   <div className="p-8 relative z-10">

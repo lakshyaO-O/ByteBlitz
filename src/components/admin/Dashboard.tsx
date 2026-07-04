@@ -74,7 +74,7 @@ export function Dashboard() {
             <Card key={card.key} className={cn('bg-card/50 border', card.border)}>
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{card.label}</span>
+                  <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{card.label}</span>
                   <Icon className={cn('w-4 h-4', card.color)} />
                 </div>
                 <p className={cn('text-2xl font-black font-headline', card.color)}>{formatted}</p>

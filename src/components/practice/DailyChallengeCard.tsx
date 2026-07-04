@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Zap, CheckCircle2, Gift, Calendar, Swords } from 'lucide-react';
+import { Loader2, Zap, CheckCircle2, Gift, Calendar, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DailyChallengeCardProps {
@@ -17,130 +17,157 @@ interface DailyChallengeCardProps {
   onStartWeekly: (problemId: string) => void;
 }
 
+function HeroSkeleton() {
+  return (
+    <div className="rounded-xl border border-border/50 bg-card animate-pulse p-6 space-y-3">
+      <div className="h-4 w-40 bg-muted rounded" />
+      <div className="h-6 w-64 bg-muted rounded" />
+      <div className="flex gap-3">
+        <div className="h-9 w-28 bg-muted rounded" />
+        <div className="h-9 w-28 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
 export function DailyChallengeCard({
   daily, status, weekly, weeklyProgress, loading,
   onStartDaily, onClaimDaily, onStartWeekly,
 }: DailyChallengeCardProps) {
-  if (loading) {
-    return (
-      <Card className="bg-card/50 border-border">
-        <CardContent className="p-5 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-primary" />
-        </CardContent>
-      </Card>
-    );
-  }
+  if (loading) return <HeroSkeleton />;
 
   const dailyCompleted = status?.completed;
   const dailyClaimed = status?.claimed;
+
   const weeklyPct = weeklyProgress.total > 0
     ? Math.round((weeklyProgress.solved / weeklyProgress.total) * 100)
     : 0;
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className={cn(
-        'border overflow-hidden transition-all',
-        dailyCompleted ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border bg-card/50',
-      )}>
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2 min-w-0">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">
-                  Daily Challenge
-                </h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {dailyCompleted
-                  ? 'You completed today\'s challenge!'
-                  : 'Solve today\'s featured problem for bonus XP.'}
-              </p>
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="text-[10px] font-bold gap-1">
-                  <Zap className="w-3 h-3" /> +{daily?.xpBonus || 50} XP
-                </Badge>
-                {dailyCompleted && !dailyClaimed && (
-                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">
-                    Ready to claim!
-                  </Badge>
-                )}
-                {dailyClaimed && (
-                  <Badge className="bg-primary/10 text-primary border-primary/30 text-[10px] gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Claimed
-                  </Badge>
-                )}
-              </div>
-            </div>
-            <div className="shrink-0">
-              {dailyClaimed ? (
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                </div>
-              ) : dailyCompleted ? (
-                <Button size="sm" onClick={onClaimDaily} className="gap-1.5 text-xs h-8">
-                  <Gift className="w-3.5 h-3.5" /> Claim
-                </Button>
-              ) : (
-                <Button size="sm" onClick={onStartDaily} className="gap-1.5 text-xs h-8">
-                  <Swords className="w-3.5 h-3.5" /> Solve
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  });
 
-      <Card className="bg-card/50 border-border">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2 min-w-0">
-              <div className="flex items-center gap-2">
-                <Swords className="w-4 h-4 text-primary" />
-                <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">
-                  Weekly Challenge
-                </h3>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="md:col-span-2">
+        <div
+          className={cn(
+            'relative rounded-xl border transition-colors',
+            dailyCompleted
+              ? 'border-emerald-500/30 bg-emerald-500/5'
+              : 'border-primary/20',
+          )}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Calendar className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{today}</p>
+                    <h2 className="text-lg font-semibold text-foreground">Daily Challenge</h2>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground max-w-md">
+                  {dailyCompleted
+                    ? 'You completed today\'s challenge! Claim your bonus XP.'
+                    : 'Solve today\'s featured problem and earn bonus XP.'}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="text-xs gap-1 py-0.5 border-primary/30">
+                    <Zap className="w-3 h-3 text-primary" /> +{daily?.xpBonus || 50} XP Bonus
+                  </Badge>
+                  {dailyCompleted && !dailyClaimed && (
+                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-xs py-0.5 gap-1">
+                      Ready to claim!
+                    </Badge>
+                  )}
+                  {dailyClaimed && (
+                    <Badge className="bg-primary/10 text-primary border-primary/30 text-xs py-0.5 gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Claimed
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {weeklyProgress.solved}/{weeklyProgress.total} problems solved
-              </p>
+
+              <div className="shrink-0">
+                {dailyClaimed ? (
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-primary" />
+                  </div>
+                ) : dailyCompleted ? (
+                  <Button size="sm" onClick={onClaimDaily} className="gap-1.5">
+                    <Gift className="w-4 h-4" /> Claim XP
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={onStartDaily} className="gap-1.5">
+                    Solve Now
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border/50 bg-card/40 overflow-hidden">
+        <CardContent className="p-5">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-secondary" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Weekly Challenge</p>
+                <p className="text-sm font-medium text-foreground">
+                  {weeklyProgress.solved}/{weeklyProgress.total} solved
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden w-24">
+                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary rounded-full transition-all"
+                    className="h-full bg-secondary rounded-full transition-all"
                     style={{ width: `${weeklyPct}%` }}
                   />
                 </div>
-                <span className="text-[10px] font-bold text-muted-foreground">{weeklyPct}%</span>
+                <span className="text-xs font-medium text-muted-foreground">{weeklyPct}%</span>
               </div>
               {weekly && weekly.xpBonus > 0 && (
-                <Badge variant="outline" className="text-[10px] font-bold gap-1">
-                  <Zap className="w-3 h-3" /> +{weekly.xpBonus} XP on completion
+                <Badge variant="outline" className="text-xs gap-1 border-secondary/30 text-secondary">
+                  <Zap className="w-3 h-3" /> +{weekly.xpBonus} XP
                 </Badge>
               )}
             </div>
-            <div className="shrink-0 flex flex-col gap-1">
-              {weekly?.problemIds.slice(0, 3).map((pid) => (
+
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {weekly?.problemIds.slice(0, 4).map((pid, i) => (
                 <Button
                   key={pid}
-                  variant="ghost"
+                  variant={i < weeklyProgress.solved ? 'secondary' : 'outline'}
                   size="sm"
                   onClick={() => onStartWeekly(pid)}
-                  className="text-[10px] h-6 px-2"
+                  className="text-xs h-7 px-2.5 font-medium"
                 >
-                  Solve
+                  {i < weeklyProgress.solved ? <CheckCircle2 className="w-3 h-3 mr-1" /> : null}
+                  #{i + 1}
                 </Button>
               ))}
-              {(weekly?.problemIds.length || 0) > 3 && (
-                <span className="text-[9px] text-muted-foreground text-center">
-                  +{weekly!.problemIds.length - 3} more
+              {(weekly?.problemIds.length || 0) > 4 && (
+                <span className="text-xs text-muted-foreground self-center ml-1">
+                  +{weekly!.problemIds.length - 4}
                 </span>
               )}
             </div>
           </div>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

@@ -18,10 +18,10 @@ const platforms = [
 export default function ContestCalendarPage() {
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            CONTEST <span className="text-primary neon-text">CALENDAR</span>
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Contest <span className="text-primary">Calendar</span>
           </h1>
           <p className="text-muted-foreground">Track upcoming coding contests from major platforms.</p>
         </div>

@@ -116,7 +116,7 @@ export default function RoomsPage() {
 
     return (
       <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-2xl mx-auto">
+      <div className="space-y-8 max-w-2xl mx-auto">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-headline font-bold uppercase tracking-widest">
             <Gamepad2 className="w-3.5 h-3.5" />
@@ -192,13 +192,13 @@ export default function RoomsPage() {
 
   return (
       <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              GAME <span className="text-primary neon-text">ROOMS</span>
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Study Rooms
             </h1>
-            <p className="text-muted-foreground">Create or join custom game rooms for private matches.</p>
+            <p className="text-muted-foreground">Create or join private rooms for collaborative coding sessions.</p>
           </div>
           <div className="flex items-center gap-3">
             <GuestGate feature="Create a Room" redirectPath="/rooms">
@@ -233,7 +233,7 @@ export default function RoomsPage() {
                           <h3 className="font-bold truncate">{room.hostName}&apos;s Room</h3>
                           <Badge variant="outline" className="text-[10px] font-mono shrink-0">{room.roomCode}</Badge>
                           <Badge className={cn(
-                            'text-[10px] uppercase tracking-widest shrink-0',
+                            'text-[11px] uppercase tracking-wider shrink-0',
                             room.gameMode === 'rated' ? 'bg-primary/10 text-primary border-primary/30' :
                             room.gameMode === 'practice' ? 'bg-secondary/10 text-secondary border-secondary/30' :
                             'bg-orange-500/10 text-orange-400 border-orange-500/30'

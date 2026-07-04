@@ -35,11 +35,11 @@ export default function ContestsPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              CODING <span className="text-primary neon-text">CONTESTS</span>
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Contests
             </h1>
             <p className="text-muted-foreground">Compete against the community in timed coding competitions.</p>
           </div>
@@ -92,7 +92,7 @@ export default function ContestsPage() {
                         <div className="flex items-center gap-3">
                           <h3 className="text-xl font-headline font-bold">{contest.title}</h3>
                           <Badge variant={contest.status === 'ended' ? 'outline' : 'default'} className={cn(
-                            'text-[10px] uppercase tracking-widest',
+                            'text-[11px] uppercase tracking-wider',
                             contest.status === 'upcoming' && 'bg-primary/10 text-primary border-primary/30',
                             contest.status === 'registering' && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
                             contest.status === 'ended' && 'bg-muted text-muted-foreground border-border',

@@ -4,7 +4,11 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, BookmarkCheck, Clock, Brain, Shuffle, CheckCircle2, Lock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Loader2, BookmarkCheck, Clock, Brain, Shuffle, CheckCircle2, Lock,
+  Play, TrendingUp, BarChart3,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
 import { PracticeWorkbench } from '@/components/practice/PracticeWorkbench';
@@ -20,6 +24,137 @@ import { enrichAllProblems, getStaticProblemById, getStaticRecommendations } fro
 import type { PracticeProblemDocument, Difficulty, ProblemTopic } from '@/types';
 
 import { ALL_TOPICS } from '@/features/practice/components/ProblemFilters';
+
+function PageSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-8 w-48 bg-muted/30 rounded" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 h-36 bg-muted/20 rounded-lg" />
+        <div className="h-36 bg-muted/20 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="h-20 bg-muted/20 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-6 w-32 bg-muted/30 rounded" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-24 bg-muted/20 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContinueCard({
+  problem,
+  progress,
+  onStart,
+}: {
+  problem: PracticeProblemDocument;
+  progress: { lastSubmittedAt?: string };
+  onStart: (p: PracticeProblemDocument) => void;
+}) {
+  const timeAgo = progress.lastSubmittedAt
+    ? (() => {
+        const diff = Date.now() - new Date(progress.lastSubmittedAt).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        return `${Math.floor(hrs / 24)}d ago`;
+      })()
+    : null;
+
+  const diffColor = problem.difficulty === 'Easy' ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
+    : problem.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-500/20 bg-yellow-500/10'
+    : 'text-destructive border-destructive/20 bg-destructive/10';
+
+  return (
+    <Card className="border-border hover:border-primary/50 transition-colors h-full">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Badge variant="outline" className={cn('text-xs px-1.5 py-0.5', diffColor)}>
+                {problem.difficulty}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                +{problem.points} XP
+              </span>
+            </div>
+            <p className="text-sm font-medium truncate text-foreground">
+              {problem.title}
+            </p>
+            {timeAgo && (
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                <Clock className="w-3 h-3" /> Last attempt {timeAgo}
+              </p>
+            )}
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onStart(problem)}
+            className="shrink-0 gap-1.5 text-xs h-8"
+          >
+            <Play className="w-3 h-3" /> Continue
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function RecommendationCard({
+  problem,
+  onStart,
+}: {
+  problem: PracticeProblemDocument;
+  onStart: (p: PracticeProblemDocument) => void;
+}) {
+  const diffColor = problem.difficulty === 'Easy' ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
+    : problem.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-500/20 bg-yellow-500/10'
+    : 'text-destructive border-destructive/20 bg-destructive/10';
+
+  const topics = (problem.topics || []).slice(0, 2);
+
+  return (
+    <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer h-full" onClick={() => onStart(problem)}>
+      <CardContent className="p-4">
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium truncate text-foreground">
+                {problem.title}
+              </p>
+            </div>
+            <Badge variant="outline" className={cn('text-xs px-1.5 py-0.5 shrink-0', diffColor)}>
+              {problem.difficulty}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">+{problem.points} XP</span>
+            <Badge className="text-xs gap-1 bg-primary/10 text-primary border-primary/20 py-0.5">
+              <TrendingUp className="w-2.5 h-2.5" /> Recommended
+            </Badge>
+          </div>
+          {topics.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {topics.map((t) => (
+                <span key={t} className="px-1.5 py-0.5 rounded text-xs font-medium bg-muted/30 text-muted-foreground">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function PracticePage() {
   const { user, loading: authLoading } = useUser();
@@ -87,6 +222,23 @@ export default function PracticePage() {
     }));
   }, [problems, progress]);
 
+  const continueSolving = useMemo(() => {
+    if (!progress) return [];
+    return Object.entries(progress)
+      .filter(([, p]) => p.attempted && !p.solved)
+      .map(([id, p]) => {
+        const prob = problems.find(pr => pr.id === id);
+        return prob ? { problem: prob, progress: p } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        const ta = a!.progress.lastSubmittedAt || '';
+        const tb = b!.progress.lastSubmittedAt || '';
+        return tb.localeCompare(ta);
+      })
+      .slice(0, 6) as { problem: PracticeProblemDocument; progress: { lastSubmittedAt?: string } }[];
+  }, [progress, problems]);
+
   const loading = problemsLoading || progressLoading || authLoading;
   const totalProblemsCount = problems.length;
 
@@ -123,7 +275,6 @@ export default function PracticePage() {
   }, [problems, handleStartProblem]);
 
   const handleTopicClick = useCallback((_topicName: string) => {
-    // handled inside ProblemBrowser now
   }, []);
 
   const currentIndex = selectedProblem ? problems.findIndex(p => p.id === selectedProblem.id) : -1;
@@ -155,6 +306,14 @@ export default function PracticePage() {
   const mediumCount = solvedByDifficulty.Medium || 0;
   const hardCount = solvedByDifficulty.Hard || 0;
 
+  if (loading) {
+    return (
+      <Shell>
+        <PageSkeleton />
+      </Shell>
+    );
+  }
+
   return (
     <Shell>
       <AchievementPopupContainer
@@ -162,16 +321,16 @@ export default function PracticePage() {
         onDismiss={dismissNewAchievement}
       />
 
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-                PRACTICE <span className="text-primary neon-text">ZONE</span>
+              <h1 className="text-2xl font-headline font-bold text-foreground">
+                Practice
               </h1>
               {isBeginner && unlockProgress.length > 0 && (
-                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/50 border border-border">
+                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted/50 border border-border">
                   {unlockProgress.map(u => (
                     <div key={u.difficulty} className="flex items-center gap-1">
                       {u.unlocked ? (
@@ -180,7 +339,7 @@ export default function PracticePage() {
                         <Lock className="w-3 h-3 text-muted-foreground" />
                       )}
                       <span className={cn(
-                        'text-[9px] font-bold uppercase tracking-widest',
+                        'text-xs font-medium',
                         u.unlocked ? 'text-emerald-400' : 'text-muted-foreground',
                       )}>
                         {u.difficulty}
@@ -190,7 +349,7 @@ export default function PracticePage() {
                 </div>
               )}
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               {totalProblemsCount > 0
                 ? `${totalSolved}/${totalProblemsCount} solved`
                 : 'Loading problems...'}
@@ -201,15 +360,43 @@ export default function PracticePage() {
               <Shuffle className="w-3.5 h-3.5" /> Random
             </Button>
             {totalProblemsCount > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-primary/5 border border-primary/20">
                 <Brain className="w-4 h-4 text-primary" />
-                <span className="text-sm font-bold">{Math.round((totalSolved / totalProblemsCount) * 100)}%</span>
+                <span className="text-sm font-medium">{Math.round((totalSolved / totalProblemsCount) * 100)}%</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Dashboard */}
+        {/* Daily + Weekly Challenge */}
+        <DailyChallengeCard
+          daily={daily}
+          status={dailyStatus}
+          weekly={weekly}
+          weeklyProgress={weeklyProgress}
+          loading={dailyLoading || weeklyLoading}
+          onStartDaily={handleStartDaily}
+          onClaimDaily={claimDaily}
+          onStartWeekly={handleStartWeekly}
+        />
+
+        {/* Continue Solving */}
+        {continueSolving.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Play className="w-4 h-4 text-primary" />
+              <span className="text-xs font-medium text-foreground">Continue Solving</span>
+              <span className="text-xs text-muted-foreground">({continueSolving.length} in progress)</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {continueSolving.map(({ problem, progress: p }) => (
+                <ContinueCard key={problem.id} problem={problem} progress={p} onStart={handleStartProblem} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Statistics */}
         <PracticeDashboard
           totalSolved={totalSolved}
           totalProblems={totalProblemsCount}
@@ -226,27 +413,15 @@ export default function PracticePage() {
           onTopicClick={handleTopicClick}
         />
 
-        {/* Daily + Weekly Challenge */}
-        <DailyChallengeCard
-          daily={daily}
-          status={dailyStatus}
-          weekly={weekly}
-          weeklyProgress={weeklyProgress}
-          loading={dailyLoading || weeklyLoading}
-          onStartDaily={handleStartDaily}
-          onClaimDaily={claimDaily}
-          onStartWeekly={handleStartWeekly}
-        />
-
         {/* Recently Viewed */}
         {recentlyViewed.length > 0 && (
-          <Card className="bg-card/50 border-border overflow-hidden">
+          <Card className="border-border overflow-hidden">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Recently Viewed</span>
+                <span className="text-xs font-medium text-muted-foreground">Recently Viewed</span>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {recentlyViewed.map((r: any) => (
                   <button
                     key={r.problemId}
@@ -254,7 +429,7 @@ export default function PracticePage() {
                       const p = problems.find(pr => pr.id === r.problemId);
                       if (p) handleStartProblem(p);
                     }}
-                    className="shrink-0 px-3 py-1.5 rounded-full bg-muted/30 border border-border text-[10px] font-bold hover:border-primary/50 transition-colors whitespace-nowrap"
+                    className="shrink-0 px-3 py-1.5 rounded bg-muted/30 border border-border text-xs font-medium hover:border-primary/50 transition-colors whitespace-nowrap"
                   >
                     {r.title}
                   </button>
@@ -266,13 +441,13 @@ export default function PracticePage() {
 
         {/* Bookmarks */}
         {bookmarkedIds.length > 0 && (
-          <Card className="bg-card/50 border-primary/20 border overflow-hidden">
+          <Card className="border-primary/20 border overflow-hidden">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <BookmarkCheck className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Bookmarked</span>
+                <span className="text-xs font-medium text-primary">Bookmarked</span>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {bookmarkedIds.slice(0, 10).map(id => {
                   const p = problems.find(pr => pr.id === id);
                   if (!p) return null;
@@ -280,7 +455,7 @@ export default function PracticePage() {
                     <button
                       key={p.id}
                       onClick={() => handleStartProblem(p)}
-                      className="shrink-0 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-[10px] font-bold hover:border-primary/50 transition-colors whitespace-nowrap"
+                      className="shrink-0 px-3 py-1.5 rounded bg-primary/5 border border-primary/20 text-xs font-medium hover:border-primary/50 transition-colors whitespace-nowrap"
                     >
                       {p.title}
                     </button>
@@ -292,23 +467,14 @@ export default function PracticePage() {
         )}
 
         {/* Main Content */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-              <p className="text-sm text-muted-foreground">Loading problems...</p>
-            </div>
-          </div>
-        ) : (
-          <ProblemBrowser
-            problems={problems}
-            progress={progress}
-            isBeginner={isBeginner}
-            unlockedDifficulties={unlockedDifficulties}
-            canAccess={canAccess}
+        <ProblemBrowser
+          problems={problems}
+          progress={progress}
+          isBeginner={isBeginner}
+          unlockedDifficulties={unlockedDifficulties}
+          canAccess={canAccess}
           onStartProblem={handleStartProblem}
-          />
-        )}
+        />
       </div>
     </Shell>
   );

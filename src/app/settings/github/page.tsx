@@ -59,16 +59,16 @@ export default function GithubSettingsPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            GITHUB <span className="text-primary neon-text">INTEGRATION</span>
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            GitHub
           </h1>
           <p className="text-muted-foreground">Connect your GitHub account to showcase your repositories.</p>
         </div>
 
         {!connected ? (
-          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
+          <Card className="border-primary/30 bg-primary/5">
             <CardContent className="p-8 text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto">
                 <Github className="w-8 h-8 text-foreground" />
@@ -86,7 +86,7 @@ export default function GithubSettingsPage() {
           </Card>
         ) : (
           <>
-            <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-primary/5">
+            <Card className="border-emerald-500/30 bg-emerald-500/5">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
@@ -138,7 +138,7 @@ export default function GithubSettingsPage() {
                   <CardTitle className="text-sm font-headline font-bold uppercase tracking-widest flex items-center gap-2">
                     <Github className="w-4 h-4" /> Repositories
                   </CardTitle>
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-widest">
+                  <Badge variant="outline" className="text-[11px] uppercase tracking-wider">
                     {syncedRepos.size}/{mockRepos.length} synced
                   </Badge>
                 </div>

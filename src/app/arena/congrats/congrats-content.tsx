@@ -42,7 +42,7 @@ function CongratsContent() {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-      <Card className="max-w-lg w-full p-10 text-center bg-card/70 border-primary/30 shadow-2xl neon-border">
+      <Card className="max-w-lg w-full p-10 text-center bg-card/70 border-primary/20 shadow-xl">
         <div className="space-y-6">
           <div className="flex justify-center">
             <div className="relative">
@@ -60,7 +60,7 @@ function CongratsContent() {
             {isWin ? 'Victory' : isDraw ? 'Draw' : 'Defeat'}
           </Badge>
 
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter neon-text">
+          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter">
             {isWin ? 'Congratulations!' : isDraw ? 'Well Fought!' : 'Good Effort!'}
           </h1>
           <p className="text-muted-foreground">
@@ -76,11 +76,11 @@ function CongratsContent() {
               <div className={cn("text-3xl font-headline font-bold", isWin ? 'text-emerald-400' : isDraw ? 'text-blue-400' : 'text-red-400')}>
                 {eloChange.startsWith('-') ? eloChange : `+${eloChange}`}
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">ELO</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">ELO</div>
             </div>
             <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
               <div className="text-3xl font-headline font-bold text-primary">+{isWin ? '100' : isDraw ? '50' : '20'}</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">XP Earned</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">XP Earned</div>
             </div>
           </div>
 

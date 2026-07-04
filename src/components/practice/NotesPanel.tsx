@@ -33,10 +33,10 @@ export function NotesPanel({ userId, problemId, initialNotes = '' }: NotesPanelP
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Personal Notes</span>
+          <span className="text-xs font-medium text-muted-foreground">Personal Notes</span>
         </div>
         <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={handleSave} disabled={saving}>
-          <Save className="w-3 h-3" />
+          <Save className="w-3.5 h-3.5" />
           {saved ? 'Saved!' : saving ? 'Saving...' : 'Save'}
         </Button>
       </div>
@@ -44,7 +44,7 @@ export function NotesPanel({ userId, problemId, initialNotes = '' }: NotesPanelP
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Write your notes, thoughts, or approach here..."
-        className="min-h-[120px] bg-muted/20 border-border text-xs resize-y"
+        className="min-h-[120px] bg-muted/20 border-border text-sm resize-y"
       />
     </div>
   );

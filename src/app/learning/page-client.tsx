@@ -16,12 +16,12 @@ export default function LearningPage() {
   const completedCount = beginner.lessonsCompleted.length;
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
-            <h1 className="text-3xl font-headline font-black tracking-tight">
-              Learning <span className="text-primary neon-text">Roadmap</span>
+            <h1 className="text-3xl font-headline font-bold tracking-tight">
+              Learning <span className="text-primary">Path</span>
             </h1>
             <p className="text-muted-foreground text-sm">
               Follow this path from beginner to Arena-ready. Complete each lesson to unlock the next.
@@ -52,7 +52,7 @@ export default function LearningPage() {
         </div>
 
         {beginner.isBeginnerMode && completedCount < 1 && (
-          <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/30">
+          <Card className="bg-primary/10 border-primary/30">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">

@@ -48,10 +48,10 @@ export default function ChallengesPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            CHALLENGES
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Challenges
           </h1>
           <p className="text-muted-foreground">Complete challenges to earn bonus XP and climb the leaderboard.</p>
         </div>
@@ -65,13 +65,13 @@ export default function ChallengesPage() {
         ) : (
           <>
             {challenges.filter((c: any) => c.type === 'daily').length > 0 && (
-              <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5 neon-border">
+              <Card className="border-primary/20 bg-primary/[0.03]">
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <Flame className="w-6 h-6 text-orange-400" />
-                        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[10px] uppercase tracking-widest">
+                        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[11px] uppercase tracking-wider">
                           Daily Challenge
                         </Badge>
                       </div>
@@ -126,7 +126,7 @@ export default function ChallengesPage() {
                           <div className="space-y-1">
                             <h3 className="font-bold">{challenge.title}</h3>
                             <Badge variant="outline" className={cn(
-                              'text-[10px] uppercase tracking-widest',
+                              'text-[11px] uppercase tracking-wider',
                               challenge.difficulty === 'Hard' ? 'text-destructive border-destructive/30' :
                               challenge.difficulty === 'Medium' ? 'text-yellow-400 border-yellow-400/30' :
                               'text-emerald-400 border-emerald-400/30'

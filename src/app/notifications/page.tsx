@@ -28,7 +28,7 @@ export default function NotificationsPage() {
   const { notifications, loading, unreadCount, markAsRead } = useNotifications(user?.uid || null);
 
   return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-3xl">
+      <div className="space-y-8 max-w-3xl">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">

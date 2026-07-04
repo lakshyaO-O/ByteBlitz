@@ -1,11 +1,12 @@
 ﻿import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import CommunityPageClient from './page-client';
 
 export const metadata: Metadata = {
   title: 'Community',
   description: 'Join the DevRann developer community. Share code, showcase projects, discuss programming topics, and connect with fellow coders.',
   alternates: {
-    canonical: 'https://devrann.com/community',
+    canonical: `${SITE_URL}/community`,
   },
   openGraph: {
     title: 'Community | DevRann',

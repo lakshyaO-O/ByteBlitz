@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import ProblemsPageClient from './page-client';
 
 export const metadata: Metadata = {
   title: 'Coding Problems',
   description: 'Solve a vast collection of coding problems. From beginner to expert, practice DSA, algorithms, and system design with real-world challenges.',
   alternates: {
-    canonical: 'https://devrann.com/problems',
+    canonical: `${SITE_URL}/problems`,
   },
   openGraph: {
     title: 'Coding Problems | DevRann',

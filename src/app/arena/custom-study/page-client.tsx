@@ -51,7 +51,7 @@ export default function CustomStudyPageClient() {
 
   return (
     <Shell>
-      <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="max-w-6xl mx-auto space-y-6">
         {view === 'lobby' && (
           <>
             {/* Back link */}
@@ -67,7 +67,7 @@ export default function CustomStudyPageClient() {
               </Button>
               <Badge
                 variant="outline"
-                className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[10px] uppercase tracking-widest font-bold"
+                className="bg-emerald-500/5 text-emerald-400 border-emerald-500/20 text-[11px] uppercase tracking-wider font-bold"
               >
                 No ELO Impact
               </Badge>
@@ -75,7 +75,7 @@ export default function CustomStudyPageClient() {
 
             <div className="space-y-2">
               <h1 className="text-4xl font-headline font-black uppercase tracking-tighter">
-                Custom <span className="text-primary neon-text">Study Room</span>
+                Custom <span className="text-primary">Study Room</span>
               </h1>
               <p className="text-muted-foreground max-w-2xl">
                 Create collaborative coding rooms for study groups, interview prep, and classrooms.

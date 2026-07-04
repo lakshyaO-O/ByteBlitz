@@ -29,15 +29,15 @@ export function ShortcutHint() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-sm">
+            <DialogTitle className="flex items-center gap-2 text-sm font-medium">
               <Keyboard className="w-4 h-4 text-primary" /> Keyboard Shortcuts
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-1">
             {shortcuts.map((s) => (
               <div key={s.key} className="flex items-center justify-between py-1.5">
-                <span className="text-xs text-muted-foreground">{s.action}</span>
-                <kbd className="px-2 py-0.5 rounded bg-muted border border-border text-[10px] font-mono font-bold">
+                <span className="text-sm text-muted-foreground">{s.action}</span>
+                <kbd className="px-2 py-0.5 rounded bg-muted border border-border text-xs font-mono font-medium">
                   {s.key}
                 </kbd>
               </div>

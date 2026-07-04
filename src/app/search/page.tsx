@@ -38,12 +38,12 @@ export default function SearchPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-3xl mx-auto">
+      <div className="space-y-8 max-w-3xl mx-auto">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            SEARCH
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Search
           </h1>
-          <p className="text-muted-foreground">Find players and problems across the arena.</p>
+          <p className="text-muted-foreground">Find problems, players, and content across the platform.</p>
         </div>
 
         <Card className="bg-card/50 border-border">
@@ -144,7 +144,7 @@ export default function SearchPage() {
                             <p className="font-bold">{problem.title}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className={cn(
-                                'text-[10px] font-bold uppercase tracking-widest',
+                                'text-[11px] font-medium uppercase tracking-wider',
                                 problem.difficulty === 'Easy' ? 'text-emerald-400' :
                                 problem.difficulty === 'Medium' ? 'text-yellow-400' : 'text-destructive'
                               )}>

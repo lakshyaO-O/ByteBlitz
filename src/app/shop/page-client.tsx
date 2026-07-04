@@ -105,25 +105,25 @@ export function ShopPageClient() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
+      <div className="space-y-8 pb-16">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-xs font-headline font-bold uppercase tracking-widest">
               <Gem className="w-3.5 h-3.5" />
               DevRann Shop
             </div>
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              Dev<span className="text-primary neon-text">Coins</span> Shop
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Shop
             </h1>
-            <p className="text-muted-foreground">Spend your hard-earned DevCoins on exclusive cosmetics.</p>
+            <p className="text-muted-foreground">Spend your hard-earned DevCoins on exclusive cosmetics and rewards.</p>
           </div>
-          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
+          <Card className="bg-yellow-500/10 border-yellow-500/20">
             <CardContent className="px-6 py-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
                 <Gem className="w-6 h-6 text-yellow-400" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-yellow-400/70 font-bold">Your Balance</p>
+                <p className="text-[11px] uppercase tracking-wider text-yellow-400/70 font-bold">Your Balance</p>
                 <p className="text-2xl font-headline font-bold text-yellow-400">
                   {balanceLoading ? <Loader2 className="w-5 h-5 animate-spin inline" /> : balance.toLocaleString()}
                 </p>
@@ -151,7 +151,7 @@ export function ShopPageClient() {
                     transition={{ delay: i * 0.1 }}
                     onClick={() => setSelectedItem(item)}
                   >
-                    <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-br from-primary/5 to-yellow-500/5 cursor-pointer hover:border-primary/50 hover:shadow-lg transition-all">
+                    <Card className="relative overflow-hidden border-primary/30 bg-primary/5 cursor-pointer hover:border-primary/50 hover:shadow-lg transition-all">
                       <div className="absolute top-2 right-2 flex gap-1">
                         {isSeasonal && (
                           <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[8px] uppercase tracking-widest">

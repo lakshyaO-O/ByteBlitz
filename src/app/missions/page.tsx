@@ -43,16 +43,16 @@ export default function MissionsPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            DAILY <span className="text-primary neon-text">MISSIONS</span>
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Missions
           </h1>
           <p className="text-muted-foreground">Complete missions to earn XP, coins, and build your streak.</p>
         </div>
 
-        <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-br from-orange-500/10 via-primary/5 to-yellow-500/10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl translate-x-1/4 -translate-y-1/4" />
+        <Card className="relative overflow-hidden border-primary/30 bg-primary/10">
+
           <CardContent className="p-6 relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
@@ -62,7 +62,7 @@ export default function MissionsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-headline font-bold">{streak} Day Streak</h2>
-                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[10px] uppercase tracking-widest">Active</Badge>
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[11px] uppercase tracking-wider">Active</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">Best streak: {longestStreak} days</p>
                   <div className="flex gap-1 mt-2">

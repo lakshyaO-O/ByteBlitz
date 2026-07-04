@@ -77,7 +77,7 @@ export function HowItWorksSection() {
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[calc(50%+3rem)] w-[calc(100%-6rem)] h-px bg-gradient-to-r from-primary/30 to-transparent" />
+                  <div className="hidden lg:block absolute top-8 left-[calc(50%+3rem)] w-[calc(100%-6rem)] h-px bg-primary/30" />
                 )}
               </div>
 

@@ -55,9 +55,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-8">
         {/* Profile Header */}
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="relative">
@@ -67,7 +67,7 @@ export default function ProfilePage() {
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white">
+                <div className="absolute -bottom-1 -right-1 bg-secondary px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wider text-white">
                   LVL {currentLevel}
                 </div>
               </div>
@@ -76,7 +76,7 @@ export default function ProfilePage() {
                   <h1 className="text-2xl md:text-3xl font-headline font-bold">
                     {beginner.name || stats.username || user?.displayName || 'Coder'}
                   </h1>
-                  <Badge variant="outline" className={cn('text-[10px] uppercase tracking-widest', getTierColor(tier))}>
+                  <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider', getTierColor(tier))}>
                     {tier}
                   </Badge>
                 </div>
@@ -222,7 +222,7 @@ function StatBox({ label, value, color }: { label: string; value: string | numbe
   return (
     <div className="space-y-1 p-4 rounded-lg bg-muted/30">
       <div className={cn('text-2xl font-headline font-bold', color)}>{value}</div>
-      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
     </div>
   );
 }
@@ -240,7 +240,7 @@ function AchievementBadge({ achieved, label, icon: Icon }: { achieved: boolean; 
           <div className="w-5 h-5 text-muted-foreground" />
         )}
       </div>
-      <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      <span className="text-[11px] font-medium uppercase tracking-wider">{label}</span>
     </div>
   );
 }

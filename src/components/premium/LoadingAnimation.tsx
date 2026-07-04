@@ -20,7 +20,7 @@ export function LoadingAnimation({ text = 'Loading...', fullScreen = false, size
   return (
     <div className={cn(
       'flex flex-col items-center justify-center gap-4',
-      fullScreen && 'fixed inset-0 bg-background/80 backdrop-blur-sm z-50'
+      fullScreen && 'fixed inset-0 bg-background/80 z-50'
     )}>
       <div className="relative">
         <Loader2 className={cn('animate-spin text-primary', sizeMap[size].icon)} />

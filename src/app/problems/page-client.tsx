@@ -43,13 +43,13 @@ export default function ProblemsPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              PRACTICE <span className="text-primary neon-text">ZONE</span>
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Problems
             </h1>
-            <p className="text-muted-foreground">Level up your logic before entering the rated combat arena.</p>
+            <p className="text-muted-foreground">Browse and solve coding problems to sharpen your skills.</p>
           </div>
         </div>
 
@@ -102,7 +102,7 @@ export default function ProblemsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-border bg-muted/30 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  <tr className="border-b border-border bg-muted/30 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                     <th className="p-4">Problem</th>
                     <th className="p-4">Category</th>
                     <th className="p-4">Difficulty</th>
@@ -120,7 +120,7 @@ export default function ProblemsPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest bg-muted/50 border-border">
+                        <Badge variant="outline" className="text-[11px] font-medium uppercase tracking-wider bg-muted/50 border-border">
                           {problem.category}
                         </Badge>
                       </td>

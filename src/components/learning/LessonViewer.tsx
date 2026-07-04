@@ -162,7 +162,7 @@ export function LessonViewer({ lesson, onComplete, onBack, onNextLesson, isLastL
   const progressPercent = Math.round((completedRequired / requiredCount) * 100);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-2 rounded-xl hover:bg-muted/20 transition-colors">
@@ -170,7 +170,7 @@ export function LessonViewer({ lesson, onComplete, onBack, onNextLesson, isLastL
           </button>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className={cn('text-[10px] uppercase tracking-widest font-mono', difficultyColors[lesson.difficulty])}>
+              <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider font-mono', difficultyColors[lesson.difficulty])}>
                 <BarChart3 className="w-3 h-3 mr-1" /> {lesson.difficulty}
               </Badge>
               <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/50">
@@ -318,7 +318,7 @@ export function LessonViewer({ lesson, onComplete, onBack, onNextLesson, isLastL
                       {example.code}
                     </pre>
                     <div className="p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-1">Output</p>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-400 mb-1">Output</p>
                       <pre className="text-sm font-mono text-emerald-200 whitespace-pre-wrap">{example.output}</pre>
                     </div>
                     <p className="text-sm text-muted-foreground">{example.explanation}</p>
@@ -443,20 +443,20 @@ export function LessonViewer({ lesson, onComplete, onBack, onNextLesson, isLastL
                 <div className="grid grid-cols-3 gap-3">
                   <div className={cn('p-4 rounded-xl border text-center space-y-2', readingComplete ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-muted/20 border-border/50')}>
                     {readingComplete ? <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" /> : <BookOpen className="w-6 h-6 text-muted-foreground mx-auto" />}
-                    <p className="text-[10px] font-bold uppercase tracking-widest">Read</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wider">Read</p>
                   </div>
                   <div className={cn('p-4 rounded-xl border text-center space-y-2', quizPassed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-muted/20 border-border/50')}>
                     {quizPassed ? <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" /> : <GraduationCap className="w-6 h-6 text-muted-foreground mx-auto" />}
-                    <p className="text-[10px] font-bold uppercase tracking-widest">Quiz</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wider">Quiz</p>
                   </div>
                   <div className={cn('p-4 rounded-xl border text-center space-y-2', challengePassed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-muted/20 border-border/50')}>
                     {challengePassed ? <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" /> : <Trophy className="w-6 h-6 text-muted-foreground mx-auto" />}
-                    <p className="text-[10px] font-bold uppercase tracking-widest">Challenge</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wider">Challenge</p>
                   </div>
                 </div>
 
                 {([readingComplete, quizPassed, challengePassed].every(Boolean)) && (
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-primary/10 border border-emerald-500/30 text-center space-y-3">
+                  <div className="p-4 rounded-xl bg-emerald-500/10 border-emerald-500/30 text-center space-y-3">
                     <Sparkles className="w-8 h-8 text-primary mx-auto" />
                     <p className="text-lg font-headline font-bold">Lesson Complete!</p>
                     <p className="text-sm text-muted-foreground">You earned <span className="text-primary font-bold">+{lesson.xpReward} XP</span> and <span className="text-yellow-400 font-bold">+{lesson.coinReward} coins</span>.</p>
@@ -569,7 +569,7 @@ export function LessonViewer({ lesson, onComplete, onBack, onNextLesson, isLastL
             exit={{ opacity: 0, y: 100 }}
             className="fixed bottom-6 right-6 z-50"
           >
-            <div className="bg-gradient-to-r from-emerald-500/20 to-primary/20 border border-emerald-400/30 rounded-2xl p-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-md">
+            <div className="bg-emerald-500/20 border border-emerald-400/30 rounded-2xl p-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-primary" />

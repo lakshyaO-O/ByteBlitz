@@ -1,9 +1,12 @@
 'use client';
 
-import type { Judge, JudgeRequest, JudgeResult } from './judge';
+import type { Judge, JudgeRequest, JudgeResult, JudgeProgress } from './judge';
 import type { Verdict, TestCaseResult } from '@/types';
 
-/** Parse "varName = value" pairs from an input string into an array of values in declaration order. */
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function parseInput(input: string): { names: string[]; values: any[] } {
   const names: string[] = [];
   const values: any[] = [];
@@ -11,34 +14,73 @@ function parseInput(input: string): { names: string[]; values: any[] } {
   for (const pair of pairs) {
     const eqIdx = pair.indexOf('=');
     if (eqIdx === -1) {
-      try {
-        values.push(JSON.parse(pair.trim()));
-      } catch {
-        values.push(pair.trim());
-      }
+      try { values.push(JSON.parse(pair.trim())); }
+      catch { values.push(pair.trim()); }
       continue;
     }
     const name = pair.slice(0, eqIdx).trim();
     const raw = pair.slice(eqIdx + 1).trim();
     names.push(name);
-    try {
-      values.push(JSON.parse(raw));
-    } catch {
-      values.push(raw);
-    }
+    try { values.push(JSON.parse(raw)); }
+    catch { values.push(raw); }
   }
   return { names, values };
 }
 
-/** Extract the function name from user code. */
-function extractFunctionName(code: string): string | null {
-  const m = code.match(/(?:function|const|let|var)\s+(\w+)\s*(?:[=(])/);
-  if (m) return m[1];
-  const m2 = code.match(/^(\w+)\s*[=(]/m);
-  return m2 ? m2[1] : null;
+function stripCommentsAndStrings(code: string): string {
+  return code
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/'[^']*'/g, '')
+    .replace(/"[^"]*"/g, '')
+    .replace(/`[^`]*`/g, '');
 }
 
-/** Convert a JS value to a string for comparison. */
+function extractFunctionName(code: string): string | null {
+  const cleaned = stripCommentsAndStrings(code);
+  const fnDecl = cleaned.match(/\bfunction\s+(\w+)\s*\(/);
+  if (fnDecl) return fnDecl[1];
+  const decl = cleaned.match(/(?:const|let|var)\s+(\w+)\s*(?:[=(])/);
+  if (decl) return decl[1];
+  const fallback = code.match(/^(\w+)\s*[=(]/m);
+  return fallback ? fallback[1] : null;
+}
+
+function deepEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (a === null || b === null || a === undefined || b === undefined) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!deepEqual(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  if (typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b)) {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length !== keysB.length) return false;
+    for (const key of keysA) {
+      if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+      if (!deepEqual(a[key], b[key])) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function compareOutput(actual: string, expected: string): boolean {
+  if (actual.trim() === expected.trim()) return true;
+  try {
+    const parsedActual = JSON.parse(actual);
+    const parsedExpected = JSON.parse(expected);
+    if (typeof parsedActual === 'object' && typeof parsedExpected === 'object') {
+      return deepEqual(parsedActual, parsedExpected);
+    }
+  } catch {}
+  return false;
+}
+
 function valueToString(v: any): string {
   if (v === null || v === undefined) return '';
   if (Array.isArray(v)) return JSON.stringify(v);
@@ -46,10 +88,10 @@ function valueToString(v: any): string {
   return String(v);
 }
 
-/** Create a sandbox that runs user code and returns results. */
 interface SandboxResult {
   actualOutput: string;
   stdout: string;
+  consoleOutput: string;
   error?: string;
 }
 
@@ -58,10 +100,23 @@ function createSandbox(code: string, fnName: string | null): {
   error?: string;
 } {
   let logs: string[] = [];
+  let consoleLogs: string[] = [];
   const mockConsole = {
-    log: (...args: any[]) => logs.push(args.map(valueToString).join(' ')),
-    error: (...args: any[]) => logs.push('[error] ' + args.map(valueToString).join(' ')),
-    warn: (...args: any[]) => logs.push('[warn] ' + args.map(valueToString).join(' ')),
+    log: (...args: any[]) => {
+      const line = args.map(valueToString).join(' ');
+      logs.push(line);
+      consoleLogs.push(line);
+    },
+    error: (...args: any[]) => {
+      const line = '[error] ' + args.map(valueToString).join(' ');
+      logs.push(line);
+      consoleLogs.push(line);
+    },
+    warn: (...args: any[]) => {
+      const line = '[warn] ' + args.map(valueToString).join(' ');
+      logs.push(line);
+      consoleLogs.push(line);
+    },
   };
 
   const wrappedCode = `
@@ -74,21 +129,24 @@ function createSandbox(code: string, fnName: string | null): {
     const factory = new Function(wrappedCode);
     const fn = factory(mockConsole);
     if (typeof fn !== 'function') {
-      return { run: () => ({ actualOutput: '', stdout: logs.join('\n'), error: 'No function found' }) };
+      return { run: () => ({ actualOutput: '', stdout: '', consoleOutput: '', error: 'No function found' }) };
     }
     return {
       run: (...args: any[]) => {
         logs = [];
+        consoleLogs = [];
         try {
           const result = fn(...args);
           return {
             actualOutput: valueToString(result),
             stdout: logs.join('\n'),
+            consoleOutput: consoleLogs.join('\n'),
           };
         } catch (err: any) {
           return {
             actualOutput: '',
             stdout: logs.join('\n'),
+            consoleOutput: consoleLogs.join('\n'),
             error: err.message || 'Runtime Error',
           };
         }
@@ -96,13 +154,12 @@ function createSandbox(code: string, fnName: string | null): {
     };
   } catch (err: any) {
     return {
-      run: () => ({ actualOutput: '', stdout: '', error: err.message || 'Compilation Error' }),
+      run: () => ({ actualOutput: '', stdout: '', consoleOutput: '', error: err.message || 'Compilation Error' }),
       error: err.message || 'Compilation Error',
     };
   }
 }
 
-/** Reference solutions for static problems. */
 const SOLUTIONS: Record<string, string> = {
   'two-sum': `function twoSum(nums, target) { const map = {}; for (let i = 0; i < nums.length; i++) { const complement = target - nums[i]; if (complement in map) return [map[complement], i]; map[nums[i]] = i; } return []; }`,
   'reverse-string': `function reverseString(s) { let left = 0, right = s.length - 1; while (left < right) { const tmp = s[left]; s[left] = s[right]; s[right] = tmp; left++; right--; } return s; }`,
@@ -111,7 +168,7 @@ const SOLUTIONS: Record<string, string> = {
   'merge-sorted-array': `function merge(nums1, m, nums2, n) { let i = m - 1, j = n - 1, k = m + n - 1; while (j >= 0) { if (i >= 0 && nums1[i] > nums2[j]) { nums1[k] = nums1[i]; i--; } else { nums1[k] = nums2[j]; j--; } k--; } return nums1; }`,
   'fibonacci': `function fibonacci(n) { if (n <= 1) return n; let a = 0, b = 1; for (let i = 2; i <= n; i++) { const c = a + b; a = b; b = c; } return b; }`,
   'fizz-buzz': `function fizzBuzz(n) { const result = []; for (let i = 1; i <= n; i++) { if (i % 15 === 0) result.push('FizzBuzz'); else if (i % 3 === 0) result.push('Fizz'); else if (i % 5 === 0) result.push('Buzz'); else result.push(String(i)); } return result; }`,
-  'max-subarray': `function maxSubArray(nums) { let max = nums[0], cur = nums[0]; for (let i = 1; i < nums.length; i++) { cur = Math.max(nums[i], cur + nums[i]); max = Math.max(max, cur); } return max; }`,
+  'max-subarray': `function maxSubArray(nums) { let max = nums[0], cur = nums[0]; for (let i = 1; i < nums.length; i++) { cur = Math.max(nums[i], cur + nums[i]); max = Math.max(max, cur); return max; }`,
   'contains-duplicate': `function containsDuplicate(nums) { const seen = new Set(); for (const n of nums) { if (seen.has(n)) return true; seen.add(n); } return false; }`,
   'first-unique-character': `function firstUniqChar(s) { const counts = {}; for (const ch of s) counts[ch] = (counts[ch] || 0) + 1; for (let i = 0; i < s.length; i++) { if (counts[s[i]] === 1) return i; } return -1; }`,
   'climbing-stairs': `function climbStairs(n) { if (n <= 2) return n; let a = 1, b = 2; for (let i = 3; i <= n; i++) { const c = a + b; a = b; b = c; } return b; }`,
@@ -143,129 +200,196 @@ function estimateMemory(input: string): number {
   }
 }
 
+function computePerCaseVerdict(
+  passed: boolean,
+  error?: string,
+  elapsedMs?: number,
+  timeLimitMs?: number,
+): Verdict {
+  if (error) {
+    if (error.includes('Compilation')) return 'Compilation Error';
+    if (error === 'Time Limit Exceeded') return 'Time Limit Exceeded';
+    if (error === 'Memory Limit Exceeded') return 'Memory Limit Exceeded';
+    return 'Runtime Error';
+  }
+  if (elapsedMs && timeLimitMs && elapsedMs > timeLimitMs) return 'Time Limit Exceeded';
+  if (!passed) return 'Wrong Answer';
+  return 'Accepted';
+}
+
 export function createMockJudge(): Judge {
   return {
-    async execute(request: JudgeRequest): Promise<JudgeResult> {
-      const { code, testCases, timeLimitMs, problemId } = request;
+    async execute(
+      request: JudgeRequest,
+      onProgress?: (progress: JudgeProgress) => void,
+    ): Promise<JudgeResult> {
+      const { code, language, testCases, timeLimitMs, problemId } = request;
       const totalCases = testCases.length;
       const testCaseResults: TestCaseResult[] = [];
       let allPassed = true;
       let totalTimeMs = 0;
       let maxMemoryKb = 0;
       let globalError: string | undefined;
+      let compileError: string | undefined;
+
+      // ── Compile Phase ──
+      onProgress?.({ phase: 'compiling', message: 'Parsing and compiling code...' });
+      const compileStart = performance.now();
+      await sleep(80 + Math.random() * 60);
 
       const fnName = extractFunctionName(code);
+      let sandboxError: string | undefined;
 
-      for (const tc of testCases) {
+      // Try creating sandbox — this catches syntax errors = compilation error
+      const testSandbox = createSandbox(code, fnName);
+      sandboxError = testSandbox.error;
+
+      if (sandboxError) {
+        compileError = sandboxError;
+        compileError = sandboxError.includes('SyntaxError')
+          ? `Compilation Error: ${sandboxError}`
+          : sandboxError;
+      }
+
+      const compileTimeMs = Math.round(performance.now() - compileStart);
+      const codeSize = new TextEncoder().encode(code).length;
+
+      if (compileError) {
+        onProgress?.({ phase: 'error', message: 'Compilation failed' });
+        const compileTestCase: TestCaseResult = {
+          passed: false,
+          verdict: 'Compilation Error',
+          input: '',
+          expectedOutput: '',
+          actualOutput: '',
+          executionTimeMs: 0,
+          memoryUsedKb: 0,
+          exitCode: 1,
+          error: compileError,
+        };
+        testCaseResults.push(compileTestCase);
+
+        return {
+          verdict: 'Compilation Error',
+          passedTestCases: 0,
+          totalTestCases: totalCases,
+          executionTimeMs: 0,
+          memoryUsedKb: 0,
+          compileTimeMs,
+          codeSize,
+          testCaseResults: [compileTestCase],
+          compileError,
+        };
+      }
+
+      // ── Execution Phase ──
+      for (let i = 0; i < testCases.length; i++) {
+        const tc = testCases[i];
+        onProgress?.({ phase: 'running', current: i + 1, total: totalCases, message: `Running Test ${i + 1}/${totalCases}` });
+
         const { names, values } = parseInput(tc.input);
         const sandbox = createSandbox(code, fnName);
 
-        if (sandbox.error) {
-          globalError = sandbox.error;
-          testCaseResults.push({
-            passed: false,
-            input: tc.input,
-            expectedOutput: tc.expected,
-            actualOutput: '',
-            executionTimeMs: 0,
-            memoryUsedKb: 0,
-            error: sandbox.error,
-          });
-          allPassed = false;
-          continue;
-        }
-
+        // Check TLE before execution (cumulative)
         if (totalTimeMs > timeLimitMs) {
           testCaseResults.push({
             passed: false,
-            input: tc.input,
+            verdict: 'Time Limit Exceeded',
+            input: tc.isHidden ? '' : tc.input,
             expectedOutput: tc.expected,
             actualOutput: '',
             executionTimeMs: 0,
             memoryUsedKb: 0,
-            error: 'Time Limit Exceeded',
+            exitCode: 124,
+            error: 'Time Limit Exceeded: cumulative execution time exceeded limit',
           });
           allPassed = false;
           continue;
         }
 
         const startTime = performance.now();
+        await sleep(20 + Math.random() * 40); // simulate realistic timing
         const result = sandbox.run(...values);
         const elapsedMs = performance.now() - startTime;
-
-        if (elapsedMs > timeLimitMs && !result.error) {
-          testCaseResults.push({
-            passed: false,
-            input: tc.input,
-            expectedOutput: tc.expected,
-            actualOutput: '',
-            executionTimeMs: Math.round(elapsedMs),
-            memoryUsedKb: 0,
-            error: 'Time Limit Exceeded',
-          });
-          allPassed = false;
-          continue;
-        }
-
         totalTimeMs += elapsedMs;
+
         const memoryKb = estimateMemory(tc.input);
         maxMemoryKb = Math.max(maxMemoryKb, memoryKb);
 
         let expected = tc.expected;
-
-        // For hidden test cases with empty/placeholder expected, try reference solution
         if (tc.isHidden && (!expected || expected === '0' || expected === '1')) {
           const refOutput = problemId ? getReferenceOutput(problemId, tc.input) : null;
           if (refOutput !== null) expected = refOutput;
         }
 
+        // Determine per-test-case error/verdict
+        let passed = false;
+        let caseError: string | undefined;
+        let verdict: Verdict = 'Accepted';
+        let exitCode = 0;
+
         if (result.error) {
-          testCaseResults.push({
-            passed: false,
-            input: tc.input,
-            expectedOutput: expected,
-            actualOutput: '',
-            executionTimeMs: Math.round(elapsedMs),
-            memoryUsedKb: memoryKb,
-            error: result.error,
-          });
-          allPassed = false;
-          continue;
+          caseError = result.error;
+          if (caseError.includes('Compilation')) {
+            verdict = 'Compilation Error';
+            exitCode = 1;
+          } else {
+            verdict = 'Runtime Error';
+            exitCode = 1;
+          }
+        } else if (elapsedMs > timeLimitMs) {
+          caseError = 'Time Limit Exceeded: test case took too long';
+          verdict = 'Time Limit Exceeded';
+          exitCode = 124;
+        } else {
+          const canValidate = expected && expected !== '0' && expected !== '1';
+          passed = canValidate
+            ? compareOutput(result.actualOutput, expected)
+            : true;
+          if (!passed) {
+            verdict = 'Wrong Answer';
+            exitCode = 0;
+          }
         }
 
-        // If no expected value available for hidden case, auto-pass (informational)
-        const canValidate = expected && expected !== '0' && expected !== '1' && expected !== '0';
-        const passed = canValidate
-          ? result.actualOutput.trim() === expected.trim()
-          : true;
+        if (!passed && verdict !== 'Time Limit Exceeded') allPassed = false;
 
-        if (!passed) allPassed = false;
+        const showInput = !tc.isHidden;
 
         testCaseResults.push({
           passed,
-          input: tc.input,
-          expectedOutput: expected,
-          actualOutput: result.actualOutput,
+          verdict,
+          input: showInput ? tc.input : '',
+          expectedOutput: expected || '',
+          actualOutput: result.actualOutput || '',
           executionTimeMs: Math.round(elapsedMs),
           memoryUsedKb: memoryKb,
+          exitCode,
+          error: caseError,
           stdout: result.stdout || undefined,
+          consoleOutput: result.consoleOutput || undefined,
         });
       }
 
       const passedCount = testCaseResults.filter(r => r.passed).length;
+
+      // Overall verdict
       let verdict: Verdict = 'Accepted';
       if (passedCount < totalCases) {
-        const hasTLE = testCaseResults.some(r => r.error === 'Time Limit Exceeded');
-        const hasCompile = testCaseResults.some(r => r.error && r.error.includes('Compilation'));
-        const hasRuntime = testCaseResults.some(r => r.error && !r.error.includes('Compilation') && r.error !== 'Time Limit Exceeded');
+        const hasCompile = testCaseResults.some(r => r.verdict === 'Compilation Error');
+        const hasTLE = testCaseResults.some(r => r.verdict === 'Time Limit Exceeded');
+        const hasRuntime = testCaseResults.some(r => r.verdict === 'Runtime Error');
+        const hasWA = testCaseResults.some(r => r.verdict === 'Wrong Answer');
         if (hasCompile) verdict = 'Compilation Error';
         else if (hasTLE) verdict = 'Time Limit Exceeded';
         else if (hasRuntime) verdict = 'Runtime Error';
-        else verdict = 'Wrong Answer';
+        else if (hasWA) verdict = 'Wrong Answer';
       }
 
-      const badMemory = testCaseResults.some(r => r.error === 'Memory Limit Exceeded');
-      if (badMemory) verdict = 'Memory Limit Exceeded';
+      const hasMLE = testCaseResults.some(r => r.verdict === 'Memory Limit Exceeded');
+      if (hasMLE) verdict = 'Memory Limit Exceeded';
+
+      onProgress?.({ phase: 'finished', message: 'Execution complete' });
 
       return {
         verdict,
@@ -273,6 +397,8 @@ export function createMockJudge(): Judge {
         totalTestCases: totalCases,
         executionTimeMs: Math.round(totalTimeMs),
         memoryUsedKb: maxMemoryKb,
+        compileTimeMs,
+        codeSize,
         testCaseResults,
       };
     },

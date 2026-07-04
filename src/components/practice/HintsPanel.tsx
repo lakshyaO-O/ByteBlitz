@@ -19,16 +19,16 @@ export function HintsPanel({ hints }: HintsPanelProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Lightbulb className="w-4 h-4 text-yellow-400" />
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Hints</span>
+          <span className="text-xs font-medium text-muted-foreground">Hints</span>
         </div>
-        <span className="text-[10px] text-muted-foreground">{revealedHints}/{hints.length}</span>
+        <span className="text-xs text-muted-foreground">{revealedHints}/{hints.length}</span>
       </div>
       {hints.slice(0, revealedHints).map((hint, i) => (
         <div
           key={i}
-          className="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20 text-xs text-muted-foreground leading-relaxed"
+          className="p-3 rounded bg-yellow-500/5 border border-yellow-500/20 text-sm text-muted-foreground leading-relaxed"
         >
-          <span className="font-bold text-yellow-400">Hint {i + 1}:</span> {hint}
+          <span className="font-medium text-yellow-400">Hint {i + 1}:</span> {hint}
         </div>
       ))}
       {revealedHints < hints.length && (

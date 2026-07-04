@@ -30,16 +30,16 @@ export default function LeaderboardPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8 max-w-5xl mx-auto">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/5 text-secondary text-xs font-headline font-bold uppercase tracking-widest">
             <Trophy className="w-3.5 h-3.5" />
             Hall of Legends
           </div>
-          <h1 className="text-5xl font-headline font-black uppercase tracking-tighter text-foreground">
-            GLOBAL <span className="text-primary neon-text">RANKINGS</span>
+          <h1 className="text-5xl font-headline font-bold text-foreground">
+            Leaderboard
           </h1>
-          <p className="text-muted-foreground">The top architects currently dominating the arena.</p>
+          <p className="text-muted-foreground">The top developers leading the rankings.</p>
         </div>
 
         {loading ? (
@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
             </div>
 
             <Card className="bg-card/50 border-border overflow-hidden">
-              <div className="bg-muted/50 p-4 border-b border-border grid grid-cols-12 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="bg-muted/50 p-4 border-b border-border grid grid-cols-12 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 <div className="col-span-1">Rank</div>
                 <div className="col-span-5 px-4">Architect</div>
                 <div className="col-span-3 text-center">ELO</div>
@@ -109,14 +109,14 @@ function TopPlayerCard({ rank, name, rating, userId }: { rank: number; name: str
       onClick={() => userId && router.push(`/profile/${userId}`)}
       className={cn(
       'relative border-border bg-card/50 overflow-hidden group cursor-pointer',
-      isFirst ? 'order-first md:order-none scale-110 z-10 border-primary/40 bg-primary/5 neon-border shadow-2xl' : 'scale-95 opacity-80'
+      isFirst ? 'order-first md:order-none scale-105 z-10 border-primary/30 bg-primary/5 shadow-xl' : 'scale-95 opacity-80'
     )}>
       <CardContent className="p-8 text-center space-y-4">
         <div className="absolute top-4 left-4 font-headline font-black text-2xl opacity-10 italic">#0{rank}</div>
         <div className="relative mx-auto w-24 h-24">
           <div className={cn(
             'w-full h-full rounded-full border-4 p-1 flex items-center justify-center',
-            isFirst ? 'border-primary neon-glow' : 'border-secondary'
+            isFirst ? 'border-primary' : 'border-secondary'
           )}>
             <Avatar className="w-full h-full rounded-full">
               <AvatarImage />
@@ -187,7 +187,7 @@ function LeaderRow({ rank, name, rating, wins, games, isCurrentUser, isTop3, use
             {name}
             {isCurrentUser && <span className="ml-2 text-[10px] font-normal text-muted-foreground">(you)</span>}
           </p>
-          <p className={cn('text-[10px] font-bold uppercase tracking-widest truncate', getTierColor(tier))}>{tier}</p>
+          <p className={cn('text-[11px] font-medium uppercase tracking-wider truncate', getTierColor(tier))}>{tier}</p>
         </div>
       </div>
       <div className="col-span-3 text-center">

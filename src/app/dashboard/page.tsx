@@ -117,8 +117,7 @@ export default function BeginnerDashboard() {
       <Shell>
         <div className="space-y-6 pb-12">
           {/* Welcome Header */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-primary/5 to-secondary/10 border border-primary/20 p-6 md:p-8">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative overflow-hidden rounded-2xl bg-primary/10 border border-primary/20 p-6 md:p-8">
             <div className="relative z-10">
               <div className="flex items-start justify-between">
                 <div>
@@ -172,28 +171,24 @@ export default function BeginnerDashboard() {
               icon={BookOpen}
               label="Continue Learning"
               sub="Resume your lesson"
-              color="from-blue-400 to-cyan-400"
               onClick={() => window.location.href = '/learning'}
             />
             <QuickActionCard
               icon={Code2}
               label="Quick Practice"
               sub="Try a coding challenge"
-              color="from-green-400 to-emerald-400"
               onClick={() => window.location.href = '/practice'}
             />
             <QuickActionCard
               icon={GraduationCap}
               label="Learning Roadmap"
               sub="See your progress"
-              color="from-purple-400 to-pink-400"
               onClick={() => window.location.href = '/learning'}
             />
             <QuickActionCard
               icon={Swords}
               label={completedCount >= 15 ? 'Enter Arena' : 'Arena (Locked)'}
               sub={completedCount >= 15 ? 'Battle others!' : `Complete ${15 - completedCount} more lessons`}
-              color={completedCount >= 15 ? 'from-yellow-400 to-amber-600' : 'from-gray-500 to-gray-600'}
               onClick={() => completedCount >= 15 ? window.location.href = '/arena' : null}
               locked={completedCount < 15}
             />
@@ -214,7 +209,7 @@ export default function BeginnerDashboard() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                         {completedCount >= totalLessons ? 'Completed!' : 'Current Lesson'}
                       </p>
                       <h3 className="text-lg font-headline font-bold mt-1">
@@ -352,7 +347,7 @@ export default function BeginnerDashboard() {
               </Card>
 
               {/* Daily Motivation */}
-              <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
+              <Card className="bg-card border-primary/20">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
                     <Quote className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -442,8 +437,8 @@ export default function BeginnerDashboard() {
   );
 }
 
-function QuickActionCard({ icon: Icon, label, sub, color, onClick, locked }: {
-  icon: any; label: string; sub: string; color: string; onClick?: () => void; locked?: boolean;
+function QuickActionCard({ icon: Icon, label, sub, onClick, locked }: {
+  icon: any; label: string; sub: string; onClick?: () => void; locked?: boolean;
 }) {
   return (
     <button
@@ -454,7 +449,7 @@ function QuickActionCard({ icon: Icon, label, sub, color, onClick, locked }: {
         locked && 'opacity-60 cursor-not-allowed'
       )}
     >
-      <div className={cn('w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center mb-3 group-hover:scale-110 transition-transform', color)}>
+      <div className={cn('w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform')}>
         <Icon className="w-5 h-5 text-white" />
       </div>
       <p className="font-bold text-sm">{label}</p>

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import HomeClient from './home-client';
 
 export const metadata: Metadata = {
   title: 'DevRann - Learn Coding, Practice DSA & Compete Live',
   description: 'Learn programming from beginner to advanced, solve coding problems, compete in live coding arenas, track ELO, build projects, and grow with AI-powered learning.',
   alternates: {
-    canonical: 'https://devrann.com',
+    canonical: `${SITE_URL}`,
   },
   openGraph: {
     title: 'DevRann - Competitive Coding Platform',

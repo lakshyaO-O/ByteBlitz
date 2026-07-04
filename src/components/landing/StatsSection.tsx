@@ -38,7 +38,7 @@ export function StatsSection() {
 
   return (
     <section className="relative py-32 border-t border-border/50">
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] via-transparent to-primary/[0.02] pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/[0.02] pointer-events-none" />
 
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
@@ -68,7 +68,7 @@ export function StatsSection() {
             <motion.div
               key={item.key}
               variants={itemVariants}
-              className="relative p-8 bg-card/30 border border-border/50 backdrop-blur-sm text-center group hover:border-primary/30 transition-colors duration-300"
+              className="relative p-8 bg-card/30 border border-border/50  text-center group hover:border-primary/30 transition-colors duration-300"
             >
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-primary/5 border border-primary/10 rounded-none">

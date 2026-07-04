@@ -65,11 +65,11 @@ export function CelebrationOverlay() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="w-full max-w-md rounded-3xl border border-primary/20 bg-card/95 p-5 shadow-2xl backdrop-blur-xl"
+              className="w-full max-w-md rounded-3xl border border-primary/20 bg-background/95 p-5 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/20 border border-primary/30">
                   <currentEvent.icon className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">

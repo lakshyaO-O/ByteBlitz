@@ -67,14 +67,14 @@ export default function ProjectDetailPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <Button variant="ghost" asChild className="gap-2 text-muted-foreground hover:text-foreground -ml-2">
           <Link href="/projects"><ArrowLeft className="w-4 h-4" /> Back to Projects</Link>
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="relative h-64 md:h-80 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-border flex items-center justify-center overflow-hidden">
+            <div className="relative h-64 md:h-80 rounded-xl bg-primary/10 border border-border flex items-center justify-center overflow-hidden">
               <Code2 className="w-20 h-20 text-muted-foreground/20" />
               {project.screenshots.length > 0 && (
                 <>
@@ -96,7 +96,7 @@ export default function ProjectDetailPage() {
                 </>
               )}
               {project.featured && (
-                <Badge className="absolute top-4 left-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px] uppercase tracking-widest">
+                <Badge className="absolute top-4 left-4 bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[11px] uppercase tracking-wider">
                   Featured
                 </Badge>
               )}

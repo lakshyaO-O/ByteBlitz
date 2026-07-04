@@ -68,7 +68,7 @@ export default function AchievementsPage() {
   const achievedCount = ACHIEVEMENTS.filter(a => isAchieved(a)).length;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
@@ -110,7 +110,7 @@ export default function AchievementsPage() {
                     <Lock className="w-3 h-3 text-muted-foreground" />
                   )}
                   <span className={cn(
-                    'text-[10px] font-bold uppercase tracking-widest',
+                    'text-[11px] font-medium uppercase tracking-wider',
                     achieved ? 'text-emerald-400' : 'text-muted-foreground'
                   )}>
                     {achieved ? 'Unlocked' : achievement.requirement}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import PostDetailPageClient from './page-client';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -8,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: `Community Post`,
     description: `View community post on DevRann. Join the discussion, share code, and connect with fellow developers.`,
     alternates: {
-      canonical: `https://devrann.com/community/posts/${id}`,
+      canonical: `${SITE_URL}/community/posts/${id}`,
     },
     openGraph: {
       title: `Community Post | DevRann`,

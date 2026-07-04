@@ -11,10 +11,10 @@ import {
 export default function WeeklyChallengesPage() {
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            WEEKLY <span className="text-primary neon-text">CHALLENGES</span>
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Weekly <span className="text-primary">Challenges</span>
           </h1>
           <p className="text-muted-foreground">Compete in weekly challenges, earn XP, and climb the leaderboard.</p>
         </div>

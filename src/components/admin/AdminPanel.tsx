@@ -707,7 +707,7 @@ function ProblemManagement() {
               {ALL_TOPIC_OPTIONS.map(t => (
                 <button key={t} onClick={() => toggleTopic(t)}
                   className={cn(
-                    'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest transition-colors',
+                    'px-2 py-0.5 rounded text-[11px] font-medium uppercase tracking-wider transition-colors',
                     form.topics.includes(t) ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground border border-border',
                   )}>
                   {t}

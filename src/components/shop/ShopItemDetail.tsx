@@ -79,19 +79,19 @@ export function ShopItemDetail({ item, owned, balance, onBuy, onEquip, onUnequip
             <p className="text-sm text-muted-foreground">{item.description}</p>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className="text-[10px] uppercase tracking-widest gap-1">
+              <Badge variant="outline" className="text-[11px] uppercase tracking-wider gap-1">
                 {typeInfo.icon} {typeInfo.label}
               </Badge>
-              <Badge variant="outline" className={cn('text-[10px] uppercase tracking-widest', rarityColor)}>
+              <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider', rarityColor)}>
                 <Star className="w-2.5 h-2.5 mr-1" /> {item.rarity}
               </Badge>
               {item.effect && (
-                <Badge variant="outline" className="text-[10px] uppercase tracking-widest text-primary">
+                <Badge variant="outline" className="text-[11px] uppercase tracking-wider text-primary">
                   <Zap className="w-2.5 h-2.5 mr-1" /> {item.effect.replace('_', ' ')}
                 </Badge>
               )}
               {item.seasonal && (
-                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] uppercase tracking-widest">
+                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[11px] uppercase tracking-wider">
                   <Sparkles className="w-2.5 h-2.5 mr-1" /> Seasonal
                 </Badge>
               )}
@@ -102,13 +102,13 @@ export function ShopItemDetail({ item, owned, balance, onBuy, onEquip, onUnequip
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Price</p>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Price</p>
               <p className={cn('text-2xl font-headline font-bold flex items-center gap-2', canAfford ? 'text-yellow-400' : 'text-destructive')}>
                 <Gem className="w-5 h-5" /> {item.price.toLocaleString()}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Your Balance</p>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Your Balance</p>
               <p className="text-lg font-headline font-bold text-yellow-400">{balance.toLocaleString()}</p>
             </div>
           </div>

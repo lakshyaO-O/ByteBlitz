@@ -36,7 +36,7 @@ export function AchievementPopup({ achievement, onDismiss }: AchievementPopupPro
         visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
       )}
     >
-      <div className="bg-gradient-to-br from-yellow-500/20 via-primary/10 to-purple-500/20 border border-yellow-500/30 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-lg">
         <button
           onClick={() => { setVisible(false); setTimeout(onDismiss, 300); }}
           className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
@@ -46,12 +46,12 @@ export function AchievementPopup({ achievement, onDismiss }: AchievementPopupPro
         <div className="flex items-start gap-3">
           <div className="text-2xl">{achievement.icon}</div>
           <div className="space-y-0.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">
+            <p className="text-xs font-medium text-yellow-400">
               Achievement Unlocked!
             </p>
-            <p className="text-sm font-bold text-foreground">{achievement.title}</p>
-            <p className="text-xs text-muted-foreground">{achievement.desc}</p>
-            <div className="flex items-center gap-1 mt-1 text-[10px] font-bold text-yellow-400">
+            <p className="text-sm font-semibold text-foreground">{achievement.title}</p>
+            <p className="text-sm text-muted-foreground">{achievement.desc}</p>
+            <div className="flex items-center gap-1 mt-1 text-xs font-medium text-yellow-400">
               <Zap className="w-3 h-3" /> +{achievement.xp} XP
             </div>
           </div>

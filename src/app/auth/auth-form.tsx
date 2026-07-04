@@ -318,7 +318,7 @@ function AuthForm() {
   if (showForgotPassword) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
-        <Card className="max-w-md w-full bg-card/80 border-border backdrop-blur-xl">
+        <Card className="max-w-md w-full bg-background/95 border-border">
           <CardHeader className="text-center space-y-2">
             <div className="flex justify-center mb-2 text-primary">
               <Zap className="h-8 w-8 fill-primary" />
@@ -371,7 +371,7 @@ function AuthForm() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
-      <Card className="max-w-md w-full bg-card/80 border-border backdrop-blur-xl">
+      <Card className="max-w-md w-full bg-background/95 border-border">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center mb-2 text-primary">
             <Zap className="h-8 w-8 fill-primary" />

@@ -37,8 +37,8 @@ export function DiscussionPanel({ problemId, userId, username }: DiscussionPanel
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <MessageSquare className="w-4 h-4 text-muted-foreground" />
-        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Discussion</span>
-        {!loading && <span className="text-[10px] text-muted-foreground">({messages.length})</span>}
+        <span className="text-xs font-medium text-muted-foreground">Discussion</span>
+        {!loading && <span className="text-xs text-muted-foreground">({messages.length})</span>}
       </div>
 
       {loading ? (
@@ -47,11 +47,11 @@ export function DiscussionPanel({ problemId, userId, username }: DiscussionPanel
         <ScrollArea className="max-h-[200px]">
           <div className="space-y-2 pr-2">
             {messages.map((msg) => (
-              <div key={msg.id} className="p-2.5 rounded-lg bg-muted/20 border border-border text-xs">
+              <div key={msg.id} className="p-2.5 rounded bg-muted/20 border border-border text-sm">
                 <div className="flex items-center gap-1.5 mb-1">
                   <User className="w-3 h-3 text-primary" />
-                  <span className="font-bold text-[10px]">{msg.username}</span>
-                  <span className="text-[9px] text-muted-foreground ml-auto">
+                  <span className="font-medium text-xs">{msg.username}</span>
+                  <span className="text-xs text-muted-foreground ml-auto">
                     {msg.createdAt?.toMillis ? new Date(msg.createdAt.toMillis()).toLocaleDateString() : ''}
                   </span>
                 </div>
@@ -61,7 +61,7 @@ export function DiscussionPanel({ problemId, userId, username }: DiscussionPanel
           </div>
         </ScrollArea>
       ) : (
-        <p className="text-xs text-muted-foreground italic">No discussion yet. Be the first to comment!</p>
+        <p className="text-sm text-muted-foreground italic">No discussion yet. Be the first to comment!</p>
       )}
 
       {userId && (
@@ -70,7 +70,7 @@ export function DiscussionPanel({ problemId, userId, username }: DiscussionPanel
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Share your thoughts..."
-            className="min-h-[36px] text-xs bg-muted/20 border-border resize-none"
+            className="min-h-[36px] text-sm bg-muted/20 border-border resize-none"
             rows={1}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handlePost(); }

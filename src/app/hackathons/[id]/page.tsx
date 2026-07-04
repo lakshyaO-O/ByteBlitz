@@ -70,7 +70,7 @@ export default function HackathonDetailPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <Button variant="ghost" asChild className="gap-2 text-muted-foreground hover:text-foreground -ml-2">
           <Link href="/hackathons"><ArrowLeft className="w-4 h-4" /> Back to Hackathons</Link>
         </Button>
@@ -79,15 +79,15 @@ export default function HackathonDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <Badge variant="outline" className="text-[10px] uppercase tracking-widest bg-muted/50">{h.category}</Badge>
+                <Badge variant="outline" className="text-[11px] uppercase tracking-wider bg-muted/50">{h.category}</Badge>
                 <Badge variant="outline" className={cn(
-                  'text-[10px] uppercase tracking-widest',
+                  'text-[11px] uppercase tracking-wider',
                   h.difficulty === 'Beginner' ? 'text-emerald-400 border-emerald-400/30' :
                   h.difficulty === 'Intermediate' ? 'text-yellow-400 border-yellow-400/30' :
                   'text-destructive border-destructive/30'
                 )}>{h.difficulty}</Badge>
                 <Badge className={cn(
-                  'text-[10px] uppercase tracking-widest',
+                  'text-[11px] uppercase tracking-wider',
                   h.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
                   h.status === 'upcoming' ? 'bg-primary/10 text-primary border-primary/30' :
                   'bg-muted text-muted-foreground border-border'

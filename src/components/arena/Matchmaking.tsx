@@ -73,7 +73,7 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
     return (
       <div className="flex flex-col items-center gap-8 py-12">
         <MatchmakingAnimation status="found" opponentName={opponent?.username} />
-        <Card className="w-full max-w-lg border-primary/50 bg-primary/5 neon-border">
+        <Card className="w-full max-w-lg border-primary/30 bg-primary/5">
           <CardContent className="p-8 space-y-6">
             <div className="text-center space-y-2">
               <p className="text-primary font-headline font-bold uppercase tracking-widest text-sm">
@@ -131,7 +131,7 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
           <Swords className="w-3.5 h-3.5" />
           1v1 Rated Battle
         </div>
-        <h2 className="text-4xl font-headline font-bold text-foreground neon-text uppercase tracking-tighter">
+        <h2 className="text-4xl font-headline font-bold text-foreground uppercase tracking-tighter">
           Find Your Match
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto">
@@ -192,7 +192,7 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
                   </div>
                   {roomCode ? (
                     <div className="flex flex-col items-center gap-4">
-                      <div className="text-4xl font-mono font-bold tracking-[0.25em] text-primary neon-text">
+                      <div className="text-4xl font-mono font-bold tracking-[0.25em] text-primary">
                         {roomCode}
                       </div>
                       <Button variant="outline" size="sm" onClick={handleCopyCode} className="gap-2">
@@ -223,7 +223,7 @@ export function Matchmaking({ onMatchFound }: MatchmakingProps) {
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                 <Settings className="w-4 h-4" />
-                ARENA SETTINGS
+                Arena Settings
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl bg-card border-border max-h-[90vh] overflow-hidden">

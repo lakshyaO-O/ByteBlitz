@@ -74,9 +74,9 @@ export default function PublicProfilePage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-primary/5 to-secondary/5 overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3" />
+      <div className="space-y-8">
+        <Card className="border-primary/20 bg-primary/5 overflow-hidden">
+
           <CardContent className="p-6 md:p-8 relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="relative">
@@ -86,17 +86,17 @@ export default function PublicProfilePage() {
                     {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white">
+                <div className="absolute -bottom-1 -right-1 bg-secondary px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wider text-white">
                   LVL {user.level}
                 </div>
               </div>
               <div className="flex-1 space-y-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-2xl md:text-3xl font-headline font-bold">{user.displayName}</h1>
-                  <Badge variant="outline" className={cn('text-[10px] uppercase tracking-widest', tierColorMap[user.tier] || 'text-muted-foreground')}>
+                  <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider', tierColorMap[user.tier] || 'text-muted-foreground')}>
                     <Medal className="w-3 h-3 mr-1" /> {user.tier}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <Badge variant="outline" className="text-[11px] uppercase tracking-wider text-muted-foreground">
                     @{user.username}
                   </Badge>
                 </div>
@@ -286,7 +286,7 @@ function StatBox({ label, value, color }: { label: string; value: string | numbe
     <Card className="bg-card/50 border-border">
       <CardContent className="p-4 text-center space-y-1">
         <div className={cn('text-xl md:text-2xl font-headline font-bold', color)}>{value}</div>
-        <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
+        <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
       </CardContent>
     </Card>
   );

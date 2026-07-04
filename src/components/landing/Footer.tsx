@@ -25,7 +25,7 @@ export function LandingFooter() {
           <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-primary" />
             <span className="text-xl font-headline font-bold tracking-tight text-foreground">
-              CODEZ<span className="text-primary">ARENA</span>
+              Dev<span className="text-primary">Rann</span>
             </span>
           </div>
 

@@ -158,9 +158,26 @@ export function RoomsSkeleton() {
 export function PracticeSkeleton() {
   return (
     <div className="min-h-screen bg-[#05070f] p-6 space-y-6">
-      <SkeletonBlock className="h-10 w-48" />
-      <div className="space-y-3">
-        {[1, 2, 3, 4].map(i => <CardSkeleton key={i} />)}
+      <SkeletonBlock className="h-10 w-56" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 h-52 bg-muted/20 rounded-2xl animate-pulse" />
+        <div className="h-52 bg-muted/20 rounded-2xl animate-pulse" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="h-24 bg-muted/20 rounded-xl animate-pulse" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-32 bg-muted/20 rounded-xl animate-pulse" />
+        ))}
+      </div>
+      <div className="h-8 w-32 bg-muted/30 rounded" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-20 bg-muted/20 rounded-xl animate-pulse" />
+        ))}
       </div>
     </div>
   );

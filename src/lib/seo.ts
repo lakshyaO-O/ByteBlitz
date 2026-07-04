@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = 'https://devrann.com';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://devrann.vercel.app';
 export const SITE_NAME = 'DevRann';
 export const SITE_DESCRIPTION =
   'Learn programming from beginner to advanced, solve coding problems, compete in live coding arenas, track ELO, build projects, and grow with AI-powered learning.';

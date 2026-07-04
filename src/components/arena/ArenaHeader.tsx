@@ -21,7 +21,7 @@ export function ArenaHeader({
 }: ArenaHeaderProps) {
   return (
     <div className={cn('relative overflow-hidden', className)}>
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
       <div className="relative z-10 flex flex-col items-center text-center space-y-8 py-16">
         <div className="relative">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-primary/30 bg-primary/5">
@@ -33,8 +33,8 @@ export function ArenaHeader({
         </div>
 
         <div className="space-y-3">
-          <h1 className="text-5xl md:text-7xl font-headline font-black tracking-tighter uppercase neon-text">
-            THE ARENA
+          <h1 className="text-5xl md:text-7xl font-headline font-bold tracking-tight">
+            Arena
           </h1>
           <p className="text-muted-foreground font-headline text-sm uppercase tracking-[0.25em] flex items-center justify-center gap-2">
             <Zap className="w-3 h-3 text-primary/50" />

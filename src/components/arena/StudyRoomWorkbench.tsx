@@ -485,7 +485,7 @@ export function StudyRoomWorkbench({ config, isHost, onLeave }: StudyRoomWorkben
                     config.problemIds.find((id) => PROBLEM_DATA[id]?.title === p.title) || activeProblemId
                   )}
                   className={cn(
-                    'px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border',
+                    'px-3 py-1.5 rounded-lg text-[11px] font-medium uppercase tracking-wider transition-all border',
                     p.title === problem?.title
                       ? 'bg-primary/10 text-primary border-primary/30'
                       : 'bg-muted/10 text-muted-foreground/50 border-border/30 hover:border-border/60'

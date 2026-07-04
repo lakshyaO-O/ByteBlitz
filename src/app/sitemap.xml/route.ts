@@ -1,6 +1,4 @@
-import type { MetadataRoute } from 'next';
-
-const BASE_URL = 'https://devrann.com';
+import { SITE_URL } from '@/lib/seo';
 
 interface RouteConfig {
   path: string;
@@ -10,11 +8,10 @@ interface RouteConfig {
 
 const staticRoutes: RouteConfig[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1.0 },
-  { path: '/auth', changeFrequency: 'monthly', priority: 0.3 },
-  { path: '/dashboard', changeFrequency: 'daily', priority: 0.7 },
   { path: '/practice', changeFrequency: 'daily', priority: 0.8 },
   { path: '/problems', changeFrequency: 'daily', priority: 0.8 },
   { path: '/arena', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/arena/custom-study', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/contests', changeFrequency: 'daily', priority: 0.8 },
   { path: '/contest-calendar', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/challenges', changeFrequency: 'daily', priority: 0.7 },
@@ -26,8 +23,6 @@ const staticRoutes: RouteConfig[] = [
   { path: '/rooms', changeFrequency: 'daily', priority: 0.5 },
   { path: '/achievements', changeFrequency: 'weekly', priority: 0.5 },
   { path: '/missions', changeFrequency: 'daily', priority: 0.6 },
-  { path: '/progress', changeFrequency: 'weekly', priority: 0.5 },
-  { path: '/progress/streaks', changeFrequency: 'weekly', priority: 0.4 },
   { path: '/projects', changeFrequency: 'daily', priority: 0.6 },
   { path: '/code-share', changeFrequency: 'daily', priority: 0.5 },
   { path: '/weekly-challenges', changeFrequency: 'weekly', priority: 0.6 },
@@ -43,26 +38,38 @@ const staticRoutes: RouteConfig[] = [
   { path: '/ai-roadmap', changeFrequency: 'weekly', priority: 0.5 },
   { path: '/resume-reviewer', changeFrequency: 'weekly', priority: 0.5 },
   { path: '/replay', changeFrequency: 'weekly', priority: 0.4 },
-  { path: '/search', changeFrequency: 'monthly', priority: 0.3 },
   { path: '/shop', changeFrequency: 'weekly', priority: 0.5 },
-  { path: '/monetization', changeFrequency: 'monthly', priority: 0.3 },
-  { path: '/analytics', changeFrequency: 'weekly', priority: 0.4 },
-  { path: '/security', changeFrequency: 'monthly', priority: 0.4 },
-  { path: '/settings', changeFrequency: 'monthly', priority: 0.2 },
-  { path: '/settings/github', changeFrequency: 'monthly', priority: 0.2 },
-  { path: '/profile', changeFrequency: 'daily', priority: 0.5 },
-  { path: '/notifications', changeFrequency: 'monthly', priority: 0.2 },
-  { path: '/friends', changeFrequency: 'daily', priority: 0.5 },
-  { path: '/admin', changeFrequency: 'monthly', priority: 0.1 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
-    url: `${BASE_URL}${route.path}`,
-    lastModified: new Date(),
-    changeFrequency: route.changeFrequency,
-    priority: route.priority,
-  }));
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
 
-  return staticEntries;
+export async function GET() {
+  const lastMod = new Date().toISOString();
+
+  const urls = staticRoutes.map((route) => {
+    const loc = `${SITE_URL}${route.path}`;
+    return `  <url>
+    <loc>${escapeXml(loc)}</loc>
+    <lastmod>${lastMod}</lastmod>
+    <changefreq>${route.changeFrequency}</changefreq>
+    <priority>${route.priority}</priority>
+  </url>`;
+  }).join('\n');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  return new Response(xml, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      'X-Content-Type-Options': 'nosniff',
+      'Vary': 'Accept-Encoding',
+    },
+  });
 }

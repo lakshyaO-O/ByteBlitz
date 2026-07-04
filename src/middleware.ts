@@ -18,17 +18,42 @@ const PUBLIC_ROUTES = new Set([
   '/api/github',
   '/api/projects',
   '/sw.js',
-  '/dashboard',
+  '/sitemap.xml',
+  '/robots.txt',
   '/arena',
   '/practice',
+  '/problems',
   '/leaderboard',
   '/contests',
+  '/contest-calendar',
   '/challenges',
-  '/rooms',
+  '/hackathons',
+  '/community',
   '/learning',
+  '/rooms',
+  '/feed',
+  '/forum',
+  '/code-share',
+  '/career-hub',
+  '/ai-mentor',
+  '/ai-code-review',
+  '/ai-debugger',
+  '/ai-interviewer',
+  '/ai-roadmap',
+  '/resume-reviewer',
+  '/replay',
+  '/search',
+  '/shop',
+  '/monetization',
+  '/achievements',
+  '/missions',
+  '/projects',
+  '/study-groups',
+  '/mentors',
+  '/weekly-challenges',
 ]);
 
-const STATIC_EXTENSIONS = /\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot|webp|avif)$/;
+const STATIC_EXTENSIONS = /\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot|webp|avif|xml|txt)$/;
 
 function isPublicRoute(pathname: string): boolean {
   if (STATIC_EXTENSIONS.test(pathname)) return true;
@@ -75,5 +100,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|.*\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot|webp|avif)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|.*\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot|webp|avif|xml|txt)$).*)'],
 };

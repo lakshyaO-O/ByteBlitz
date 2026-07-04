@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import CustomStudyPageClient from './page-client';
 
 export const metadata: Metadata = {
   title: 'Custom Study Room | DevRann',
   description:
     'Create or join collaborative study rooms. Solve problems together, chat with peers, and learn as a team — no ELO pressure.',
-  alternates: { canonical: 'https://devrann.com/arena/custom-study' },
+  alternates: { canonical: `${SITE_URL}/arena/custom-study` },
   openGraph: {
     title: 'Custom Study Room | DevRann Arena',
     description:

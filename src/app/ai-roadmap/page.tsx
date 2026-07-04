@@ -176,7 +176,7 @@ export default function AIRoadmapPage() {
             </div>
           </div>
 
-          <Card className="bg-gradient-to-br from-primary/10 to-secondary/5 border-primary/20">
+          <Card className="bg-primary/10 border-primary/20">
             <CardContent className="p-6">
               <h2 className="text-xl font-headline font-bold">{roadmap.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">{roadmap.description}</p>
@@ -216,7 +216,7 @@ export default function AIRoadmapPage() {
                       <div className="px-4 pb-4 space-y-4 border-t border-border pt-4">
                         <p className="text-sm text-muted-foreground">{phase.description}</p>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Topics</p>
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Topics</p>
                           <div className="flex flex-wrap gap-1.5">
                             {phase.topics.map((t, i) => (
                               <Badge key={i} variant="secondary" className="text-[9px] uppercase tracking-widest">{t}</Badge>
@@ -224,7 +224,7 @@ export default function AIRoadmapPage() {
                           </div>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Resources</p>
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">Resources</p>
                           <ul className="space-y-1">
                             {phase.resources.map((r, i) => (
                               <li key={i} className="text-sm flex items-start gap-2">
@@ -235,7 +235,7 @@ export default function AIRoadmapPage() {
                           </ul>
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2">Milestones</p>
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-400 mb-2">Milestones</p>
                           <ul className="space-y-1">
                             {phase.milestones.map((m, i) => (
                               <li key={i} className="text-sm flex items-start gap-2">

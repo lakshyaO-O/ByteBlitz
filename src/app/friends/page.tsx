@@ -174,7 +174,7 @@ export default function FriendsPage() {
   );
 
   return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">

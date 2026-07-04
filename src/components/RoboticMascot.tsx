@@ -269,12 +269,9 @@ export function RoboticMascot() {
                 style={{
                   width: 5,
                   height: EDGE_TAB_SIZE,
-                  background: 'linear-gradient(180deg, rgba(6,182,212,0.6), rgba(99,102,241,0.6))',
-                  boxShadow: '0 0 12px rgba(6,182,212,0.3), 0 0 24px rgba(6,182,212,0.1), inset 0 0 6px rgba(6,182,212,0.15)',
+                  background: 'rgba(6,182,212,0.6)',
                 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 to-indigo-400/20 animate-pulse" />
-              </div>
+              />
 
               <div
                 className={cn(
@@ -341,7 +338,7 @@ export function RoboticMascot() {
                 style={{
                   width: AVATAR_SIZE,
                   height: AVATAR_SIZE,
-                  background: 'linear-gradient(135deg, rgba(6,182,212,0.25), rgba(99,102,241,0.2))',
+                  background: 'rgba(6,182,212,0.2)',
                   border: '1.5px solid rgba(6,182,212,0.5)',
                 }}
               >
@@ -380,14 +377,9 @@ export function RoboticMascot() {
                     exit={{ opacity: 0, x: 8 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     className={cn(
-                      'absolute top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg whitespace-nowrap pointer-events-none',
+                      'absolute top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg whitespace-nowrap pointer-events-none bg-slate-800/80 border border-cyan-500/20',
                       edgeSide === 'right' ? 'right-full mr-2' : 'left-full ml-2',
                     )}
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(99,102,241,0.1))',
-                      border: '1px solid rgba(6,182,212,0.2)',
-                      backdropFilter: 'blur(8px)',
-                    }}
                   >
                     <span className="text-[10px] font-bold text-cyan-300 tracking-wide flex items-center gap-1.5">
                       <GripHorizontal className="w-3 h-3" /> Drag to hide
@@ -408,14 +400,11 @@ export function RoboticMascot() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 20, transition: { duration: 0.15 } }}
             transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.8 }}
-            className="fixed inset-x-3 bottom-3 z-[9999] w-[calc(100vw-1.5rem)] max-w-[420px] sm:right-6 sm:bottom-6 sm:left-auto sm:w-[420px] max-h-[calc(100dvh-2rem)] sm:h-[600px] bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-500/25 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(6,182,212,0.08)] flex flex-col overflow-hidden"
+            className="fixed inset-x-3 bottom-3 z-[9999] w-[calc(100vw-1.5rem)] max-w-[420px] sm:right-6 sm:bottom-6 sm:left-auto sm:w-[420px] max-h-[calc(100dvh-2rem)] sm:h-[600px] bg-slate-900 border border-cyan-500/25 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(6,182,212,0.08)] flex flex-col overflow-hidden"
           >
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-
             {/* Header */}
-            <div className="relative flex items-center gap-3 px-5 py-4 border-b border-cyan-500/15 bg-gradient-to-r from-cyan-500/5 to-transparent shrink-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400/30 to-indigo-400/30 border border-cyan-400/30 flex items-center justify-center shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+            <div className="relative flex items-center gap-3 px-5 py-4 border-b border-cyan-500/15 bg-cyan-500/5 shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-cyan-300" />
               </div>
               <div className="flex-1 min-w-0">
@@ -460,8 +449,8 @@ export function RoboticMascot() {
                   <div className={cn(
                     'max-w-[88%] px-4 py-3 rounded-2xl text-sm leading-relaxed',
                     msg.role === 'user'
-                      ? 'bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 text-cyan-50 rounded-br-sm border border-cyan-500/15 shadow-[0_2px_8px_rgba(6,182,212,0.08)]'
-                      : 'bg-gradient-to-br from-slate-800/70 to-slate-800/30 text-slate-200 rounded-bl-sm border border-slate-700/25',
+                      ? 'bg-cyan-500/20 text-cyan-50 rounded-br-sm border border-cyan-500/15'
+                      : 'bg-slate-800/70 text-slate-200 rounded-bl-sm border border-slate-700/25',
                   )}>
                     {msg.content}
                   </div>
@@ -473,7 +462,7 @@ export function RoboticMascot() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start"
                 >
-                  <div className="max-w-[85%] px-4 py-3 rounded-2xl bg-gradient-to-br from-slate-800/70 to-slate-800/30 border border-slate-700/25 rounded-bl-sm flex items-center gap-2.5">
+                  <div className="max-w-[85%] px-4 py-3 rounded-2xl bg-slate-800/70 border border-slate-700/25 rounded-bl-sm flex items-center gap-2.5">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-cyan-400" />
                     <span className="text-sm text-slate-400">Thinking...</span>
                   </div>
@@ -482,7 +471,7 @@ export function RoboticMascot() {
             </div>
 
             {/* Input */}
-            <div className="relative px-5 py-4 border-t border-cyan-500/10 bg-gradient-to-r from-transparent via-slate-900/60 to-transparent shrink-0">
+            <div className="relative px-5 py-4 border-t border-cyan-500/10 bg-slate-900/60 shrink-0">
               <div className="flex gap-2">
                 <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
@@ -491,7 +480,7 @@ export function RoboticMascot() {
                   disabled={isLoading}
                 />
                 <button onClick={() => handleSend()} disabled={!input.trim() || isLoading}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/20 to-cyan-500/10 border border-cyan-400/25 flex items-center justify-center hover:from-cyan-400/30 hover:to-cyan-500/20 hover:shadow-[0_0_12px_rgba(6,182,212,0.15)] transition-all disabled:opacity-30 shrink-0"
+                  className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/25 flex items-center justify-center hover:bg-cyan-500/30 transition-all disabled:opacity-30 shrink-0"
                 >
                   <Send className="w-4 h-4 text-cyan-300" />
                 </button>

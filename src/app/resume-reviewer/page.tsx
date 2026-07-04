@@ -175,7 +175,7 @@ export default function ResumeReviewerPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Target Role</label>
+                  <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1 block">Target Role</label>
                   <Input
                     placeholder="e.g. Senior Frontend Engineer"
                     value={targetRole}
@@ -184,7 +184,7 @@ export default function ResumeReviewerPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Years of Experience</label>
+                  <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1 block">Years of Experience</label>
                   <Input
                     placeholder="e.g. 5"
                     value={yearsExperience}
@@ -193,7 +193,7 @@ export default function ResumeReviewerPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1 block">Job Description</label>
+                  <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1 block">Job Description</label>
                   <Textarea
                     placeholder="Paste the job description for targeted feedback..."
                     value={jobDescription}
@@ -312,11 +312,11 @@ export default function ResumeReviewerPage() {
                               <Badge variant="outline" className="text-[9px] uppercase tracking-widest mb-2">{s.section}</Badge>
                               <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-widest text-destructive mb-1">Before</p>
+                                  <p className="text-[10px] font-medium uppercase tracking-wider text-destructive mb-1">Before</p>
                                   <p className="text-xs p-2 rounded bg-destructive/5 border border-destructive/20 font-mono">{s.before}</p>
                                 </div>
                                 <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 mb-1">After</p>
+                                  <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400 mb-1">After</p>
                                   <p className="text-xs p-2 rounded bg-emerald-500/5 border border-emerald-500/20 font-mono">{s.after}</p>
                                 </div>
                               </div>

@@ -60,8 +60,8 @@ export function HeroSection() {
         </motion.div>
 
         <motion.div variants={itemVariants} className="mb-6">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-headline font-black tracking-tighter text-foreground uppercase leading-[0.85]">
-            CODEZ<span className="text-primary inline-block" style={{ textShadow: '0 0 30px hsl(184 100% 55% / 0.6), 0 0 60px hsl(184 100% 55% / 0.3)' }}>ARENA</span>
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-headline font-black tracking-tighter text-foreground leading-[0.85]">
+            Dev<span className="text-primary">Rann</span>
           </h1>
         </motion.div>
 
@@ -89,7 +89,7 @@ export function HeroSection() {
             className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold text-background rounded-none overflow-hidden"
           >
             <span className="absolute inset-0 bg-primary transition-transform duration-300 group-hover:scale-105" />
-            <span className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <span className="relative z-10 flex items-center gap-2">
               Get Started
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -98,7 +98,7 @@ export function HeroSection() {
 
           <Link
             href="/auth?mode=login"
-            className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold border border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-muted rounded-none overflow-hidden"
+            className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold border border-border bg-background/50 text-foreground hover:bg-muted rounded-none overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
               <LogIn className="w-4 h-4" />

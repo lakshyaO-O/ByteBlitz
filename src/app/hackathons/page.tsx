@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import HackathonsPageClient from './page-client';
 
 export const metadata: Metadata = {
   title: 'Hackathons',
   description: 'Participate in hackathons on DevRann. Build projects, compete with teams, showcase your skills, and win prizes.',
   alternates: {
-    canonical: 'https://devrann.com/hackathons',
+    canonical: `${SITE_URL}/hackathons`,
   },
   openGraph: {
     title: 'Hackathons | DevRann',

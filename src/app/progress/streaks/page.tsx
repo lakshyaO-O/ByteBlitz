@@ -53,16 +53,16 @@ export default function StreaksPage() {
   return (
     <TooltipProvider>
       <Shell>
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-8">
           <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              LEARNING <span className="text-primary neon-text">STREAKS</span>
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Streaks
             </h1>
             <p className="text-muted-foreground">Track your daily coding consistency and earn milestone rewards.</p>
           </div>
 
-          <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-br from-orange-500/10 via-primary/5 to-yellow-500/10">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl translate-x-1/4 -translate-y-1/4" />
+          <Card className="relative overflow-hidden border-primary/30 bg-primary/10">
+
             <CardContent className="p-8 relative z-10">
               <div className="flex flex-col md:flex-row items-center gap-8">
                 <motion.div
@@ -70,7 +70,7 @@ export default function StreaksPage() {
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                  <div className="w-32 h-32 rounded-full bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
                     <Flame className="w-16 h-16 text-white drop-shadow-lg" />
                   </div>
                   <div className="absolute -top-1 -right-1 bg-background rounded-full px-3 py-1 border border-orange-500/30">
@@ -82,10 +82,10 @@ export default function StreaksPage() {
                   <p className="text-5xl font-headline font-black text-orange-400">{currentStreak} Days</p>
                   <p className="text-muted-foreground">Best streak: {longestStreak} days · Keep the momentum going!</p>
                   <div className="flex items-center gap-2 justify-center md:justify-start">
-                    <Badge variant="outline" className="text-[10px] uppercase tracking-widest border-orange-400/30 text-orange-400">
+                    <Badge variant="outline" className="text-[11px] uppercase tracking-wider border-orange-400/30 text-orange-400">
                       <Flame className="w-3 h-3 mr-1" /> On Fire!
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    <Badge variant="outline" className="text-[11px] uppercase tracking-wider text-muted-foreground">
                       <Zap className="w-3 h-3 mr-1" /> +50 XP today
                     </Badge>
                   </div>

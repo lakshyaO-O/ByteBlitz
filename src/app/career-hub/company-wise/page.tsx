@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
@@ -114,7 +114,7 @@ export default function CompanyWisePage() {
               >
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
-                    <div className={cn('w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 text-lg font-headline font-bold text-white', COMPANY_COLORS[company.company] || 'from-primary to-secondary')}>
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0 text-lg font-headline font-bold text-white">
                       {COMPANY_LOGOS[company.company] || company.company[0]}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -154,7 +154,7 @@ export default function CompanyWisePage() {
               <>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-3">
-                    <div className={cn('w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-sm font-headline font-bold text-white', COMPANY_COLORS[selectedCompany.company] || 'from-primary to-secondary')}>
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-sm font-headline font-bold text-white">
                       {COMPANY_LOGOS[selectedCompany.company] || selectedCompany.company[0]}
                     </div>
                     <div>

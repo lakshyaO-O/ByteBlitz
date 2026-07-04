@@ -231,7 +231,7 @@ export default function AIMentorPage() {
                   key={topic.label}
                   onClick={() => handleTopicClick(topic.label)}
                   disabled={isLoading}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/30 border border-border/50 text-[10px] font-bold uppercase tracking-widest hover:border-primary/30 hover:bg-primary/5 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/30 border border-border/50 text-[11px] font-medium uppercase tracking-wider hover:border-primary/30 hover:bg-primary/5 transition-colors disabled:opacity-50"
                 >
                   <topic.icon className="w-3 h-3" />
                   {topic.label}

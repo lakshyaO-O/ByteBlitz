@@ -111,7 +111,7 @@ function MetricCard({ label, value, icon: Icon, color, infoKey, sub }: {
         </Tooltip>
         <Icon className={cn('w-5 h-5 mx-auto', color)} />
         <div className={cn('text-2xl font-headline font-bold', color)}>{value}</div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
+        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
         {sub && <div className="text-[9px] text-muted-foreground/60 -mt-1">{sub}</div>}
       </CardContent>
     </Card>
@@ -166,21 +166,21 @@ export default function ProgressPage() {
 
   return (
     <TooltipProvider>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-            PROGRESS <span className="text-primary neon-text">TRACKER</span>
+          <h1 className="text-4xl font-headline font-bold text-foreground">
+            Progress
           </h1>
-          <p className="text-muted-foreground">Every lesson, battle, and problem shapes your journey. Track it all here.</p>
+          <p className="text-muted-foreground">Track your coding journey across lessons, problems, and challenges.</p>
         </div>
 
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h2 className="text-2xl font-headline font-bold">{profile?.username || beginner.name || 'Player'}</h2>
-                  <Badge variant="outline" className={cn('text-[10px] uppercase tracking-widest', getTierColor(tier))}>
+                  <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider', getTierColor(tier))}>
                     <Trophy className="w-3 h-3 mr-1" /> {tier}
                   </Badge>
                 </div>
@@ -189,19 +189,19 @@ export default function ProgressPage() {
               <div className="flex gap-6">
                 <div className="text-center">
                   <div className="text-3xl font-headline font-bold text-emerald-400">{arenaWins}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Wins</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Wins</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-headline font-bold text-destructive">{arenaLosses}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Losses</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Losses</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-headline font-bold text-yellow-400">{arenaDraws}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Draws</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Draws</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-headline font-bold text-blue-400">{lessonsCount}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Lessons</div>
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Lessons</div>
                 </div>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function ProgressPage() {
                 </span>
               </div>
               <div className="h-3 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary neon-glow transition-all" style={{ width: `${xpPercent}%` }} />
+                <div className="h-full bg-primary transition-all" style={{ width: `${xpPercent}%` }} />
               </div>
               <p className="text-xs text-muted-foreground">
                 {nextLevelXp} XP needed for Level {level + 1}

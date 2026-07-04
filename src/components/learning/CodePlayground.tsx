@@ -181,7 +181,7 @@ export function CodePlayground({
 
       {showHint && hint && (
         <div className="mx-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-200">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400 mb-1">Hint</p>
+          <p className="text-[11px] font-medium uppercase tracking-wider text-amber-400 mb-1">Hint</p>
           {hint}
         </div>
       )}

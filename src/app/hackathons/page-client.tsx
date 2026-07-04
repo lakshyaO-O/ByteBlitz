@@ -60,7 +60,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
       <span className="text-2xl sm:text-3xl font-headline font-black tabular-nums text-foreground">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
         {label}
       </span>
     </div>
@@ -91,7 +91,7 @@ function EmptySectionCard({
       )}
     >
       <div className="flex flex-col items-center text-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center border border-primary/10">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/10">
           <Icon className="w-8 h-8 text-primary/60" />
         </div>
         <div className="space-y-1.5">
@@ -99,7 +99,7 @@ function EmptySectionCard({
           <p className="text-sm text-muted-foreground max-w-md">{description}</p>
         </div>
         {badge && (
-          <Badge variant="outline" className="bg-secondary/5 text-secondary border-secondary/20 text-[10px] uppercase tracking-widest font-bold">
+          <Badge variant="outline" className="bg-secondary/5 text-secondary border-secondary/20 text-[11px] uppercase tracking-wider font-bold">
             {badge}
           </Badge>
         )}
@@ -136,10 +136,10 @@ function EventPlaceholderCard({
       transition={{ duration: 0.35 }}
     >
       <Card className="group relative overflow-hidden border-border/50 bg-card/30 hover:border-primary/20 hover:bg-card/50 transition-all duration-300">
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start gap-5">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 border border-primary/5">
+            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/5">
               <Icon className="w-7 h-7 text-primary/60" />
             </div>
             <div className="flex-1 min-w-0 space-y-2.5">
@@ -188,7 +188,7 @@ function EventPlaceholderCard({
             {comingSoon && (
               <div className="hidden sm:flex flex-col items-center justify-center px-3 py-2 rounded-lg bg-secondary/5 border border-secondary/10">
                 <Sparkles className="w-4 h-4 text-secondary/60 mb-1" />
-                <span className="text-[9px] font-bold uppercase tracking-widest text-secondary/50">Soon</span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-secondary/50">Soon</span>
               </div>
             )}
           </div>
@@ -227,14 +227,14 @@ export default function HackathonsPage() {
 
   return (
     <Shell>
-      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
+      <div className="space-y-10 pb-16">
         {/* Header */}
         <div className="space-y-3">
-          <h1 className="text-4xl sm:text-5xl font-headline font-black uppercase tracking-tighter text-foreground">
-            CHALLENGES & HACK<span className="text-primary neon-text">ATHONS</span>
+          <h1 className="text-4xl sm:text-5xl font-headline font-bold text-foreground">
+            Hackathons
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Compete in coding challenges and hackathons. Build real projects, collaborate with teams, win prizes, and level up your developer profile.
+            Compete in coding challenges and hackathons. Build real projects, collaborate with teams, and win prizes.
           </p>
         </div>
 
@@ -267,7 +267,7 @@ export default function HackathonsPage() {
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={cn(
-                    'px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border',
+                    'px-3 py-1.5 rounded-lg text-[11px] font-medium uppercase tracking-wider transition-all border',
                     activeCategory === cat
                       ? 'bg-primary/10 text-primary border-primary/30'
                       : 'bg-transparent text-muted-foreground/50 border-transparent hover:text-muted-foreground hover:border-border/30'
@@ -329,15 +329,12 @@ export default function HackathonsPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <div className="relative overflow-hidden rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.07] via-secondary/[0.04] to-background">
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-secondary/5 rounded-full blur-3xl" />
-
+          <div className="relative overflow-hidden rounded-2xl border border-primary/15 bg-primary/[0.07]">
             <div className="relative p-8 sm:p-10 lg:p-12">
               <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-12">
                 <div className="flex-1 space-y-5">
                   <div className="flex items-center gap-3">
-                    <Badge className="bg-primary/15 text-primary border-primary/30 text-[10px] uppercase tracking-widest font-bold px-3 py-1">
+                    <Badge className="bg-primary/15 text-primary border-primary/30 text-[11px] uppercase tracking-wider font-bold px-3 py-1">
                       <Sparkles className="w-3 h-3 mr-1.5" /> Next Event
                     </Badge>
                     <span className="text-[10px] font-mono text-muted-foreground/50">Season 2</span>
@@ -379,7 +376,7 @@ export default function HackathonsPage() {
                 </div>
 
                 <div className="hidden lg:flex flex-col items-center gap-4 p-6 rounded-xl bg-muted/10 border border-border/30 min-w-[200px]">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10">
+                  <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/10">
                     <Trophy className="w-8 h-8 text-orange-400/80" />
                   </div>
                   <div className="text-center space-y-1">
@@ -401,7 +398,7 @@ export default function HackathonsPage() {
         <section className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-primary/30" />
+              <div className="w-1 h-6 rounded-full bg-primary" />
               <h2 className="text-xl sm:text-2xl font-headline font-bold">Upcoming Challenges</h2>
             </div>
             <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground/60" disabled>
@@ -444,7 +441,7 @@ export default function HackathonsPage() {
         <section className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-secondary to-secondary/30" />
+              <div className="w-1 h-6 rounded-full bg-secondary" />
               <h2 className="text-xl sm:text-2xl font-headline font-bold">Upcoming Hackathons</h2>
             </div>
             <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground/60" disabled>
@@ -480,7 +477,7 @@ export default function HackathonsPage() {
         <section className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-muted-foreground/40 to-muted-foreground/10" />
+              <div className="w-1 h-6 rounded-full bg-muted-foreground/40" />
               <h2 className="text-xl sm:text-2xl font-headline font-bold text-muted-foreground/70">Past Events</h2>
             </div>
           </div>
@@ -499,12 +496,12 @@ export default function HackathonsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card className="relative overflow-hidden border-dashed border-secondary/30 bg-gradient-to-br from-secondary/[0.04] to-transparent">
+          <Card className="relative overflow-hidden border-dashed border-secondary/30 bg-secondary/[0.04]">
             <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/5 rounded-full blur-2xl" />
 
             <CardContent className="p-8 sm:p-10">
               <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-secondary/15 to-primary/10 flex items-center justify-center shrink-0 border border-secondary/10">
+                <div className="w-20 h-20 rounded-2xl bg-secondary/15 flex items-center justify-center shrink-0 border border-secondary/10">
                   <Mail className="w-10 h-10 text-secondary/60" />
                 </div>
 

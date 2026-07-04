@@ -87,7 +87,7 @@ export function MilestoneCelebration({ userId, onDismiss }: MilestoneCelebration
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.5 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-background/60"
       >
         <Card className="bg-card border-border max-w-sm mx-4 overflow-hidden">
           <div className="p-8 text-center">

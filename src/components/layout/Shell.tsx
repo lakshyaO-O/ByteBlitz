@@ -9,9 +9,9 @@ import {
   ChevronLeft, Code2, LogIn, UserPlus, GraduationCap, BookOpen,
   Crown, Sparkles, Bug, Brain, Briefcase, MessageCircle,
   Share2, Globe, Rocket, Store, MessageSquare, Eye,
-  ChevronDown, ChevronRight, Lightbulb, X, Gem,
+  ChevronDown, Lightbulb, X, Gem,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
 import { useAuth } from '@/firebase/provider';
@@ -129,14 +129,14 @@ function TopHeader({
   }, [user?.uid]);
 
   return (
-    <div className="sticky top-0 z-40 flex items-center justify-end gap-3 px-4 sm:px-6 lg:px-8 h-14 border-b border-border/40 bg-background/80 backdrop-blur-lg shrink-0">
+    <div className="sticky top-0 z-40 flex items-center justify-end gap-3 px-4 sm:px-6 lg:px-8 h-14 border-b border-border/40 bg-background/80 shrink-0">
       {user && (
         <Link
           href="/shop"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/20 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/30 border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
         >
           <Gem className="w-4 h-4" />
-          <span className="text-sm font-bold font-headline">{devCoinBalance.toLocaleString()}</span>
+          <span className="text-sm font-semibold">{devCoinBalance.toLocaleString()}</span>
         </Link>
       )}
       <Link
@@ -146,7 +146,7 @@ function TopHeader({
       >
         <Bell className="w-5 h-5" />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[10px] font-semibold text-primary-foreground flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -242,23 +242,19 @@ function NavLink({
         className={cn(
           'relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
           isActive
-            ? 'text-primary'
+            ? 'text-primary bg-primary/5 font-semibold'
             : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/30'
         )}
       >
         {isActive && (
-          <motion.div
-            layoutId="nav-active"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-full shadow-[0_0_8px_rgba(26,238,255,0.4)]"
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-          />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
         )}
-        <item.icon className={cn('w-4.5 h-4.5 shrink-0 relative', isActive && 'text-primary')} />
+        <item.icon className={cn('w-4.5 h-4.5 shrink-0 relative transition-transform duration-150 group-hover:scale-105', isActive && 'text-primary')} />
         {!collapsed && (
           <>
             <span className="truncate">{item.label}</span>
             {item.badge && (
-              <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/20 text-primary shrink-0">
+              <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
                 {item.badge}
               </span>
             )}
@@ -304,6 +300,11 @@ function SidebarContent({
 
   return (
     <div className="flex flex-col h-full">
+      {/* Search */}
+      <div className="shrink-0 pt-3">
+        <SidebarSearch collapsed={collapsed} />
+      </div>
+
       {/* Logo */}
       <div className="border-b border-border/50 shrink-0 p-3">
         <Link
@@ -318,17 +319,12 @@ function SidebarContent({
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="border-b border-border/30 shrink-0 pt-3">
-        <SidebarSearch collapsed={collapsed} />
-      </div>
-
       {/* Guest badge */}
       {!user && !collapsed && (
         <div className="px-4 py-2 border-b border-border/30 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 border border-primary/20 rounded">
-            <Eye className="w-3.5 h-3.5 text-primary shrink-0" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-primary">Guest Mode</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/30 border border-border rounded">
+            <Eye className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="text-[11px] font-medium text-muted-foreground">Guest Mode</span>
           </div>
         </div>
       )}
@@ -341,55 +337,54 @@ function SidebarContent({
           const hasActive = section.items.some(
             (item) => pathname === item.href || pathname.startsWith(item.href + '/')
           );
+          const showLabel = section.label && !collapsed;
+          const showItems = !section.label || !isCollapsed || collapsed;
 
           return (
-            <div key={sectionLabel} className={cn('mb-0.5', hasActive && '')}>
-              {section.label && !collapsed && (
+            <div key={sectionLabel} className="mb-px">
+              {showLabel && (
                 <button
                   onClick={() => onToggleSection(sectionLabel)}
                   className={cn(
-                    'flex items-center justify-between w-full px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-widest transition-colors',
+                    'flex items-center justify-between w-full px-3 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-colors',
                     hasActive
                       ? 'text-primary/60'
                       : 'text-muted-foreground/40 hover:text-muted-foreground/70'
                   )}
                 >
                   <span>{section.label}</span>
-                  {isCollapsed ? (
-                    <ChevronRight className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )}
+                  <ChevronDown
+                    className={cn(
+                      'w-3 h-3 transition-transform duration-200',
+                      isCollapsed && '-rotate-90'
+                    )}
+                  />
                 </button>
               )}
-              {(!collapsed || !section.label) && (!section.label || !isCollapsed) && (
-                <div className={cn('space-y-0.5', section.label && !collapsed ? 'mt-0.5' : '')}>
-                  {section.items.map((item) => (
-                    <NavLink
-                      key={item.href}
-                      item={item}
-                      collapsed={collapsed}
-                      onNav={onNav}
-                      isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
-                      activeRef={activeItemRef}
-                    />
-                  ))}
-                </div>
-              )}
-              {collapsed && !section.label && (
-                <div className="space-y-0.5">
-                  {section.items.map((item) => (
-                    <NavLink
-                      key={item.href}
-                      item={item}
-                      collapsed={collapsed}
-                      onNav={onNav}
-                      isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
-                      activeRef={activeItemRef}
-                    />
-                  ))}
-                </div>
-              )}
+              <AnimatePresence initial={false}>
+                {showItems && (
+                  <motion.div
+                    key={sectionLabel}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                  >
+                    <div className={cn('space-y-0.5', showLabel && 'mt-0.5')}>
+                      {section.items.map((item) => (
+                        <NavLink
+                          key={item.href}
+                          item={item}
+                          collapsed={collapsed}
+                          onNav={onNav}
+                          isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
+                          activeRef={activeItemRef}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           );
         })}
@@ -410,7 +405,7 @@ function SidebarContent({
                   </Avatar>
                   <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-sm font-bold truncate">{displayName}</p>
-                    <p className={cn('text-[10px] font-bold uppercase tracking-widest truncate', getTierColor(tier))}>
+                    <p className={cn('text-[11px] font-medium truncate', getTierColor(tier))}>
                       {tier}
                     </p>
                   </div>
@@ -435,7 +430,7 @@ function SidebarContent({
             <Link
               href="/auth?mode=register"
               className={cn(
-                'flex items-center justify-center gap-2 w-full h-10 text-sm font-headline font-bold text-background bg-primary hover:bg-primary/90 transition-colors uppercase tracking-wider rounded-lg',
+                'flex items-center justify-center gap-2 w-full h-10 text-sm font-semibold text-background bg-primary hover:bg-primary/90 transition-colors rounded-lg',
                 collapsed && 'w-10 h-10 p-0'
               )}
             >
@@ -445,7 +440,7 @@ function SidebarContent({
             <Link
               href="/auth?mode=login"
               className={cn(
-                'flex items-center justify-center gap-2 w-full h-10 text-sm font-headline font-bold text-foreground border border-border hover:bg-muted transition-colors uppercase tracking-wider rounded-lg',
+                'flex items-center justify-center gap-2 w-full h-10 text-sm font-semibold text-foreground border border-border hover:bg-muted transition-colors rounded-lg',
                 collapsed && 'w-10 h-10 p-0'
               )}
             >
@@ -547,7 +542,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-border/50 bg-card/40 backdrop-blur-sm transition-all duration-300 relative',
+          'hidden lg:flex flex-col border-r border-border/50 bg-card/40 transition-all duration-300 relative',
           sidebarCollapsed ? 'w-16' : 'w-64'
         )}
       >

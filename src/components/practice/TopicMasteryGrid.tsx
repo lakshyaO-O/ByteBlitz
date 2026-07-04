@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
   BookOpen, Code2, Layers, Braces, FunctionSquare, RefreshCw,
@@ -57,7 +56,7 @@ export function TopicMasteryGrid({ topics, loading, onTopicClick }: TopicMastery
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {Array.from({ length: 12 }).map((_, i) => (
-          <Card key={i} className="bg-card/50 border-border animate-pulse">
+          <Card key={i} className="border-border animate-pulse">
             <CardContent className="p-3 space-y-2">
               <div className="h-3 w-20 bg-muted rounded" />
               <div className="h-4 w-12 bg-muted rounded" />
@@ -92,21 +91,21 @@ export function TopicMasteryGrid({ topics, loading, onTopicClick }: TopicMastery
             onClick={() => onTopicClick?.(topic.topic)}
             className="text-left"
           >
-            <Card className="bg-card/50 border-border hover:border-primary/30 transition-all cursor-pointer h-full">
+            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer h-full">
               <CardContent className="p-3 space-y-1.5">
                 <div className="flex items-center gap-2">
                   <div className={cn('w-6 h-6 rounded flex items-center justify-center shrink-0', bgColor)}>
                     <Icon className={cn('w-3 h-3', color)} />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest truncate text-muted-foreground">
+                  <span className="text-xs font-medium truncate text-muted-foreground">
                     {topic.topic}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={cn('text-sm font-bold font-headline', color)}>
+                  <span className={cn('text-sm font-semibold', color)}>
                     {topic.solved}/{topic.total}
                   </span>
-                  <span className="text-[9px] font-mono text-muted-foreground">{pct}%</span>
+                  <span className="text-xs font-mono text-muted-foreground">{pct}%</span>
                 </div>
                 <div className="h-1 bg-muted rounded-full overflow-hidden">
                   <div

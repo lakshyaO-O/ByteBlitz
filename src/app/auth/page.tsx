@@ -1,13 +1,14 @@
 export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import AuthFormWrapper from './auth-form';
 
 export const metadata: Metadata = {
   title: 'Sign In / Sign Up',
   description: 'Create your DevRann account or sign in to access coding challenges, live arena battles, AI-powered learning, and developer community features.',
   alternates: {
-    canonical: 'https://devrann.com/auth',
+    canonical: `${SITE_URL}/auth`,
   },
   openGraph: {
     title: 'Sign In / Sign Up | DevRann',

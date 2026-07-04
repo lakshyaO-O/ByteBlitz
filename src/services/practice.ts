@@ -9,7 +9,7 @@ import {
 import type {
   PracticeProblemDocument, PracticeSubmission, Verdict, SubmissionStatus,
   UserPracticeProgress, RecentlyViewedProblem, CodingLanguage,
-  ProblemContent, ProblemDocumentMeta, PracticeDraft,
+  ProblemContent, ProblemDocumentMeta, PracticeDraft, TestCaseResult,
 } from '@/types';
 import { createMockJudge } from '@/features/practice/services/mock-judge';
 
@@ -111,15 +111,16 @@ export async function submitSolution(
   userId: string, username: string,
   problemId: string, language: CodingLanguage, code: string,
   testCases: Array<{ input: string; expected: string; isHidden?: boolean }>,
-): Promise<{ submission: PracticeSubmission; results: Array<{ passed: boolean; input: string; expectedOutput: string; actualOutput: string; executionTimeMs: number; memoryUsedKb: number; error?: string; stdout?: string }> }> {
+  onProgress?: (progress: any) => void,
+): Promise<{ submission: PracticeSubmission; results: TestCaseResult[]; compileTimeMs?: number; codeSize?: number }> {
   const problem = await fetchProblem(problemId);
   const judgeResult = await judge.execute({
     code, language, testCases, problemId,
     timeLimitMs: problem?.timeLimitMs || 2000,
     memoryLimitKb: problem?.memoryLimitKb || 256000,
-  });
+  }, onProgress);
 
-  const { verdict, passedTestCases, totalTestCases, testCaseResults } = judgeResult;
+  const { verdict, passedTestCases, totalTestCases, testCaseResults, compileTimeMs, codeSize } = judgeResult;
   const results = testCaseResults;
 
   const { firestore: db } = initializeFirebase();
@@ -131,11 +132,12 @@ export async function submitSolution(
       verdict, passedTestCases, totalTestCases,
       executionTimeMs: judgeResult.executionTimeMs,
       memoryUsedKb: judgeResult.memoryUsedKb,
+      compileTimeMs: compileTimeMs ?? null,
+      codeSize: codeSize ?? null,
       submittedAt: serverTimestamp(),
     });
     submissionId = subRef.id;
 
-    // Write to practiceProgress (used by useUserProgress hook)
     const ppRef = doc(db, 'users', userId, 'practiceProgress', problemId);
     await setDoc(ppRef, {
       solved: verdict === 'Accepted',
@@ -147,7 +149,6 @@ export async function submitSolution(
       bookmarked: false,
     }, { merge: true });
 
-    // Also write to progress (legacy collection)
     await setDoc(doc(db, 'users', userId, 'progress', problemId), {
       solved: verdict === 'Accepted',
       attempted: true,
@@ -183,7 +184,7 @@ export async function submitSolution(
     submittedAt: new Date().toISOString(),
   };
 
-  return { submission, results };
+  return { submission, results, compileTimeMs, codeSize };
 }
 
 export async function fetchSubmissions(userId: string, problemId?: string): Promise<PracticeSubmission[]> {

@@ -53,3 +53,6 @@ firestore-debug.log
 .env.vercel
 dev-server.log
 public1/
+
+.vercel
+.env*

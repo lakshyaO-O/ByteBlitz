@@ -339,15 +339,20 @@ export type Verdict = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Compilati
 
 export type SubmissionStatus = 'pending' | 'running' | 'completed' | 'error';
 
+export type ExecutionPhase = 'idle' | 'compiling' | 'running' | 'finished' | 'error';
+
 export interface TestCaseResult {
   passed: boolean;
+  verdict: Verdict | 'Pending';
   input: string;
   expectedOutput: string;
   actualOutput: string;
   executionTimeMs: number;
   memoryUsedKb: number;
+  exitCode: number;
   error?: string;
   stdout?: string;
+  consoleOutput?: string;
 }
 
 export interface SubmissionResult {

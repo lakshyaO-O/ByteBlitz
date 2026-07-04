@@ -74,7 +74,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-background">
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
 
       <div className="relative min-h-screen w-full max-w-lg mx-auto px-4 py-6 sm:px-6 flex flex-col items-center justify-center">
         <div className="mb-8 text-center">
@@ -215,7 +215,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={cn('flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br', lang.color)}>
+                        <div className={cn('flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20', lang.color)}>
                           <span className="text-white font-bold text-xs">{lang.key === 'javascript' ? 'JS' : lang.key === 'python' ? 'Py' : lang.key === 'cpp' ? 'C++' : lang.key === 'java' ? 'Ja' : '?'}</span>
                         </div>
                         <div>
@@ -289,11 +289,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
                   <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
                     <Code2 className="w-5 h-5 text-primary mx-auto mb-1" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest">{languages.find(l => l.key === language)?.label || language}</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wider">{languages.find(l => l.key === language)?.label || language}</p>
                   </div>
                   <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
                     <BookOpen className="w-5 h-5 text-secondary mx-auto mb-1" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest">{reasons.find(r => r.key === reason)?.label || reason}</p>
+                    <p className="text-[11px] font-medium uppercase tracking-wider">{reasons.find(r => r.key === reason)?.label || reason}</p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">

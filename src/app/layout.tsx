@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { Inter, Space_Grotesk, Source_Code_Pro } from 'next/font/google';
+import { DM_Sans, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { RootLayoutClient } from '@/components/RootLayoutClient';
@@ -12,21 +12,21 @@ import { AppStartupDecorations } from '@/components/AppStartupDecorations';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, SITE_KEYWORDS, TWITTER_HANDLE } from '@/lib/seo';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-body',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
+const jakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-headline',
   display: 'swap',
 });
 
-const sourceCodePro = Source_Code_Pro({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-code',
@@ -97,6 +97,9 @@ export const metadata: Metadata = {
     other: [
       { rel: 'mask-icon', url: '/icons/icon.svg', color: '#28f7a5' },
     ],
+  },
+  verification: {
+    google: 'R-0q3lInNqhW3SXzjIXAB3rGUafWvgEPe6QQqQlmppk',
   },
   appleWebApp: {
     capable: true,
@@ -201,7 +204,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${sourceCodePro.variable} font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary`}>
+      <body className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-body antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary`}>
         <GoogleAnalytics />
         <FirebaseClientProvider>
           <GlobalErrorHandler />

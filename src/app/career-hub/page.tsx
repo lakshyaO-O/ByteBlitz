@@ -143,7 +143,7 @@ export default function CareerHubPage() {
               </div>
               <div className="flex flex-wrap gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Type</label>
+                  <label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Type</label>
                   <div className="flex flex-wrap gap-1.5">
                     {typeOptions.map(t => (
                       <Badge key={t} variant={typeFilter === t ? 'default' : 'outline'} className="cursor-pointer text-[9px] uppercase tracking-widest" onClick={() => setTypeFilter(typeFilter === t ? '' : t)}>
@@ -153,7 +153,7 @@ export default function CareerHubPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Experience</label>
+                  <label className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold">Experience</label>
                   <div className="flex flex-wrap gap-1.5">
                     {experienceOptions.map(e => (
                       <Badge key={e} variant={expFilter === e ? 'default' : 'outline'} className="cursor-pointer text-[9px] uppercase tracking-widest" onClick={() => setExpFilter(expFilter === e ? '' : e)}>

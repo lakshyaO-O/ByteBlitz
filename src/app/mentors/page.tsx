@@ -91,7 +91,7 @@ export default function MentorsPage() {
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mr-1 self-center">Expertise:</span>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold mr-1 self-center">Expertise:</span>
             {EXPERTISE_OPTIONS.map(exp => (
               <Badge
                 key={exp}
@@ -105,7 +105,7 @@ export default function MentorsPage() {
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mr-1 self-center">Language:</span>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-bold mr-1 self-center">Language:</span>
             {LANGUAGE_OPTIONS.map(lang => (
               <Badge
                 key={lang}
@@ -201,7 +201,7 @@ export default function MentorsPage() {
           </div>
         )}
 
-        <Card className="bg-gradient-to-br from-primary/10 to-secondary/5 border-primary/20">
+        <Card className="bg-primary/10 border-primary/20">
           <CardContent className="p-8 text-center">
             <GraduationCap className="w-12 h-12 mx-auto mb-4 text-primary" />
             <h2 className="text-xl font-headline font-bold">Want to become a mentor?</h2>

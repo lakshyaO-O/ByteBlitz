@@ -49,13 +49,13 @@ export default function ProjectsPage() {
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
-              PROJECT <span className="text-primary neon-text">SHOWCASE</span>
+            <h1 className="text-4xl font-headline font-bold text-foreground">
+              Projects
             </h1>
-            <p className="text-muted-foreground">Discover and share amazing projects built by the community.</p>
+            <p className="text-muted-foreground">Discover and share projects built by the community.</p>
           </div>
           <Dialog>
             <DialogTrigger asChild>
@@ -103,11 +103,11 @@ export default function ProjectsPage() {
             <motion.div key={project.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
               <Card className={cn(
                 'bg-card/50 border-border hover:border-primary/30 transition-all group cursor-pointer h-full',
-                project.featured && 'border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 to-transparent'
+                project.featured && 'border-yellow-500/30 bg-yellow-500/5'
               )}>
                 <CardContent className="p-0 flex flex-col h-full">
                   <div className="h-40 bg-muted/30 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5" />
+                    <div className="absolute inset-0 bg-primary/5" />
                     <Code2 className="w-12 h-12 text-muted-foreground/30" />
                     {project.featured && (
                       <Badge className="absolute top-3 left-3 bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[8px] uppercase tracking-widest">

@@ -38,7 +38,7 @@ export function QueueStatus({
           <Swords className="w-3.5 h-3.5" />
           1v1 Rated Battle
         </div>
-        <h2 className="text-4xl font-headline font-bold text-foreground neon-text uppercase tracking-tighter">
+        <h2 className="text-4xl font-headline font-bold text-foreground uppercase tracking-tighter">
           Find Your Match
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto">
@@ -64,7 +64,7 @@ export function QueueStatus({
           </Button>
         </GuestGate>
       ) : (
-        <Card className="w-full max-w-lg border-primary/50 bg-primary/5 neon-border animate-in fade-in zoom-in duration-300">
+        <Card className="w-full max-w-lg border-primary/30 bg-primary/5 animate-in fade-in zoom-in duration-300">
           <CardContent className="p-8 space-y-6">
             <div className="flex justify-between items-center">
               <div className="space-y-1">

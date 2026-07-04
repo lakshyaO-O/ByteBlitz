@@ -188,12 +188,12 @@ export function UsersManager() {
                       <td className="px-3 py-2.5 text-center font-mono hidden sm:table-cell">{u.rating || 0}</td>
                       <td className="px-3 py-2.5 text-center font-mono hidden sm:table-cell">{u.streak || 0}</td>
                       <td className="px-3 py-2.5 text-center hidden md:table-cell">
-                        <span className={cn('text-[9px] font-bold uppercase tracking-widest', (u.subscriptionTier || 'free') === 'pro' ? 'text-yellow-400' : (u.subscriptionTier || 'free') === 'elite' ? 'text-purple-400' : 'text-muted-foreground')}>
+                        <span className={cn('text-[10px] font-medium uppercase tracking-wider', (u.subscriptionTier || 'free') === 'pro' ? 'text-yellow-400' : (u.subscriptionTier || 'free') === 'elite' ? 'text-purple-400' : 'text-muted-foreground')}>
                           {u.subscriptionTier || 'free'}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-center">
-                        <span className={cn('text-[9px] font-bold uppercase tracking-widest', userRole === 'super_admin' ? 'text-destructive' : userRole === 'admin' ? 'text-primary' : userRole === 'moderator' ? 'text-yellow-400' : 'text-muted-foreground')}>
+                        <span className={cn('text-[10px] font-medium uppercase tracking-wider', userRole === 'super_admin' ? 'text-destructive' : userRole === 'admin' ? 'text-primary' : userRole === 'moderator' ? 'text-yellow-400' : 'text-muted-foreground')}>
                           {userRole}
                         </span>
                       </td>

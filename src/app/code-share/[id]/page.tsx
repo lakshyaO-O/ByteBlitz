@@ -10,30 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import {
-  Heart, GitFork, Copy, Check, ArrowLeft, Eye, Tag, Calendar,
-  User, Globe, Loader2, Share2,
+  Heart, GitFork, Copy, Check, ArrowLeft, Eye,
+  Globe, Loader2, Share2, FileCode, ArrowUpRight,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
-
-const mockSnippets: Record<string, any> = {
-  '1': {
-    id: '1', title: 'Binary Search Implementation', description: 'A clean binary search function with O(log n) time complexity.',
-    language: 'python', code: 'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1',
-    username: 'alice_dev', avatar: '', likes: 42, forks: 12, views: 256,
-    tags: ['algorithm', 'search'], isPublic: true, createdAt: '2026-06-28',
-    userTitle: 'Full Stack Developer',
-  },
-  '2': {
-    id: '2', title: 'React Custom Hook: useDebounce', description: 'Debounce hook for search inputs and API calls.',
-    language: 'typescript', code: 'import { useState, useEffect } from "react";\n\nexport function useDebounce<T>(value: T, delay: number): T {\n  const [debouncedValue, setDebouncedValue] = useState<T>(value);\n  useEffect(() => {\n    const handler = setTimeout(() => setDebouncedValue(value), delay);\n    return () => clearTimeout(handler);\n  }, [value, delay]);\n  return debouncedValue;\n}',
-    username: 'bob_codes', avatar: '', likes: 89, forks: 34, views: 1024,
-    tags: ['react', 'hooks'], isPublic: true, createdAt: '2026-06-30',
-    userTitle: 'Frontend Engineer',
-  },
-};
 
 const langMap: Record<string, string> = {
   python: 'python', typescript: 'typescript', javascript: 'javascript',
@@ -44,122 +26,113 @@ export default function CodeShareDetailPage() {
   const params = useParams();
   const [copied, setCopied] = React.useState(false);
 
-  const snippet = mockSnippets[params.id as string];
+  const snippet: any = null;
+  const loading = false;
 
-  if (!snippet) {
+  if (loading) {
     return (
       <Shell>
         <div className="flex items-center justify-center h-[50vh]">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       </Shell>
     );
   }
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(snippet.code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const related = Object.values(mockSnippets).filter(s => s.id !== snippet.id).slice(0, 3);
+  if (!snippet) {
+    return (
+      <Shell>
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+          <FileCode className="w-10 h-10 text-muted-foreground/30 mb-3" />
+          <p className="font-medium text-muted-foreground">Snippet not found</p>
+          <p className="text-sm text-muted-foreground mt-1">This snippet may have been removed or doesn&apos;t exist.</p>
+          <Button variant="outline" asChild className="mt-4 gap-1.5">
+            <Link href="/code-share"><ArrowLeft className="w-4 h-4" /> Back to Code Share</Link>
+          </Button>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <Button variant="ghost" asChild className="gap-2 text-muted-foreground hover:text-foreground -ml-2">
-          <Link href="/code-share"><ArrowLeft className="w-4 h-4" /> Back to Code Share</Link>
+      <div className="space-y-6">
+        <Button variant="ghost" size="sm" asChild className="gap-1.5 text-muted-foreground -ml-2">
+          <Link href="/code-share"><ArrowLeft className="w-4 h-4" /> Back</Link>
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Badge variant="outline" className="text-[10px] uppercase tracking-widest font-mono bg-muted/50">
-                  {snippet.language}
-                </Badge>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-[11px] font-mono">{snippet.language}</Badge>
                 {snippet.isPublic && <Globe className="w-3 h-3 text-muted-foreground" />}
               </div>
-              <h1 className="text-3xl font-headline font-bold">{snippet.title}</h1>
-              <p className="text-muted-foreground mt-2">{snippet.description}</p>
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {snippet.tags.map((tag: string) => (
-                  <Badge key={tag} variant="secondary" className="text-[9px] uppercase tracking-widest">
-                    <Tag className="w-2.5 h-2.5 mr-1" />{tag}
-                  </Badge>
+              <h1 className="text-xl font-headline font-bold">{snippet.title}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{snippet.description}</p>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {snippet.tags?.map((tag: string) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                 ))}
               </div>
             </div>
 
             <Card className="overflow-hidden border-border">
-              <div className="bg-muted/50 px-4 py-2 flex items-center justify-between border-b border-border">
+              <div className="bg-muted/30 px-3 py-1.5 flex items-center justify-between border-b border-border">
                 <span className="text-xs font-mono text-muted-foreground">{snippet.language}</span>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={handleCopy}>
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied!' : 'Copy'}
-                  </Button>
-                </div>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-7" onClick={() => {
+                  navigator.clipboard.writeText(snippet.code);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}>
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </Button>
               </div>
               <MonacoEditor
                 height="400px"
                 language={langMap[snippet.language] || 'plaintext'}
                 value={snippet.code}
                 theme="vs-dark"
-                options={{ readOnly: true, minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false }}
+                options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13, scrollBeyondLastLine: false }}
               />
             </Card>
 
-            <div className="flex items-center gap-4">
-              <Button variant="outline" className="gap-2"><Heart className="w-4 h-4" /> Like ({snippet.likes})</Button>
-              <Button variant="outline" className="gap-2"><GitFork className="w-4 h-4" /> Fork ({snippet.forks})</Button>
-              <Button variant="outline" className="gap-2"><Share2 className="w-4 h-4" /> Share</Button>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" className="gap-1.5"><Heart className="w-3.5 h-3.5" /> {snippet.likes}</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><GitFork className="w-3.5 h-3.5" /> Fork</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><Share2 className="w-3.5 h-3.5" /> Share</Button>
               <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
                 <Eye className="w-3 h-3" /> {snippet.views} views
               </span>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <Card className="bg-card/50 border-border">
-              <CardContent className="p-5">
+          <div className="space-y-4">
+            <Card className="border-border">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10">
+                  <Avatar className="w-9 h-9">
                     <AvatarImage src={snippet.avatar} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs">{snippet.username[0].toUpperCase()}</AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">{snippet.username?.[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-bold text-sm">{snippet.username}</p>
-                    <p className="text-[10px] text-muted-foreground">{snippet.userTitle}</p>
+                    <p className="font-medium text-sm">{snippet.username}</p>
+                    {snippet.userTitle && (
+                      <p className="text-xs text-muted-foreground">{snippet.userTitle}</p>
+                    )}
                   </div>
                 </div>
                 <Separator className="my-3" />
-                <div className="space-y-2 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-2"><Calendar className="w-3 h-3" /> {snippet.createdAt}</span>
-                  <span className="flex items-center gap-2"><Eye className="w-3 h-3" /> {snippet.views} views</span>
-                  <span className="flex items-center gap-2"><Heart className="w-3 h-3" /> {snippet.likes} likes</span>
-                  <span className="flex items-center gap-2"><GitFork className="w-3 h-3" /> {snippet.forks} forks</span>
+                <div className="space-y-1.5 text-xs text-muted-foreground">
+                  {snippet.createdAt && (
+                    <div className="flex items-center gap-2"><Eye className="w-3 h-3" /> {snippet.createdAt}</div>
+                  )}
+                  <div className="flex items-center gap-2"><Eye className="w-3 h-3" /> {snippet.views} views</div>
+                  <div className="flex items-center gap-2"><Heart className="w-3 h-3" /> {snippet.likes} likes</div>
                 </div>
               </CardContent>
             </Card>
-
-            {related.length > 0 && (
-              <div>
-                <h3 className="text-sm font-headline font-bold uppercase tracking-widest text-muted-foreground mb-3">Related Snippets</h3>
-                <div className="space-y-3">
-                  {related.map((s: any) => (
-                    <Link key={s.id} href={`/code-share/${s.id}`}>
-                      <Card className="bg-card/50 border-border hover:border-primary/30 transition-all">
-                        <CardContent className="p-3">
-                          <p className="font-bold text-sm truncate">{s.title}</p>
-                          <Badge variant="outline" className="text-[8px] uppercase tracking-widest mt-1 font-mono">{s.language}</Badge>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

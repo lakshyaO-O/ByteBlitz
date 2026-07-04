@@ -16,14 +16,14 @@ import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
-  FileText, Code2, MessageSquare, Share2, Heart, Search, Plus, Loader2, Clock,
-  Users, Image as ImageIcon, Tag,
+  FileText, MessageSquare, Share2, Heart, Search, Plus, Loader2, Clock,
+  Users, Tag,
 } from 'lucide-react';
 import type { CommunityPost, PostType } from '@/types';
 
 const POST_TYPES: { value: string; label: string }[] = [
   { value: 'all', label: 'All' },
-  { value: 'code_share', label: 'Code Share' },
+  { value: 'code_share', label: 'Code' },
   { value: 'project_showcase', label: 'Projects' },
   { value: 'discussion', label: 'Discussion' },
   { value: 'tip', label: 'Tips' },
@@ -110,62 +110,62 @@ export default function CommunityPage() {
 
   return (
     <Shell>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-headline font-black uppercase tracking-tighter">Community</h1>
-            <p className="text-muted-foreground">Share code, projects, and learn together.</p>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-headline font-bold text-foreground">Community</h1>
+            <p className="text-sm text-muted-foreground">Share code, projects, and learn together.</p>
           </div>
-          <Button className="gap-2" onClick={() => setCreateOpen(true)}>
+          <Button className="gap-1.5" onClick={() => setCreateOpen(true)}>
             <Plus className="w-4 h-4" /> Create Post
           </Button>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <Tabs value={typeFilter} onValueChange={setTypeFilter} className="w-full sm:w-auto">
-            <TabsList className="bg-muted/50">
+            <TabsList>
               {POST_TYPES.map(t => (
                 <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
           <div className="relative flex-1 max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search posts..." className="pl-10 bg-muted/50 border-border" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <Input placeholder="Search posts..." className="pl-8 h-9 text-sm" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
           </div>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>
+          <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
         ) : filteredPosts.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filteredPosts.map(post => (
-              <Card key={post.id} className="bg-card/50 border-border hover:border-primary/30 transition-all">
-                <CardContent className="p-5 space-y-4">
+              <Card key={post.id} className="border-border">
+                <CardContent className="p-4 space-y-3">
                   <div className="flex items-start gap-3">
-                    <Avatar className="h-10 w-10 border border-muted shrink-0">
+                    <Avatar className="h-9 w-9 border border-muted shrink-0">
                       <AvatarImage src={post.photoURL} />
                       <AvatarFallback className="bg-muted text-xs">{(post.username || '?')[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm">{post.username}</span>
-                        <Badge variant="outline" className="text-[9px] uppercase tracking-widest">{post.type.replace('_', ' ')}</Badge>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 ml-auto">
+                        <span className="font-medium text-sm">{post.username}</span>
+                        <Badge variant="outline" className="text-xs">{post.type.replace('_', ' ')}</Badge>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
                           <Clock className="w-3 h-3" /> {getTimeAgo(post.createdAt)}
                         </span>
                       </div>
-                      <h3 className="font-bold mt-1">{post.title}</h3>
+                      <h3 className="font-medium mt-1">{post.title}</h3>
                       <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{post.content}</p>
                       {post.code && (
-                        <pre className="mt-3 p-3 rounded-lg bg-muted/30 border border-border text-xs font-code overflow-x-auto">
+                        <pre className="mt-2 p-3 rounded bg-muted/30 border border-border text-sm font-mono overflow-x-auto">
                           <code>{post.code}</code>
                         </pre>
                       )}
                       {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-3">
+                        <div className="flex flex-wrap gap-1.5 mt-2">
                           {post.tags.map(tag => (
-                            <Badge key={tag} variant="secondary" className="text-[9px] uppercase tracking-widest">{tag}</Badge>
+                            <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                           ))}
                         </div>
                       )}
@@ -173,16 +173,16 @@ export default function CommunityPage() {
                   </div>
 
                   <div className="flex items-center gap-1 pt-2 border-t border-border">
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary" onClick={() => handleLike(post.id)}>
-                      <Heart className={cn('w-4 h-4', post.likedBy?.includes(user?.uid || '') && 'fill-primary text-primary')} />
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => handleLike(post.id)}>
+                      <Heart className={cn('w-3.5 h-3.5', post.likedBy?.includes(user?.uid || '') && 'fill-primary text-primary')} />
                       {post.likes}
                     </Button>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary">
-                      <MessageSquare className="w-4 h-4" />
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                      <MessageSquare className="w-3.5 h-3.5" />
                       {post.comments}
                     </Button>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary">
-                      <Share2 className="w-4 h-4" />
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                      <Share2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </CardContent>
@@ -191,20 +191,20 @@ export default function CommunityPage() {
           </div>
         ) : (
           <div className="text-center py-20 text-muted-foreground">
-            <Users className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>No posts yet. Be the first to share!</p>
+            <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No posts yet. Be the first to share!</p>
           </div>
         )}
 
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2"><FileText className="w-5 h-5 text-primary" /> Create Post</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 text-base"><FileText className="w-4 h-4 text-primary" /> Create Post</DialogTitle>
               <DialogDescription>Share your code, project, or thoughts with the community.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Post Type</Label>
+                <Label className="text-sm">Post Type</Label>
                 <Select value={formType} onValueChange={v => setFormType(v as PostType)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -216,20 +216,20 @@ export default function CommunityPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Title</Label>
+                <Label className="text-sm">Title</Label>
                 <Input value={formTitle} onChange={e => setFormTitle(e.target.value)} placeholder="Post title..." />
               </div>
               <div className="space-y-2">
-                <Label>Content</Label>
+                <Label className="text-sm">Content</Label>
                 <Textarea value={formContent} onChange={e => setFormContent(e.target.value)} placeholder="Write something..." rows={4} />
               </div>
               <div className="space-y-2">
-                <Label>Code (optional)</Label>
-                <Textarea value={formCode} onChange={e => setFormCode(e.target.value)} placeholder="Paste your code..." rows={6} className="font-code text-sm" />
+                <Label className="text-sm">Code (optional)</Label>
+                <Textarea value={formCode} onChange={e => setFormCode(e.target.value)} placeholder="Paste your code..." rows={6} className="font-mono text-sm" />
               </div>
               {formCode && (
                 <div className="space-y-2">
-                  <Label>Language</Label>
+                  <Label className="text-sm">Language</Label>
                   <Select value={formLanguage} onValueChange={setFormLanguage}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -241,7 +241,7 @@ export default function CommunityPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label>Tags (comma separated)</Label>
+                <Label className="text-sm">Tags (comma separated)</Label>
                 <Input value={formTags} onChange={e => setFormTags(e.target.value)} placeholder="e.g. react, dsa, tutorial" />
               </div>
             </div>

@@ -159,8 +159,8 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gradient-to-br from-card/80 to-card/50 border-border overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-primary/20 via-secondary/10 to-primary/5" />
+      <Card className="bg-card/80 border-border overflow-hidden">
+        <div className="h-32 bg-primary/20" />
         <CardContent className="relative px-6 pb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-16">
             <Avatar className="w-24 h-24 border-4 border-background ring-2 ring-primary/30 shrink-0">
@@ -178,7 +178,7 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
                   {tier}
                 </Badge>
                 {profile.title && (
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-widest">{profile.title}</Badge>
+                  <Badge variant="outline" className="text-[11px] uppercase tracking-wider">{profile.title}</Badge>
                 )}
               </div>
               {profile.bio && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{profile.bio}</p>}
@@ -381,7 +381,7 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
                       {allAchievements.map((achievement, i) => (
                         <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-lg bg-muted/20 border border-border/50 text-center">
                           <Star className={cn('w-6 h-6', i < 3 ? 'text-yellow-400' : 'text-muted-foreground')} />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">{achievement}</span>
+                          <span className="text-[11px] font-medium uppercase tracking-wider">{achievement}</span>
                         </div>
                       ))}
                     </div>

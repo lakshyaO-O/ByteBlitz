@@ -128,7 +128,7 @@ export function ErrorTranslator({ errorMessage, language = 'python' }: ErrorTran
 
           {translation.example && (
             <div className="p-2 rounded-lg bg-muted/30">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Example</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Example</p>
               <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-code">{translation.example}</pre>
             </div>
           )}

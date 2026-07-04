@@ -221,7 +221,7 @@ export function BattleArenaMultiplayer({
   if (battle.phase === 'countdown') {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
-        <Card className="bg-gray-900/80 border-primary/30 backdrop-blur-xl w-full max-w-2xl">
+        <Card className="bg-gray-900/80 border-primary/30 w-full max-w-2xl">
           <CardContent className="p-12 text-center">
             <div className="flex items-center justify-center gap-8 mb-8">
               <div className="text-center">

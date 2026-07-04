@@ -65,7 +65,7 @@ export function LoadingScreen({
 
         <div className="space-y-2">
           <h1 className="text-3xl font-headline font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
+            <span className="text-foreground">
               DevRann
             </span>
           </h1>
@@ -87,7 +87,7 @@ export function LoadingScreen({
             </p>
           </div>
         ) : (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="space-y-4">
             <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30">
               <p className="text-sm text-destructive font-medium">
                 Something took longer than expected.

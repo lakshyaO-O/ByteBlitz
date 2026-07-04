@@ -121,7 +121,7 @@ export default function SettingsPage() {
     .split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-3xl">
+      <div className="space-y-8 max-w-3xl">
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-black uppercase tracking-tighter text-foreground">
             SETTINGS

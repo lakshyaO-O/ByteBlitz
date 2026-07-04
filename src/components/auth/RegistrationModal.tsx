@@ -26,7 +26,7 @@ export function RegistrationModal({ open, onClose, redirectPath = '/auth', featu
           transition={{ duration: 0.2 }}
         >
           <motion.div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/80"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -34,7 +34,7 @@ export function RegistrationModal({ open, onClose, redirectPath = '/auth', featu
           />
 
           <motion.div
-            className="relative w-full max-w-md bg-card border border-border/50 backdrop-blur-xl"
+            className="relative w-full max-w-md bg-card border border-border/50"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

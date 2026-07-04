@@ -165,7 +165,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+              className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
             >
               Back to Site
             </Link>

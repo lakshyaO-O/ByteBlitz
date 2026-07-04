@@ -22,7 +22,7 @@ export function PremiumUpgradeModal({ open, onClose, feature }: PremiumUpgradeMo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-card border border-border/50 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <div className="relative bg-card border border-border rounded-xl shadow-lg max-w-md w-full mx-4 overflow-hidden">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
@@ -31,8 +31,8 @@ export function PremiumUpgradeModal({ open, onClose, feature }: PremiumUpgradeMo
         </button>
 
         <div className="p-8 text-center space-y-6">
-          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/20 flex items-center justify-center">
-            <Crown className="w-8 h-8 text-amber-400" />
+          <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Crown className="w-7 h-7 text-amber-400" />
           </div>
 
           <div className="space-y-2">

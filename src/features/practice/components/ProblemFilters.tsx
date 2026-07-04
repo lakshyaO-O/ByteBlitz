@@ -33,9 +33,9 @@ export function ProblemFilters({
   onDifficultyChange, onTopicChange, onSortChange, onClearTopic,
 }: ProblemFiltersProps) {
   return (
-    <div className="space-y-3 p-4 rounded-xl bg-muted/20 border border-border">
+    <div className="space-y-3 p-4 rounded-lg bg-muted/20 border border-border">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-16">Difficulty</span>
+        <span className="text-xs font-medium text-muted-foreground w-16">Difficulty</span>
         {DIFFICULTIES.map((d) => {
           const locked = isBeginner && d !== 'All' && d !== 'Easy' && !unlockedDifficulties.includes(d as Difficulty);
           return (
@@ -45,7 +45,7 @@ export function ProblemFilters({
               size="sm"
               disabled={locked}
               onClick={() => onDifficultyChange(d)}
-              className="text-xs font-bold uppercase tracking-widest h-7"
+              className="text-xs h-7"
             >
               {locked && <Lock className="w-3 h-3 mr-1" />}
               {d}
@@ -55,14 +55,14 @@ export function ProblemFilters({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-16">Topic</span>
+        <span className="text-xs font-medium text-muted-foreground w-16">Topic</span>
         <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
           {ALL_TOPICS.map(t => (
             <button
               key={t}
               onClick={() => onTopicChange(topic === t ? 'All' : t)}
               className={cn(
-                'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest transition-colors whitespace-nowrap',
+                'px-2 py-0.5 rounded text-xs font-medium transition-colors whitespace-nowrap',
                 topic === t
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted/50 text-muted-foreground hover:text-foreground border border-border',
@@ -73,14 +73,14 @@ export function ProblemFilters({
           ))}
         </div>
         {topic !== 'All' && (
-          <Button variant="ghost" size="sm" onClick={onClearTopic} className="text-[10px] h-6">
+          <Button variant="ghost" size="sm" onClick={onClearTopic} className="text-xs h-6">
             <X className="w-3 h-3 mr-1" /> Clear
           </Button>
         )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-16">Sort</span>
+        <span className="text-xs font-medium text-muted-foreground w-16">Sort</span>
         {SORT_OPTIONS.map(s => (
           <Button
             key={s}

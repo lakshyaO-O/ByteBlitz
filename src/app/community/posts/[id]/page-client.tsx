@@ -111,7 +111,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <Shell>
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
       </Shell>
     );
   }
@@ -130,36 +130,36 @@ export default function PostDetailPage() {
   return (
     <Shell>
       <div className="space-y-6 max-w-3xl">
-        <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={() => window.history.back()}>
+        <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground -ml-2" onClick={() => window.history.back()}>
           <ArrowLeft className="w-4 h-4" /> Back
         </Button>
 
-        <Card className="bg-card/50 border-border">
-          <CardContent className="p-6 space-y-4">
+        <Card className="border-border">
+          <CardContent className="p-5 space-y-4">
             <div className="flex items-start gap-3">
-              <Avatar className="h-10 w-10 border border-muted shrink-0">
+              <Avatar className="h-9 w-9 border border-muted shrink-0">
                 <AvatarImage src={post.photoURL} />
                 <AvatarFallback className="bg-muted text-xs">{(post.username || '?')[0]}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold">{post.username}</span>
-                  <Badge variant="outline" className="text-[9px] uppercase tracking-widest">{post.type.replace('_', ' ')}</Badge>
-                  <span className="text-[10px] text-muted-foreground flex items-center gap-1 ml-auto">
+                  <span className="font-medium">{post.username}</span>
+                  <Badge variant="outline" className="text-xs">{post.type.replace('_', ' ')}</Badge>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
                     <Clock className="w-3 h-3" /> {getTimeAgo(post.createdAt)}
                   </span>
                 </div>
-                <h1 className="text-xl font-headline font-bold mt-2">{post.title}</h1>
+                <h1 className="text-lg font-semibold mt-2">{post.title}</h1>
                 <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{post.content}</p>
                 {post.code && (
-                  <pre className="mt-4 p-4 rounded-lg bg-muted/30 border border-border text-sm font-code overflow-x-auto">
+                  <pre className="mt-3 p-3 rounded bg-muted/30 border border-border text-sm font-mono overflow-x-auto">
                     <code>{post.code}</code>
                   </pre>
                 )}
                 {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-4">
+                  <div className="flex flex-wrap gap-1.5 mt-3">
                     {post.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="text-[9px] uppercase tracking-widest">{tag}</Badge>
+                      <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
                     ))}
                   </div>
                 )}
@@ -167,16 +167,16 @@ export default function PostDetailPage() {
             </div>
 
             <div className="flex items-center gap-1 pt-3 border-t border-border">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary" onClick={handleLike}>
-                <Heart className={cn('w-4 h-4')} />
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={handleLike}>
+                <Heart className={cn('w-3.5 h-3.5')} />
                 {post.likes}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary">
-                <MessageSquare className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                <MessageSquare className="w-3.5 h-3.5" />
                 {post.comments}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-primary">
-                <Share2 className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                <Share2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </CardContent>
@@ -185,7 +185,7 @@ export default function PostDetailPage() {
         <Separator />
 
         <div className="space-y-4">
-          <h2 className="text-lg font-headline font-bold flex items-center gap-2">
+          <h2 className="text-base font-semibold flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-primary" /> Comments ({comments.length})
           </h2>
 
@@ -210,7 +210,7 @@ export default function PostDetailPage() {
             )}
           </div>
 
-          <Card className="bg-card/50 border-border">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex gap-3">
                 <Avatar className="h-8 w-8 border border-muted shrink-0">
@@ -230,7 +230,7 @@ export default function PostDetailPage() {
                         Cancel reply
                       </Button>
                     )}
-                    <Button size="sm" className="gap-2 ml-auto" onClick={handleComment} disabled={submitting || !replyText.trim()}>
+                    <Button size="sm" className="gap-1.5 ml-auto" onClick={handleComment} disabled={submitting || !replyText.trim()}>
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                       {replyTo ? 'Reply' : 'Comment'}
                     </Button>
@@ -257,12 +257,12 @@ function CommentThread({ comment, replies, onReply, isReplying, replyText, setRe
           <div className="flex items-start gap-3">
             <Avatar className="h-8 w-8 border border-muted shrink-0">
               <AvatarImage src={comment.photoURL} />
-              <AvatarFallback className="bg-muted text-[10px]">{(comment.username || '?')[0]}</AvatarFallback>
+              <AvatarFallback className="bg-muted text-xs">{(comment.username || '?')[0]}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm">{comment.username}</span>
-                <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                <span className="font-medium text-sm">{comment.username}</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="w-3 h-3" /> {getTimeAgo(comment.createdAt)}
                 </span>
               </div>
@@ -282,14 +282,14 @@ function CommentThread({ comment, replies, onReply, isReplying, replyText, setRe
               <CardContent className="p-3">
                 <div className="flex items-start gap-2">
                   <Avatar className="h-6 w-6 border border-muted shrink-0">
-                    <AvatarFallback className="bg-muted text-[8px]">{(reply.username || '?')[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-muted text-[10px]">{(reply.username || '?')[0]}</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs">{reply.username}</span>
-                      <span className="text-[9px] text-muted-foreground">{getTimeAgo(reply.createdAt)}</span>
+                      <span className="font-medium text-xs">{reply.username}</span>
+                      <span className="text-xs text-muted-foreground">{getTimeAgo(reply.createdAt)}</span>
                     </div>
-                    <p className="text-xs mt-0.5">{reply.content}</p>
+                    <p className="text-sm mt-0.5">{reply.content}</p>
                   </div>
                 </div>
               </CardContent>

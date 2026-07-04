@@ -16,7 +16,7 @@ const sectionVariants = {
 function SectionDivider() {
   return (
     <motion.div
-      className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent mx-auto max-w-4xl"
+      className="h-px bg-primary/20 mx-auto max-w-4xl"
       initial={{ scaleX: 0, opacity: 0 }}
       whileInView={{ scaleX: 1, opacity: 1 }}
       viewport={{ once: true }}

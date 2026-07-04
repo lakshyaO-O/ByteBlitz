@@ -191,10 +191,7 @@ export function CompleteRoadmap({ onStartLesson }: CompleteRoadmapProps) {
               >
                 <div className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      'w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center shrink-0',
-                      lesson.color
-                    )}>
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
                       <LessonIcon name={lesson.icon} className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -255,7 +252,7 @@ export function CompleteRoadmap({ onStartLesson }: CompleteRoadmapProps) {
                           </div>
 
                           <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Topics</p>
+                            <p className="text-[11px] font-medium uppercase tracking-wider text-primary mb-2">Topics</p>
                             <div className="flex flex-wrap gap-1.5">
                               {lesson.topics.map(topic => (
                                 <span key={topic} className="px-2 py-1 text-[10px] bg-muted/50 rounded-md text-muted-foreground">
@@ -267,7 +264,7 @@ export function CompleteRoadmap({ onStartLesson }: CompleteRoadmapProps) {
 
                           {lesson.realLifeAnalogy && (
                             <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400 mb-1">Real-life analogy</p>
+                              <p className="text-[11px] font-medium uppercase tracking-wider text-amber-400 mb-1">Real-life analogy</p>
                               <p className="text-xs text-muted-foreground">{lesson.realLifeAnalogy}</p>
                             </div>
                           )}
@@ -316,7 +313,7 @@ export function CompleteRoadmap({ onStartLesson }: CompleteRoadmapProps) {
                     exit={{ opacity: 0, scale: 0.8 }}
                     className="fixed top-4 right-4 z-50"
                   >
-                    <Card className="bg-gradient-to-r from-emerald-500/20 to-primary/20 border-emerald-400/30 p-4 shadow-xl backdrop-blur-md">
+                    <Card className="bg-emerald-500/20 border-emerald-400/30 p-4 shadow-xl">
                       <div className="flex items-center gap-3">
                         <Sparkles className="w-6 h-6 text-primary" />
                         <div>

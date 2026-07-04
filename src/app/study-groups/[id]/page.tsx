@@ -106,7 +106,7 @@ export default function StudyGroupDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Study Groups
         </Button>
 
-        <Card className="bg-gradient-to-br from-primary/10 to-secondary/5 border-primary/20">
+        <Card className="bg-primary/10 border-primary/20">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
