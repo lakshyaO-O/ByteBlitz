@@ -267,14 +267,10 @@ function SidebarContent({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 pt-2">
-        <SidebarSearch collapsed={collapsed} />
-      </div>
-
-      <div className="border-b border-border/30 shrink-0 px-3 py-2.5">
+      <div className="shrink-0 px-3 py-2.5 border-b border-border/30">
         <Link
           href="/"
-          className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-center')}
+          className="flex items-center justify-center"
         >
           <img
             src="/logo.svg"
@@ -282,6 +278,10 @@ function SidebarContent({
             className="h-9 w-9 shrink-0"
           />
         </Link>
+      </div>
+
+      <div className="shrink-0 pt-2">
+        <SidebarSearch collapsed={collapsed} />
       </div>
 
       {!user && !collapsed && (
