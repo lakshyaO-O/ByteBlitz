@@ -110,15 +110,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
-/* ─── Top header with notification bell ─── */
-
-function TopHeader({
-  user,
-  unread,
-}: {
-  user: any;
-  unread: number;
-}) {
+function TopHeader({ user, unread }: { user: any; unread: number }) {
   const [devCoinBalance, setDevCoinBalance] = useState(0);
 
   useEffect(() => {
@@ -129,24 +121,24 @@ function TopHeader({
   }, [user?.uid]);
 
   return (
-    <div className="sticky top-0 z-40 flex items-center justify-end gap-3 px-4 sm:px-6 lg:px-8 h-14 border-b border-border/40 bg-background/80 shrink-0">
+    <div className="sticky top-0 z-40 flex items-center justify-end gap-3 px-6 h-12 border-b border-border/40 bg-background/80 backdrop-blur-sm shrink-0">
       {user && (
         <Link
           href="/shop"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/30 border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/20 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
         >
-          <Gem className="w-4 h-4" />
-          <span className="text-sm font-semibold">{devCoinBalance.toLocaleString()}</span>
+          <Gem className="w-3.5 h-3.5" />
+          <span className="text-xs font-semibold">{devCoinBalance.toLocaleString()}</span>
         </Link>
       )}
       <Link
         href="/notifications"
-        className="relative p-2 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-colors"
+        className="relative p-1.5 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4" />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[10px] font-semibold text-primary-foreground flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-[9px] font-semibold text-primary-foreground flex items-center justify-center">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -154,8 +146,6 @@ function TopHeader({
     </div>
   );
 }
-
-/* ─── Sidebar search bar ─── */
 
 function SidebarSearch({ collapsed }: { collapsed: boolean }) {
   const router = useRouter();
@@ -176,7 +166,7 @@ function SidebarSearch({ collapsed }: { collapsed: boolean }) {
     return (
       <Link
         href="/search"
-        className="flex items-center justify-center w-full h-10 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-muted/30 transition-colors"
+        className="flex items-center justify-center w-full h-9 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-muted/30 transition-colors"
         aria-label="Search"
       >
         <Search className="w-4 h-4" />
@@ -185,24 +175,24 @@ function SidebarSearch({ collapsed }: { collapsed: boolean }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="px-3 pb-3">
+    <form onSubmit={handleSubmit} className="px-3 pb-2">
       <div
         className={cn(
-          'flex items-center gap-2 px-3 h-10 rounded-lg border transition-all duration-200',
+          'flex items-center gap-2 px-2.5 h-9 rounded-md border transition-all duration-200',
           focused
-            ? 'border-primary/40 bg-muted/20'
-            : 'border-border/40 bg-muted/10 hover:border-border/60'
+            ? 'border-primary/30 bg-muted/10'
+            : 'border-border/40 bg-muted/5 hover:border-border/60'
         )}
       >
-        <Search className="w-4 h-4 shrink-0 text-muted-foreground/40" />
+        <Search className="w-3.5 h-3.5 shrink-0 text-muted-foreground/30" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Search challenges, users..."
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/30 outline-none min-w-0"
+          placeholder="Search..."
+          className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/30 outline-none min-w-0"
         />
         {query && (
           <button
@@ -210,7 +200,7 @@ function SidebarSearch({ collapsed }: { collapsed: boolean }) {
             onClick={() => setQuery('')}
             className="text-muted-foreground/30 hover:text-muted-foreground transition-colors"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-3 h-3" />
           </button>
         )}
       </div>
@@ -218,14 +208,8 @@ function SidebarSearch({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-/* ─── Animated nav link ─── */
-
 function NavLink({
-  item,
-  collapsed,
-  onNav,
-  isActive,
-  activeRef,
+  item, collapsed, onNav, isActive, activeRef,
 }: {
   item: NavItem;
   collapsed: boolean;
@@ -234,53 +218,36 @@ function NavLink({
   activeRef?: (el: HTMLAnchorElement | null) => void;
 }) {
   return (
-    <div className="relative">
-      <Link
-        ref={isActive ? activeRef : undefined}
-        href={item.href}
-        onClick={onNav}
-        className={cn(
-          'relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
-          isActive
-            ? 'text-primary bg-primary/5 font-semibold'
-            : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/30'
-        )}
-      >
-        {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full" />
-        )}
-        <item.icon className={cn('w-4.5 h-4.5 shrink-0 relative transition-transform duration-150 group-hover:scale-105', isActive && 'text-primary')} />
-        {!collapsed && (
-          <>
-            <span className="truncate">{item.label}</span>
-            {item.badge && (
-              <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
-                {item.badge}
-              </span>
-            )}
-          </>
-        )}
-      </Link>
-    </div>
+    <Link
+      ref={isActive ? activeRef : undefined}
+      href={item.href}
+      onClick={onNav}
+      className={cn(
+        'relative flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all duration-150',
+        isActive
+          ? 'text-foreground bg-secondary font-medium'
+          : 'text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
+      )}
+    >
+      <item.icon className={cn('w-4 h-4 shrink-0', isActive && 'text-primary')} />
+      {!collapsed && (
+        <>
+          <span className="truncate">{item.label}</span>
+          {item.badge && (
+            <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+              {item.badge}
+            </span>
+          )}
+        </>
+      )}
+    </Link>
   );
 }
 
-/* ─── Sidebar content (extracted to prevent remount) ─── */
-
 function SidebarContent({
-  collapsed,
-  collapsedSections,
-  onToggleSection,
-  pathname,
-  user,
-  profileData,
-  initials,
-  tier,
-  onNav,
-  onLogout,
-  activeItemRef,
-  navRef,
-  onNavScroll,
+  collapsed, collapsedSections, onToggleSection, pathname,
+  user, profileData, initials, tier, onNav, onLogout,
+  activeItemRef, navRef, onNavScroll,
 }: {
   collapsed: boolean;
   collapsedSections: Record<string, boolean>;
@@ -300,37 +267,33 @@ function SidebarContent({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search */}
-      <div className="shrink-0 pt-3">
+      <div className="shrink-0 pt-2">
         <SidebarSearch collapsed={collapsed} />
       </div>
 
-      {/* Logo */}
-      <div className="border-b border-border/50 shrink-0 p-3">
+      <div className="border-b border-border/30 shrink-0 px-3 py-2.5">
         <Link
           href="/"
-          className={cn('flex items-center group', collapsed ? 'justify-center' : 'justify-center')}
+          className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-center')}
         >
           <img
-            src="/icons/icon.svg"
+            src="/logo.svg"
             alt="DevRann"
-            className="h-10 w-10 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]"
+            className="h-9 w-9 shrink-0"
           />
         </Link>
       </div>
 
-      {/* Guest badge */}
       {!user && !collapsed && (
-        <div className="px-4 py-2 border-b border-border/30 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/30 border border-border rounded">
-            <Eye className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            <span className="text-[11px] font-medium text-muted-foreground">Guest Mode</span>
+        <div className="px-4 py-2 border-b border-border/20 shrink-0">
+          <div className="flex items-center gap-2 px-2.5 py-1 bg-muted/20 border border-border/50 rounded-md">
+            <Eye className="w-3 h-3 text-muted-foreground shrink-0" />
+            <span className="text-[10px] font-medium text-muted-foreground">Guest Mode</span>
           </div>
         </div>
       )}
 
-      {/* Navigation */}
-      <nav ref={navRef} onScroll={onNavScroll} className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
+      <nav ref={navRef} onScroll={onNavScroll} className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 scrollbar-thin">
         {NAV_SECTIONS.map((section, idx) => {
           const sectionLabel = section.label || `section-${idx}`;
           const isCollapsed = collapsedSections[sectionLabel];
@@ -346,16 +309,16 @@ function SidebarContent({
                 <button
                   onClick={() => onToggleSection(sectionLabel)}
                   className={cn(
-                    'flex items-center justify-between w-full px-3 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-colors',
+                    'flex items-center justify-between w-full px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider transition-colors',
                     hasActive
-                      ? 'text-primary/60'
-                      : 'text-muted-foreground/40 hover:text-muted-foreground/70'
+                      ? 'text-primary/50'
+                      : 'text-muted-foreground/30 hover:text-muted-foreground/60'
                   )}
                 >
                   <span>{section.label}</span>
                   <ChevronDown
                     className={cn(
-                      'w-3 h-3 transition-transform duration-200',
+                      'w-2.5 h-2.5 transition-transform duration-200',
                       isCollapsed && '-rotate-90'
                     )}
                   />
@@ -368,7 +331,7 @@ function SidebarContent({
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    transition={{ duration: 0.12, ease: 'easeOut' }}
                   >
                     <div className={cn('space-y-0.5', showLabel && 'mt-0.5')}>
                       {section.items.map((item) => (
@@ -390,22 +353,21 @@ function SidebarContent({
         })}
       </nav>
 
-      {/* Bottom profile / auth */}
-      <div className={cn('border-t border-border/50 shrink-0', collapsed ? 'p-2' : 'p-3')}>
+      <div className={cn('border-t border-border/30 shrink-0', collapsed ? 'p-2' : 'p-3')}>
         {user ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {!collapsed && profileData && (
-              <div className="px-3 py-2.5 rounded-lg bg-muted/15 border border-border/30">
-                <div className="flex items-center gap-3 min-w-0">
-                  <Avatar className="h-9 w-9 shrink-0 border border-primary/30 ring-1 ring-primary/10">
+              <div className="px-3 py-2 rounded-md bg-muted/10 border border-border/30">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Avatar className="h-8 w-8 shrink-0 border border-primary/20 ring-1 ring-primary/5">
                     <AvatarImage src={user?.photoURL || ''} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                    <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1 overflow-hidden">
-                    <p className="text-sm font-bold truncate">{displayName}</p>
-                    <p className={cn('text-[11px] font-medium truncate', getTierColor(tier))}>
+                    <p className="text-xs font-semibold truncate">{displayName}</p>
+                    <p className={cn('text-[10px] font-medium truncate', getTierColor(tier))}>
                       {tier}
                     </p>
                   </div>
@@ -416,35 +378,35 @@ function SidebarContent({
               variant="ghost"
               size="sm"
               className={cn(
-                'w-full text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-colors',
-                collapsed ? 'justify-center px-0 h-10' : 'justify-start gap-2'
+                'w-full text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors',
+                collapsed ? 'justify-center px-0 h-9' : 'justify-start gap-2'
               )}
               onClick={onLogout}
             >
-              <LogOut className="w-4 h-4 shrink-0" />
-              {!collapsed && <span>Logout</span>}
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              {!collapsed && <span className="text-xs">Logout</span>}
             </Button>
           </div>
         ) : (
-          <div className={cn('space-y-2', collapsed && 'flex flex-col items-center')}>
+          <div className={cn('space-y-1.5', collapsed && 'flex flex-col items-center')}>
             <Link
               href="/auth?mode=register"
               className={cn(
-                'flex items-center justify-center gap-2 w-full h-10 text-sm font-semibold text-background bg-primary hover:bg-primary/90 transition-colors rounded-lg',
-                collapsed && 'w-10 h-10 p-0'
+                'flex items-center justify-center gap-2 w-full h-9 text-xs font-semibold text-background bg-primary hover:bg-primary/90 transition-colors rounded-md',
+                collapsed && 'w-9 h-9 p-0'
               )}
             >
-              <UserPlus className="w-4 h-4 shrink-0" />
+              <UserPlus className="w-3.5 h-3.5 shrink-0" />
               {!collapsed && 'Create Account'}
             </Link>
             <Link
               href="/auth?mode=login"
               className={cn(
-                'flex items-center justify-center gap-2 w-full h-10 text-sm font-semibold text-foreground border border-border hover:bg-muted transition-colors rounded-lg',
-                collapsed && 'w-10 h-10 p-0'
+                'flex items-center justify-center gap-2 w-full h-9 text-xs font-semibold text-foreground border border-border hover:bg-muted/40 transition-colors rounded-md',
+                collapsed && 'w-9 h-9 p-0'
               )}
             >
-              <LogIn className="w-4 h-4 shrink-0" />
+              <LogIn className="w-3.5 h-3.5 shrink-0" />
               {!collapsed && 'Sign In'}
             </Link>
           </div>
@@ -453,8 +415,6 @@ function SidebarContent({
     </div>
   );
 }
-
-/* ─── Shell ─── */
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
@@ -504,7 +464,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   const closeMobile = useCallback(() => setIsMobileMenuOpen(false), []);
 
-  /* save sidebar scroll position on scroll */
   const handleNavScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
       setScrollPosition(e.currentTarget.scrollTop);
@@ -512,7 +471,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
     [setScrollPosition]
   );
 
-  /* keep active nav item in view — only scroll if out of view, don't center aggressively */
   const activeItemRef = useCallback(
     (el: HTMLAnchorElement | null) => {
       if (!el) return;
@@ -527,7 +485,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
     []
   );
 
-  /* restore sidebar scroll on mount */
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -539,11 +496,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop sidebar */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-border/50 bg-card/40 transition-all duration-300 relative',
-          sidebarCollapsed ? 'w-16' : 'w-64'
+          'hidden lg:flex flex-col border-r border-border/40 bg-card/30 transition-all duration-200 relative',
+          sidebarCollapsed ? 'w-14' : 'w-60'
         )}
       >
         <SidebarContent
@@ -562,35 +518,33 @@ export function Shell({ children }: { children: React.ReactNode }) {
           onNavScroll={handleNavScroll}
         />
 
-        {/* Collapse toggle */}
         <button
           type="button"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 p-1.5 rounded-full border border-border/40 hover:bg-muted/40 transition-colors hidden lg:block z-10 bg-card/70"
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 p-1 rounded-full border border-border/30 hover:bg-muted/30 transition-colors hidden lg:block z-10 bg-card/60"
           aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <ChevronLeft
             className={cn(
-              'w-4 h-4 text-muted-foreground/50 transition-transform duration-300',
+              'w-3.5 h-3.5 text-muted-foreground/40 transition-transform duration-200',
               sidebarCollapsed && 'rotate-180'
             )}
           />
         </button>
       </aside>
 
-      {/* Mobile sheet */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden fixed top-4 left-4 z-50"
+            className="lg:hidden fixed top-3 left-3 z-50"
             aria-label="Open navigation menu"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-4 h-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 p-0">
+        <SheetContent side="left" className="w-64 p-0">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
@@ -610,11 +564,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      {/* Main area */}
       <div className="flex flex-col flex-1 min-w-0">
         <TopHeader user={user} unread={unread} />
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          <div className="mx-auto px-6 py-6 lg:py-8">
             {children}
           </div>
         </main>

@@ -60,7 +60,11 @@ export function useUserProgress(userId: string | null) {
     const unsub = onSnapshot(q, (snap) => {
       const map: Record<string, UserPracticeProgress> = {};
       snap.docs.forEach(d => {
-        map[d.id] = { problemId: d.id, ...d.data() } as UserPracticeProgress;
+        const data = d.data();
+        if (data.lastSubmittedAt?.toDate) {
+          data.lastSubmittedAt = data.lastSubmittedAt.toDate().toISOString();
+        }
+        map[d.id] = { problemId: d.id, ...data } as UserPracticeProgress;
       });
       setProgress(map);
       setLoading(false);

@@ -53,8 +53,8 @@ export function StatsDashboard({
         {Array.from({ length: 7 }).map((_, i) => (
           <Card key={i} className="border-border animate-pulse">
             <CardContent className="p-4 space-y-2">
-              <div className="h-3 w-16 bg-muted rounded" />
-              <div className="h-5 w-12 bg-muted rounded" />
+              <div className="h-3 w-16 bg-muted/50 rounded" />
+              <div className="h-5 w-12 bg-muted/50 rounded" />
             </CardContent>
           </Card>
         ))}
@@ -127,7 +127,7 @@ export function StatsDashboard({
                   <p className="text-xs font-medium text-muted-foreground truncate">
                     {stat.label}
                   </p>
-                  <p className={cn('text-lg font-semibold', stat.color)}>
+                  <p className={cn('text-lg font-semibold tracking-tight', stat.color)}>
                     {stat.animate ? (
                       <AnimatedNumber value={stat.value} suffix={stat.suffix || ''} />
                     ) : (

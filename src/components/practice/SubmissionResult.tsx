@@ -100,7 +100,14 @@ export function SubmissionResult({
 
   if (!verdict) return null;
 
-  const config = verdictConfig[verdict];
+  const config = verdictConfig[verdict] || {
+    label: verdict || 'Unknown',
+    color: 'text-muted-foreground',
+    bg: 'bg-muted/10',
+    border: 'border-border',
+    icon: AlertTriangle,
+    description: 'Unknown verdict.',
+  };
   const Icon = config.icon;
   const passRate = totalTestCases > 0 ? Math.round((passedTestCases / totalTestCases) * 100) : 0;
   const timePct = problemTimeLimit && problemTimeLimit > 0 ? Math.min(100, Math.round((executionTimeMs / problemTimeLimit) * 100)) : 0;

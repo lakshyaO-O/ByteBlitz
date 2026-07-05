@@ -137,6 +137,11 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem('devrann_beginner', JSON.stringify(newBeginner)); } catch {}
   };
 
+  // Auto-persist beginner state whenever it changes
+  useEffect(() => {
+    persistBeginner(state.beginner);
+  }, [state.beginner]);
+
   useEffect(() => {
     const { app: firebaseApp, firestore: db } = initializeFirebase();
     if (!firebaseApp || !db) {
@@ -166,9 +171,6 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
               problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
             } : {}),
           };
-          if (data || prev.beginner.xp > 0) {
-            persistBeginner(newBeginner);
-          }
           return { ...prev, beginner: newBeginner, firebaseProgressLoaded: true };
         });
       } else {
@@ -201,6 +203,12 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     }, { merge: true });
   }, [state.beginner]);
 
+  // Auto-sync to Firebase whenever beginner state changes
+  useEffect(() => {
+    if (!state.firebaseProgressLoaded) return;
+    syncBeginnerToFirebase();
+  }, [state.beginner, state.firebaseProgressLoaded]);
+
   const loadBeginnerFromFirebase = useCallback(async (userId?: string) => {
     const { firestore: db, auth } = initializeFirebase();
     if (!db) return;
@@ -225,9 +233,6 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
           problemsSolved: data.problemsSolved ?? prev.beginner.problemsSolved,
         } : {}),
       };
-      if (data || prev.beginner.xp > 0) {
-        persistBeginner(newBeginner);
-      }
       return { ...prev, beginner: newBeginner };
     });
   }, []);
@@ -245,11 +250,10 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateBeginnerState = useCallback((partial: Partial<BeginnerState>) => {
-    setState(prev => {
-      const newBeginner = { ...prev.beginner, ...partial };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
-    });
+    setState(prev => ({
+      ...prev,
+      beginner: { ...prev.beginner, ...partial },
+    }));
   }, []);
 
   const completeOnboarding = useCallback(async () => {
@@ -270,37 +274,34 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   }, [updateBeginnerState]);
 
   const addXp = useCallback((amount: number) => {
-    setState(prev => {
-      const newBeginner = {
+    setState(prev => ({
+      ...prev,
+      beginner: {
         ...prev.beginner,
         xp: prev.beginner.xp + amount,
         dailyXpEarned: prev.beginner.dailyXpEarned + amount,
-      };
-      persistBeginner(newBeginner);
-      syncBeginnerToFirebase();
-      return { ...prev, beginner: newBeginner };
-    });
-  }, [syncBeginnerToFirebase]);
+      },
+    }));
+  }, []);
 
   const addCoins = useCallback((amount: number) => {
-    setState(prev => {
-      const newBeginner = { ...prev.beginner, coins: prev.beginner.coins + amount };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
-    });
+    setState(prev => ({
+      ...prev,
+      beginner: { ...prev.beginner, coins: prev.beginner.coins + amount },
+    }));
   }, []);
 
   const completeLesson = useCallback((lessonId: number) => {
     setState(prev => {
       if (prev.beginner.lessonsCompleted.includes(lessonId)) return prev;
-      const newCompleted = [...prev.beginner.lessonsCompleted, lessonId];
-      const newBeginner = {
-        ...prev.beginner,
-        lessonsCompleted: newCompleted,
-        currentLesson: lessonId + 1,
+      return {
+        ...prev,
+        beginner: {
+          ...prev.beginner,
+          lessonsCompleted: [...prev.beginner.lessonsCompleted, lessonId],
+          currentLesson: lessonId + 1,
+        },
       };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
     });
   }, []);
 
@@ -309,9 +310,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       const progress = { ...prev.beginner.lessonProgress };
       if (!progress[lessonId]) progress[lessonId] = { read: false, quizPassed: false, challengePassed: false, xpAwarded: false, completedAt: null };
       progress[lessonId] = { ...progress[lessonId], read: true };
-      const newBeginner = { ...prev.beginner, lessonProgress: progress };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
+      return { ...prev, beginner: { ...prev.beginner, lessonProgress: progress } };
     });
   }, []);
 
@@ -320,9 +319,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       const progress = { ...prev.beginner.lessonProgress };
       if (!progress[lessonId]) progress[lessonId] = { read: false, quizPassed: false, challengePassed: false, xpAwarded: false, completedAt: null };
       progress[lessonId] = { ...progress[lessonId], quizPassed: true };
-      const newBeginner = { ...prev.beginner, lessonProgress: progress };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
+      return { ...prev, beginner: { ...prev.beginner, lessonProgress: progress } };
     });
   }, []);
 
@@ -331,9 +328,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       const progress = { ...prev.beginner.lessonProgress };
       if (!progress[lessonId]) progress[lessonId] = { read: false, quizPassed: false, challengePassed: false, xpAwarded: false, completedAt: null };
       progress[lessonId] = { ...progress[lessonId], challengePassed: true };
-      const newBeginner = { ...prev.beginner, lessonProgress: progress };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
+      return { ...prev, beginner: { ...prev.beginner, lessonProgress: progress } };
     });
   }, []);
 
@@ -343,21 +338,20 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       const progress = { ...prev.beginner.lessonProgress };
       if (!progress[lessonId]) progress[lessonId] = { read: false, quizPassed: false, challengePassed: false, xpAwarded: false, completedAt: null };
       progress[lessonId] = { ...progress[lessonId], xpAwarded: true, completedAt: new Date().toISOString() };
-      const newCompleted = [...prev.beginner.lessonsCompleted, lessonId];
-      const newBeginner = {
-        ...prev.beginner,
-        lessonsCompleted: newCompleted,
-        currentLesson: lessonId + 1,
-        xp: prev.beginner.xp + xpAmount,
-        coins: prev.beginner.coins + coinAmount,
-        dailyXpEarned: prev.beginner.dailyXpEarned + xpAmount,
-        lessonProgress: progress,
+      return {
+        ...prev,
+        beginner: {
+          ...prev.beginner,
+          lessonsCompleted: [...prev.beginner.lessonsCompleted, lessonId],
+          currentLesson: lessonId + 1,
+          xp: prev.beginner.xp + xpAmount,
+          coins: prev.beginner.coins + coinAmount,
+          dailyXpEarned: prev.beginner.dailyXpEarned + xpAmount,
+          lessonProgress: progress,
+        },
       };
-      persistBeginner(newBeginner);
-      syncBeginnerToFirebase();
-      return { ...prev, beginner: newBeginner };
     });
-  }, [syncBeginnerToFirebase]);
+  }, []);
 
   const incrementStreak = useCallback(() => {
     setState(prev => {
@@ -366,30 +360,26 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       if (lastDate === today && prev.beginner.streak > 0) return prev;
       const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
       const newStreak = lastDate === yesterday ? prev.beginner.streak + 1 : 1;
-      const newBeginner = { ...prev.beginner, streak: newStreak, lastStreakDate: today };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
+      return { ...prev, beginner: { ...prev.beginner, streak: newStreak, lastStreakDate: today } };
     });
   }, []);
 
   const recordSubmission = useCallback((correct: boolean) => {
-    setState(prev => {
-      const newBeginner = {
+    setState(prev => ({
+      ...prev,
+      beginner: {
         ...prev.beginner,
         totalSubmissions: prev.beginner.totalSubmissions + 1,
         correctSubmissions: prev.beginner.correctSubmissions + (correct ? 1 : 0),
-      };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
-    });
+      },
+    }));
   }, []);
 
   const recordPracticeSolved = useCallback(() => {
-    setState(prev => {
-      const newBeginner = { ...prev.beginner, problemsSolved: prev.beginner.problemsSolved + 1 };
-      persistBeginner(newBeginner);
-      return { ...prev, beginner: newBeginner };
-    });
+    setState(prev => ({
+      ...prev,
+      beginner: { ...prev.beginner, problemsSolved: prev.beginner.problemsSolved + 1 },
+    }));
   }, []);
 
   const value = useMemo(() => ({

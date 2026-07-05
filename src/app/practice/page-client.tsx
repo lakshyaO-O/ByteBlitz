@@ -27,21 +27,21 @@ import { ALL_TOPICS } from '@/features/practice/components/ProblemFilters';
 
 function PageSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
-      <div className="h-8 w-48 bg-muted/30 rounded" />
+    <div className="space-y-5 animate-pulse">
+      <div className="h-7 w-44 bg-muted/30 rounded-md" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 h-36 bg-muted/20 rounded-lg" />
-        <div className="h-36 bg-muted/20 rounded-lg" />
+        <div className="md:col-span-2 h-32 bg-muted/10 rounded-lg" />
+        <div className="h-32 bg-muted/10 rounded-lg" />
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="h-20 bg-muted/20 rounded-lg" />
+          <div key={i} className="h-16 bg-muted/10 rounded-lg" />
         ))}
       </div>
-      <div className="h-6 w-32 bg-muted/30 rounded" />
+      <div className="h-5 w-28 bg-muted/30 rounded-md" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-24 bg-muted/20 rounded-lg" />
+          <div key={i} className="h-20 bg-muted/10 rounded-lg" />
         ))}
       </div>
     </div>
@@ -49,9 +49,7 @@ function PageSkeleton() {
 }
 
 function ContinueCard({
-  problem,
-  progress,
-  onStart,
+  problem, progress, onStart,
 }: {
   problem: PracticeProblemDocument;
   progress: { lastSubmittedAt?: string };
@@ -73,11 +71,11 @@ function ContinueCard({
     : 'text-destructive border-destructive/20 bg-destructive/10';
 
   return (
-    <Card className="border-border hover:border-primary/50 transition-colors h-full">
+    <Card className="border-border hover:border-primary/30 transition-colors h-full">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className={cn('text-xs px-1.5 py-0.5', diffColor)}>
                 {problem.difficulty}
               </Badge>
@@ -100,7 +98,7 @@ function ContinueCard({
             onClick={() => onStart(problem)}
             className="shrink-0 gap-1.5 text-xs h-8"
           >
-            <Play className="w-3 h-3" /> Continue
+            <Play className="w-3.5 h-3.5" /> Continue
           </Button>
         </div>
       </CardContent>
@@ -109,8 +107,7 @@ function ContinueCard({
 }
 
 function RecommendationCard({
-  problem,
-  onStart,
+  problem, onStart,
 }: {
   problem: PracticeProblemDocument;
   onStart: (p: PracticeProblemDocument) => void;
@@ -122,7 +119,7 @@ function RecommendationCard({
   const topics = (problem.topics || []).slice(0, 2);
 
   return (
-    <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer h-full" onClick={() => onStart(problem)}>
+    <Card className="border-border hover:border-primary/30 transition-colors cursor-pointer h-full" onClick={() => onStart(problem)}>
       <CardContent className="p-4">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
@@ -144,7 +141,7 @@ function RecommendationCard({
           {topics.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {topics.map((t) => (
-                <span key={t} className="px-1.5 py-0.5 rounded text-xs font-medium bg-muted/30 text-muted-foreground">
+                <span key={t} className="px-1.5 py-0.5 rounded text-xs font-medium bg-muted/20 text-muted-foreground">
                   {t}
                 </span>
               ))}
@@ -323,14 +320,14 @@ export default function PracticePage() {
 
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-headline font-bold text-foreground">
+              <h1 className="text-xl font-semibold text-foreground">
                 Practice
               </h1>
               {isBeginner && unlockProgress.length > 0 && (
-                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted/50 border border-border">
+                <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/20 border border-border">
                   {unlockProgress.map(u => (
                     <div key={u.difficulty} className="flex items-center gap-1">
                       {u.unlocked ? (
@@ -356,11 +353,11 @@ export default function PracticePage() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleRandomProblem} className="gap-1.5 text-xs">
+            <Button variant="outline" size="sm" onClick={handleRandomProblem} className="gap-1.5">
               <Shuffle className="w-3.5 h-3.5" /> Random
             </Button>
             {totalProblemsCount > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/5 border border-primary/20">
                 <Brain className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">{Math.round((totalSolved / totalProblemsCount) * 100)}%</span>
               </div>
@@ -368,7 +365,7 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* Daily + Weekly Challenge */}
+        {/* Daily Challenge */}
         <DailyChallengeCard
           daily={daily}
           status={dailyStatus}
@@ -396,7 +393,7 @@ export default function PracticePage() {
           </div>
         )}
 
-        {/* Statistics */}
+        {/* Statistics + Recommendations + Topics */}
         <PracticeDashboard
           totalSolved={totalSolved}
           totalProblems={totalProblemsCount}
@@ -429,7 +426,7 @@ export default function PracticePage() {
                       const p = problems.find(pr => pr.id === r.problemId);
                       if (p) handleStartProblem(p);
                     }}
-                    className="shrink-0 px-3 py-1.5 rounded bg-muted/30 border border-border text-xs font-medium hover:border-primary/50 transition-colors whitespace-nowrap"
+                    className="shrink-0 px-3 py-1.5 rounded-md bg-muted/20 border border-border text-xs font-medium hover:border-primary/30 hover:text-foreground transition-colors whitespace-nowrap"
                   >
                     {r.title}
                   </button>
@@ -455,7 +452,7 @@ export default function PracticePage() {
                     <button
                       key={p.id}
                       onClick={() => handleStartProblem(p)}
-                      className="shrink-0 px-3 py-1.5 rounded bg-primary/5 border border-primary/20 text-xs font-medium hover:border-primary/50 transition-colors whitespace-nowrap"
+                      className="shrink-0 px-3 py-1.5 rounded-md bg-primary/5 border border-primary/20 text-xs font-medium hover:border-primary/40 transition-colors whitespace-nowrap"
                     >
                       {p.title}
                     </button>
@@ -466,7 +463,7 @@ export default function PracticePage() {
           </Card>
         )}
 
-        {/* Main Content */}
+        {/* Problem Browser */}
         <ProblemBrowser
           problems={problems}
           progress={progress}

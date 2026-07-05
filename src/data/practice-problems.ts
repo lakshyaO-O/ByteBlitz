@@ -29,7 +29,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
       { input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
     ],
-    topics: ['Array', 'Hash Table'],
+    topics: ['Arrays', 'Hashing'],
   },
   {
     id: 'reverse-string',
@@ -49,7 +49,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = ["h","e","l","l","o"]', output: '["o","l","l","e","h"]' },
       { input: 's = ["H","a","n","n","a","h"]', output: '["h","a","n","n","a","H"]' },
     ],
-    topics: ['String', 'Two Pointers'],
+    topics: ['Strings', 'Two Pointers'],
   },
   {
     id: 'palindrome-number',
@@ -90,7 +90,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "()[]{}"', output: 'true' },
       { input: 's = "(]"', output: 'false' },
     ],
-    topics: ['Stack', 'String'],
+    topics: ['Stack', 'Strings'],
   },
   {
     id: 'merge-sorted-array',
@@ -110,7 +110,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3', output: '[1,2,2,3,5,6]' },
       { input: 'nums1 = [1], m = 1, nums2 = [], n = 0', output: '[1]' },
     ],
-    topics: ['Array', 'Two Pointers', 'Sorting'],
+    topics: ['Arrays', 'Two Pointers', 'Sorting'],
   },
   {
     id: 'maximum-subarray',
@@ -130,7 +130,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [-2,1,-3,4,-1,2,1,-5,4]', output: '6', explanation: 'The subarray [4,-1,2,1] has the largest sum 6.' },
       { input: 'nums = [1]', output: '1' },
     ],
-    topics: ['Array', 'Divide and Conquer', 'Dynamic Programming'],
+    topics: ['Arrays', 'Divide and Conquer', 'Dynamic Programming'],
   },
   {
     id: 'binary-search',
@@ -150,14 +150,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [-1,0,3,5,9,12], target = 9', output: '4' },
       { input: 'nums = [-1,0,3,5,9,12], target = 2', output: '-1' },
     ],
-    topics: ['Array', 'Binary Search'],
+    topics: ['Arrays', 'Binary Search'],
   },
   {
     id: 'linked-list-cycle',
     title: 'Linked List Cycle',
     description: 'Given head, the head of a linked list, determine if the linked list has a cycle in it. There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer.',
     difficulty: 'Easy',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 10,
     starterCode: {
       javascript: 'function hasCycle(head) {\n  // Your code here\n}',
@@ -171,7 +171,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'head = [1,2], pos = 0', output: 'true' },
       { input: 'head = [1], pos = -1', output: 'false' },
     ],
-    topics: ['Linked List', 'Hash Table', 'Two Pointers'],
+    topics: ['Linked List', 'Hashing', 'Two Pointers'],
   },
   {
     id: 'invert-binary-tree',
@@ -191,7 +191,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [4,2,7,1,3,6,9]', output: '[4,7,2,9,6,3,1]' },
       { input: 'root = [2,1,3]', output: '[2,3,1]' },
     ],
-    topics: ['Tree', 'Depth-First Search', 'Breadth-First Search'],
+    topics: ['Trees', 'Depth-First Search', 'Breadth-First Search'],
   },
   {
     id: 'climbing-stairs',
@@ -231,7 +231,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'strs = ["flower","flow","flight"]', output: '"fl"' },
       { input: 'strs = ["dog","racecar","car"]', output: '""' },
     ],
-    topics: ['String', 'Trie'],
+    topics: ['Strings', 'Tries'],
   },
   {
     id: 'fizz-buzz',
@@ -252,7 +252,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'n = 5', output: '["1","2","Fizz","4","Buzz"]' },
       { input: 'n = 15', output: '["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]' },
     ],
-    topics: ['Math', 'String', 'Simulation'],
+    topics: ['Math', 'Strings', 'Simulation'],
   },
   {
     id: 'move-zeroes',
@@ -272,7 +272,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [0,1,0,3,12]', output: '[1,3,12,0,0]' },
       { input: 'nums = [0]', output: '[0]' },
     ],
-    topics: ['Array', 'Two Pointers'],
+    topics: ['Arrays', 'Two Pointers'],
   },
   {
     id: 'majority-element',
@@ -292,7 +292,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [3,2,3]', output: '3' },
       { input: 'nums = [2,2,1,1,1,2,2]', output: '2' },
     ],
-    topics: ['Array', 'Hash Table', 'Divide and Conquer', 'Sorting', 'Counting'],
+    topics: ['Arrays', 'Hashing', 'Divide and Conquer', 'Sorting', 'Counting'],
   },
   {
     id: 'contains-duplicate',
@@ -312,7 +312,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,2,3,1]', output: 'true' },
       { input: 'nums = [1,2,3,4]', output: 'false' },
     ],
-    topics: ['Array', 'Hash Table', 'Sorting'],
+    topics: ['Arrays', 'Hashing', 'Sorting'],
   },
   {
     id: 'first-unique-character',
@@ -333,7 +333,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "loveleetcode"', output: '2' },
       { input: 's = "aabb"', output: '-1' },
     ],
-    topics: ['String', 'Hash Table', 'Queue', 'Counting'],
+    topics: ['Strings', 'Hashing', 'Queue', 'Counting'],
   },
   {
     id: 'best-time-stock',
@@ -353,7 +353,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'prices = [7,1,5,3,6,4]', output: '5', explanation: 'Buy on day 2 (price=1) and sell on day 5 (price=6), profit = 5.' },
       { input: 'prices = [7,6,4,3,1]', output: '0' },
     ],
-    topics: ['Array', 'Dynamic Programming'],
+    topics: ['Arrays', 'Dynamic Programming'],
   },
   {
     id: 'power-of-two',
@@ -394,7 +394,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "anagram", t = "nagaram"', output: 'true' },
       { input: 's = "rat", t = "car"', output: 'false' },
     ],
-    topics: ['String', 'Hash Table', 'Sorting'],
+    topics: ['Strings', 'Hashing', 'Sorting'],
   },
   {
     id: 'missing-number',
@@ -415,7 +415,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [0,1]', output: '2' },
       { input: 'nums = [9,6,4,2,3,5,7,0,1]', output: '8' },
     ],
-    topics: ['Array', 'Hash Table', 'Math', 'Binary Search', 'Bit Manipulation', 'Sorting'],
+    topics: ['Arrays', 'Hashing', 'Math', 'Binary Search', 'Bit Manipulation', 'Sorting'],
   },
   {
     id: 'symmetric-tree',
@@ -435,7 +435,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [1,2,2,3,4,4,3]', output: 'true' },
       { input: 'root = [1,2,2,null,3,null,3]', output: 'false' },
     ],
-    topics: ['Tree', 'Depth-First Search', 'Breadth-First Search'],
+    topics: ['Trees', 'Depth-First Search', 'Breadth-First Search'],
   },
   {
     id: 'single-number',
@@ -455,7 +455,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [2,2,1]', output: '1' },
       { input: 'nums = [4,1,2,1,2]', output: '4' },
     ],
-    topics: ['Array', 'Bit Manipulation'],
+    topics: ['Arrays', 'Bit Manipulation'],
   },
   {
     id: 'roman-to-integer',
@@ -476,7 +476,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "LVIII"', output: '58' },
       { input: 's = "MCMXCIV"', output: '1994' },
     ],
-    topics: ['Math', 'String', 'Hash Table'],
+    topics: ['Math', 'Strings', 'Hashing'],
   },
   {
     id: 'intersection-two-arrays',
@@ -496,7 +496,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums1 = [1,2,2,1], nums2 = [2,2]', output: '[2]' },
       { input: 'nums1 = [4,9,5], nums2 = [9,4,9,8,4]', output: '[9,4]' },
     ],
-    topics: ['Array', 'Hash Table', 'Two Pointers', 'Binary Search', 'Sorting'],
+    topics: ['Arrays', 'Hashing', 'Two Pointers', 'Binary Search', 'Sorting'],
   },
   {
     id: 'happy-number',
@@ -516,7 +516,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'n = 19', output: 'true', explanation: '1^2 + 9^2 = 82, 8^2 + 2^2 = 68, 6^2 + 8^2 = 100, 1^2 + 0^2 + 0^2 = 1' },
       { input: 'n = 2', output: 'false' },
     ],
-    topics: ['Math', 'Hash Table', 'Two Pointers'],
+    topics: ['Math', 'Hashing', 'Two Pointers'],
   },
   {
     id: 'diameter-binary-tree',
@@ -536,14 +536,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [1,2,3,4,5]', output: '3', explanation: '3 is the length of the path [4,2,1,3] or [5,2,1,3].' },
       { input: 'root = [1,2]', output: '1' },
     ],
-    topics: ['Tree', 'Depth-First Search', 'Binary Tree'],
+    topics: ['Trees', 'Depth-First Search', 'Binary Tree'],
   },
   {
     id: 'middle-linked-list',
     title: 'Middle of the Linked List',
     description: 'Given the head of a singly linked list, return the middle node of the linked list. If there are two middle nodes, return the second middle node.',
     difficulty: 'Easy',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 10,
     starterCode: {
       javascript: 'function middleNode(head) {\n  // Your code here\n}',
@@ -577,7 +577,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'ransomNote = "aa", magazine = "ab"', output: 'false' },
       { input: 'ransomNote = "aa", magazine = "aab"', output: 'true' },
     ],
-    topics: ['String', 'Hash Table', 'Counting'],
+    topics: ['Strings', 'Hashing', 'Counting'],
   },
   {
     id: 'sqrtx',
@@ -618,7 +618,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'digits = [4,3,2,1]', output: '[4,3,2,2]' },
       { input: 'digits = [9]', output: '[1,0]' },
     ],
-    topics: ['Array', 'Math'],
+    topics: ['Arrays', 'Math'],
   },
   {
     id: 'remove-duplicates-sorted',
@@ -638,7 +638,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,1,2]', output: '2, nums = [1,2,_]' },
       { input: 'nums = [0,0,1,1,1,2,2,3,3,4]', output: '5, nums = [0,1,2,3,4,_,_,_,_,_]' },
     ],
-    topics: ['Array', 'Two Pointers'],
+    topics: ['Arrays', 'Two Pointers'],
   },
   {
     id: 'count-primes',
@@ -659,7 +659,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'n = 0', output: '0' },
       { input: 'n = 1', output: '0' },
     ],
-    topics: ['Math', 'Array', 'Enumeration', 'Number Theory'],
+    topics: ['Math', 'Arrays', 'Enumeration', 'Number Theory'],
   },
   {
     id: 'group-anagrams',
@@ -679,7 +679,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'strs = ["eat","tea","tan","ate","nat","bat"]', output: '[["bat"],["nat","tan"],["ate","eat","tea"]]' },
       { input: 'strs = [""]', output: '[[""]]' },
     ],
-    topics: ['Array', 'String', 'Hash Table', 'Sorting'],
+    topics: ['Arrays', 'Strings', 'Hashing', 'Sorting'],
   },
   {
     id: 'coin-change',
@@ -700,7 +700,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'coins = [2], amount = 3', output: '-1' },
       { input: 'coins = [1], amount = 0', output: '0' },
     ],
-    topics: ['Array', 'Dynamic Programming', 'Breadth-First Search'],
+    topics: ['Arrays', 'Dynamic Programming', 'Breadth-First Search'],
   },
   {
     id: 'lru-cache',
@@ -719,7 +719,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
     examples: [
       { input: 'LRUCache cache = new LRUCache(2); cache.put(1,1); cache.put(2,2); cache.get(1); cache.put(3,3); cache.get(2);', output: '1, -1' },
     ],
-    topics: ['Hash Table', 'Linked List', 'Design', 'Doubly-Linked List'],
+    topics: ['Hashing', 'Linked List', 'Design', 'Doubly-Linked List'],
   },
   {
     id: 'longest-substring',
@@ -740,7 +740,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "bbbbb"', output: '1' },
       { input: 's = "pwwkew"', output: '3', explanation: '"wke" with length 3.' },
     ],
-    topics: ['String', 'Hash Table', 'Sliding Window'],
+    topics: ['Strings', 'Hashing', 'Sliding Window'],
   },
   {
     id: '3sum',
@@ -761,7 +761,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [0,1,1]', output: '[]' },
       { input: 'nums = [0,0,0]', output: '[[0,0,0]]' },
     ],
-    topics: ['Array', 'Two Pointers', 'Sorting'],
+    topics: ['Arrays', 'Two Pointers', 'Sorting'],
   },
   {
     id: 'validate-bst',
@@ -781,7 +781,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [2,1,3]', output: 'true' },
       { input: 'root = [5,1,4,null,null,3,6]', output: 'false' },
     ],
-    topics: ['Tree', 'Depth-First Search', 'Binary Search Tree', 'Binary Tree'],
+    topics: ['Trees', 'Depth-First Search', 'Binary Search Tree', 'Binary Tree'],
   },
   {
     id: 'number-islands',
@@ -801,7 +801,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'grid = [["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]', output: '1' },
       { input: 'grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]', output: '3' },
     ],
-    topics: ['Array', 'Depth-First Search', 'Breadth-First Search', 'Union Find', 'Matrix'],
+    topics: ['Arrays', 'Depth-First Search', 'Breadth-First Search', 'Union Find', 'Matrix'],
   },
   {
     id: 'course-schedule',
@@ -821,7 +821,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'numCourses = 2, prerequisites = [[1,0]]', output: 'true' },
       { input: 'numCourses = 2, prerequisites = [[1,0],[0,1]]', output: 'false' },
     ],
-    topics: ['Graph', 'Depth-First Search', 'Breadth-First Search', 'Topological Sort'],
+    topics: ['Graphs', 'Depth-First Search', 'Breadth-First Search', 'Topological Sort'],
   },
   {
     id: 'merge-intervals',
@@ -841,7 +841,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'intervals = [[1,3],[2,6],[8,10],[15,18]]', output: '[[1,6],[8,10],[15,18]]' },
       { input: 'intervals = [[1,4],[4,5]]', output: '[[1,5]]' },
     ],
-    topics: ['Array', 'Sorting'],
+    topics: ['Arrays', 'Sorting'],
   },
   {
     id: 'permutations',
@@ -861,7 +861,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,2,3]', output: '[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]' },
       { input: 'nums = [0,1]', output: '[[0,1],[1,0]]' },
     ],
-    topics: ['Array', 'Backtracking', 'Recursion'],
+    topics: ['Arrays', 'Backtracking', 'Recursion'],
   },
   {
     id: 'search-rotated',
@@ -881,7 +881,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [4,5,6,7,0,1,2], target = 0', output: '4' },
       { input: 'nums = [4,5,6,7,0,1,2], target = 3', output: '-1' },
     ],
-    topics: ['Array', 'Binary Search'],
+    topics: ['Arrays', 'Binary Search'],
   },
   {
     id: 'container-water',
@@ -901,7 +901,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'height = [1,8,6,2,5,4,8,3,7]', output: '49' },
       { input: 'height = [1,1]', output: '1' },
     ],
-    topics: ['Array', 'Two Pointers', 'Greedy'],
+    topics: ['Arrays', 'Two Pointers', 'Greedy'],
   },
   {
     id: 'generate-parentheses',
@@ -921,7 +921,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'n = 3', output: '["((()))","(()())","(())()","()(())","()()()"]' },
       { input: 'n = 1', output: '["()"]' },
     ],
-    topics: ['String', 'Backtracking', 'Dynamic Programming', 'Recursion'],
+    topics: ['Strings', 'Backtracking', 'Dynamic Programming', 'Recursion'],
   },
   {
     id: 'house-robber',
@@ -941,7 +941,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,2,3,1]', output: '4', explanation: 'Rob house 1 (money=1) and then rob house 3 (money=3). Total = 4.' },
       { input: 'nums = [2,7,9,3,1]', output: '12', explanation: 'Rob house 1 (2), house 3 (9), and house 5 (1). Total = 12.' },
     ],
-    topics: ['Array', 'Dynamic Programming'],
+    topics: ['Arrays', 'Dynamic Programming'],
   },
   {
     id: 'k-closest-points',
@@ -961,7 +961,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'points = [[1,3],[-2,2]], k = 1', output: '[[-2,2]]' },
       { input: 'points = [[3,3],[5,-1],[-2,4]], k = 2', output: '[[3,3],[-2,4]]' },
     ],
-    topics: ['Array', 'Math', 'Divide and Conquer', 'Sorting', 'Heap', 'Quickselect'],
+    topics: ['Arrays', 'Math', 'Divide and Conquer', 'Sorting', 'Heap', 'Quickselect'],
   },
   {
     id: 'word-break',
@@ -982,7 +982,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "applepenapple", wordDict = ["apple","pen"]', output: 'true' },
       { input: 's = "catsandog", wordDict = ["cats","dog","sand","and","cat"]', output: 'false' },
     ],
-    topics: ['String', 'Dynamic Programming', 'Trie', 'Memoization', 'Hash Table'],
+    topics: ['Strings', 'Dynamic Programming', 'Tries', 'Memoization', 'Hashing'],
   },
   {
     id: 'clone-graph',
@@ -1002,14 +1002,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'adjList = [[2,4],[1,3],[2,4],[1,3]]', output: '[[2,4],[1,3],[2,4],[1,3]]' },
       { input: 'adjList = [[]]', output: '[[]]' },
     ],
-    topics: ['Graph', 'Hash Table', 'Depth-First Search', 'Breadth-First Search'],
+    topics: ['Graphs', 'Hashing', 'Depth-First Search', 'Breadth-First Search'],
   },
   {
     id: 'reverse-linked-list',
     title: 'Reverse Linked List',
     description: 'Given the head of a singly linked list, reverse the list, and return the reversed list.',
     difficulty: 'Easy',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 10,
     starterCode: {
       javascript: 'function reverseList(head) {\n  // Your code here\n}',
@@ -1042,14 +1042,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [3,9,20,null,null,15,7]', output: '3' },
       { input: 'root = [1,null,2]', output: '2' },
     ],
-    topics: ['Tree', 'Depth-First Search', 'Breadth-First Search', 'Binary Tree'],
+    topics: ['Trees', 'Depth-First Search', 'Breadth-First Search', 'Binary Tree'],
   },
   {
     id: 'odd-even-linked-list',
     title: 'Odd Even Linked List',
     description: 'Given the head of a singly linked list, group all the nodes with odd indices together followed by the nodes with even indices, and return the reordered list. The first node is considered odd, and the second node is even, and so on.',
     difficulty: 'Medium',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 15,
     starterCode: {
       javascript: 'function oddEvenList(head) {\n  // Your code here\n}',
@@ -1082,7 +1082,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "abccccdd"', output: '7', explanation: 'One longest palindrome is "dccaccd", whose length is 7.' },
       { input: 's = "a"', output: '1' },
     ],
-    topics: ['String', 'Hash Table', 'Greedy', 'Counting'],
+    topics: ['Strings', 'Hashing', 'Greedy', 'Counting'],
   },
   {
     id: 'min-stack',
@@ -1121,7 +1121,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,2,3,4]', output: '[24,12,8,6]' },
       { input: 'nums = [-1,1,0,-3,3]', output: '[0,0,9,0,0]' },
     ],
-    topics: ['Array', 'Prefix Sum'],
+    topics: ['Arrays', 'Prefix Sum'],
   },
   {
     id: 'max-product-subarray',
@@ -1141,14 +1141,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [2,3,-2,4]', output: '6', explanation: '[2,3] has the largest product 6.' },
       { input: 'nums = [-2,0,-1]', output: '0' },
     ],
-    topics: ['Array', 'Dynamic Programming'],
+    topics: ['Arrays', 'Dynamic Programming'],
   },
   {
     id: 'top-k-frequent',
     title: 'Top K Frequent Elements',
     description: 'Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.',
     difficulty: 'Medium',
-    category: 'Hash Tables',
+    category: 'Hashing',
     points: 20,
     starterCode: {
       javascript: 'function topKFrequent(nums, k) {\n  // Your code here\n}',
@@ -1161,7 +1161,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,1,1,2,2,3], k = 2', output: '[1,2]' },
       { input: 'nums = [1], k = 1', output: '[1]' },
     ],
-    topics: ['Array', 'Hash Table', 'Divide and Conquer', 'Sorting', 'Heap', 'Bucket Sort', 'Counting', 'Quickselect'],
+    topics: ['Arrays', 'Hashing', 'Divide and Conquer', 'Sorting', 'Heap', 'Bucket Sort', 'Counting', 'Quickselect'],
   },
   {
     id: 'rotting-oranges',
@@ -1181,7 +1181,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'grid = [[2,1,1],[1,1,0],[0,1,1]]', output: '4' },
       { input: 'grid = [[2,1,1],[0,1,1],[1,0,1]]', output: '-1' },
     ],
-    topics: ['Array', 'Breadth-First Search', 'Matrix'],
+    topics: ['Arrays', 'Breadth-First Search', 'Matrix'],
   },
   {
     id: 'decode-ways',
@@ -1202,7 +1202,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "226"', output: '3', explanation: '"226" could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).' },
       { input: 's = "06"', output: '0' },
     ],
-    topics: ['String', 'Dynamic Programming'],
+    topics: ['Strings', 'Dynamic Programming'],
   },
   {
     id: 'find-all-anagrams',
@@ -1222,7 +1222,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 's = "cbaebabacd", p = "abc"', output: '[0,6]' },
       { input: 's = "abab", p = "ab"', output: '[0,1,2]' },
     ],
-    topics: ['String', 'Hash Table', 'Sliding Window'],
+    topics: ['Strings', 'Hashing', 'Sliding Window'],
   },
   {
     id: 'unique-paths',
@@ -1262,7 +1262,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2', output: '[[2,2,2],[2,2,0],[2,0,1]]' },
       { input: 'image = [[0,0,0],[0,0,0]], sr = 0, sc = 0, color = 0', output: '[[0,0,0],[0,0,0]]' },
     ],
-    topics: ['Array', 'Depth-First Search', 'Breadth-First Search', 'Matrix'],
+    topics: ['Arrays', 'Depth-First Search', 'Breadth-First Search', 'Matrix'],
   },
   {
     id: 'implement-queue-using-stacks',
@@ -1301,7 +1301,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'root = [3,9,20,null,null,15,7]', output: '[[3],[9,20],[15,7]]' },
       { input: 'root = [1]', output: '[[1]]' },
     ],
-    topics: ['Tree', 'Breadth-First Search', 'Binary Tree'],
+    topics: ['Trees', 'Breadth-First Search', 'Binary Tree'],
   },
   {
     id: 'trapping-rain-water',
@@ -1321,7 +1321,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]', output: '6' },
       { input: 'height = [4,2,0,3,2,5]', output: '9' },
     ],
-    topics: ['Array', 'Two Pointers', 'Dynamic Programming', 'Stack', 'Monotonic Stack'],
+    topics: ['Arrays', 'Two Pointers', 'Dynamic Programming', 'Stack', 'Monotonic Stack'],
   },
   {
     id: 'n-queens',
@@ -1341,7 +1341,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'n = 4', output: '[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]' },
       { input: 'n = 1', output: '[["Q"]]' },
     ],
-    topics: ['Array', 'Backtracking'],
+    topics: ['Arrays', 'Backtracking'],
   },
   {
     id: 'median-two-sorted',
@@ -1361,14 +1361,14 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums1 = [1,3], nums2 = [2]', output: '2.0' },
       { input: 'nums1 = [1,2], nums2 = [3,4]', output: '2.5' },
     ],
-    topics: ['Array', 'Binary Search', 'Divide and Conquer'],
+    topics: ['Arrays', 'Binary Search', 'Divide and Conquer'],
   },
   {
     id: 'merge-k-sorted',
     title: 'Merge k Sorted Lists',
     description: 'You are given an array of k linked-lists lists, each linked-list is sorted in ascending order. Merge all the linked-lists into one sorted linked-list and return it.',
     difficulty: 'Hard',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 35,
     starterCode: {
       javascript: 'function mergeKLists(lists) {\n  // Your code here\n}',
@@ -1388,7 +1388,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
     title: 'Reverse Nodes in k-Group',
     description: 'Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list. k is a positive integer and is less than or equal to the length of the linked list.',
     difficulty: 'Hard',
-    category: 'Linked Lists',
+    category: 'Linked List',
     points: 35,
     starterCode: {
       javascript: 'function reverseKGroup(head, k) {\n  // Your code here\n}',
@@ -1421,7 +1421,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'word1 = "horse", word2 = "ros"', output: '3' },
       { input: 'word1 = "intention", word2 = "execution"', output: '5' },
     ],
-    topics: ['String', 'Dynamic Programming'],
+    topics: ['Strings', 'Dynamic Programming'],
   },
   {
     id: 'sliding-window-max',
@@ -1441,7 +1441,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3', output: '[3,3,5,5,6,7]' },
       { input: 'nums = [1], k = 1', output: '[1]' },
     ],
-    topics: ['Array', 'Queue', 'Sliding Window', 'Heap', 'Monotonic Queue'],
+    topics: ['Arrays', 'Queue', 'Sliding Window', 'Heap', 'Monotonic Queue'],
   },
   {
     id: 'largest-rectangle-histogram',
@@ -1461,6 +1461,6 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
       { input: 'heights = [2,1,5,6,2,3]', output: '10' },
       { input: 'heights = [2,4]', output: '4' },
     ],
-    topics: ['Array', 'Stack', 'Monotonic Stack'],
+    topics: ['Arrays', 'Stack', 'Monotonic Stack'],
   },
 ];

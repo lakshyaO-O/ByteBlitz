@@ -56,7 +56,7 @@ export function PracticeDashboard({
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-primary" />
             <span className="text-xs font-medium text-foreground">Recommended for You</span>
-            <span className="text-xs text-muted-foreground">Based on your weak topics</span>
+            <span className="text-xs text-muted-foreground">Based on weak topics</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {recommendations.map((p) => {
@@ -68,7 +68,7 @@ export function PracticeDashboard({
               return (
                 <Card
                   key={p.id}
-                  className="border-border hover:border-primary/50 transition-colors cursor-pointer h-full"
+                  className="border-border hover:border-primary/30 transition-colors cursor-pointer h-full"
                   onClick={() => onStartProblem(p)}
                 >
                   <CardContent className="p-4">
@@ -92,7 +92,7 @@ export function PracticeDashboard({
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-full gap-1.5 text-xs h-7 hover:bg-primary/10 hover:text-primary"
+                        className="w-full gap-1.5 h-7 hover:bg-primary/10 hover:text-primary"
                         onClick={(e) => { e.stopPropagation(); onStartProblem(p); }}
                       >
                         <Play className="w-3 h-3" /> Solve

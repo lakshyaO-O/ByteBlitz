@@ -33,7 +33,7 @@ export function ProblemFilters({
   onDifficultyChange, onTopicChange, onSortChange, onClearTopic,
 }: ProblemFiltersProps) {
   return (
-    <div className="space-y-3 p-4 rounded-lg bg-muted/20 border border-border">
+    <div className="space-y-3 p-4 rounded-lg bg-muted/10 border border-border">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground w-16">Difficulty</span>
         {DIFFICULTIES.map((d) => {
@@ -65,7 +65,7 @@ export function ProblemFilters({
                 'px-2 py-0.5 rounded text-xs font-medium transition-colors whitespace-nowrap',
                 topic === t
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted/50 text-muted-foreground hover:text-foreground border border-border',
+                  : 'bg-muted/30 text-muted-foreground hover:text-foreground border border-border',
               )}
             >
               {t}

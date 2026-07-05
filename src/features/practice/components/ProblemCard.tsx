@@ -34,7 +34,7 @@ export function ProblemCard({ problem, solved, bookmarked, locked, onSelect }: P
       onClick={locked ? undefined : onSelect}
       className={cn('cursor-pointer transition-opacity', locked && 'opacity-40 cursor-not-allowed')}
     >
-      <Card className="border-border hover:border-primary/50 transition-colors group">
+      <Card className="border-border hover:border-primary/30 transition-colors group">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
@@ -52,7 +52,7 @@ export function ProblemCard({ problem, solved, bookmarked, locked, onSelect }: P
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                  <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors truncate">
                     {problem.title}
                   </h3>
                   {bookmarked && <BookmarkCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
@@ -62,7 +62,7 @@ export function ProblemCard({ problem, solved, bookmarked, locked, onSelect }: P
                     {problem.difficulty}
                   </span>
                   {problem.category && (
-                    <Badge variant="outline" className="text-xs bg-muted/30">
+                    <Badge variant="outline" className="text-xs bg-muted/20">
                       {problem.category}
                     </Badge>
                   )}
@@ -83,7 +83,7 @@ export function ProblemCard({ problem, solved, bookmarked, locked, onSelect }: P
               </div>
             </div>
             {!locked && (
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 ml-3" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary/60 transition-colors shrink-0 ml-3" />
             )}
           </div>
         </CardContent>

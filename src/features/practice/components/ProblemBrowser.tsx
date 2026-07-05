@@ -114,7 +114,7 @@ export function ProblemBrowser({
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:max-w-[200px]">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40 pointer-events-none" />
             <Input
               placeholder="Search problems..."
               className="pl-8 h-8 text-sm"
@@ -134,7 +134,7 @@ export function ProblemBrowser({
             variant={showFilters || activeFilterCount > 0 ? 'secondary' : 'outline'}
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="gap-1.5 text-xs h-8"
+            className="gap-1.5 h-8"
           >
             Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
           </Button>
@@ -155,7 +155,7 @@ export function ProblemBrowser({
         />
       )}
 
-      <TabsContent value={tab} className="mt-0 space-y-3">
+      <TabsContent value={tab} className="mt-0 space-y-2">
         {filteredProblems.length > 0 ? (
           <>
             <div className="flex items-center justify-between px-1">
@@ -185,7 +185,7 @@ export function ProblemBrowser({
                   size="sm"
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={safePage === 0}
-                  className="text-xs h-7"
+                  className="h-7"
                 >
                   <ChevronLeft className="w-3 h-3 mr-1" /> Prev
                 </Button>
@@ -197,7 +197,7 @@ export function ProblemBrowser({
                   size="sm"
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={safePage >= totalPages - 1}
-                  className="text-xs h-7"
+                  className="h-7"
                 >
                   Next <ChevronRight className="w-3 h-3 ml-1" />
                 </Button>
@@ -206,8 +206,8 @@ export function ProblemBrowser({
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Search className="w-10 h-10 text-muted-foreground/30 mb-3" />
-            <p className="font-medium text-muted-foreground">No Matching Problems</p>
+            <Search className="w-10 h-10 text-muted-foreground/20 mb-3" />
+            <p className="font-medium text-muted-foreground">No matching problems</p>
             <p className="text-sm text-muted-foreground mt-1">
               {search ? 'Try a different search query.' : 'Try adjusting your filters.'}
             </p>

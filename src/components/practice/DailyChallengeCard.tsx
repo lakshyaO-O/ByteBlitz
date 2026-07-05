@@ -19,12 +19,12 @@ interface DailyChallengeCardProps {
 
 function HeroSkeleton() {
   return (
-    <div className="rounded-xl border border-border/50 bg-card animate-pulse p-6 space-y-3">
-      <div className="h-4 w-40 bg-muted rounded" />
-      <div className="h-6 w-64 bg-muted rounded" />
+    <div className="rounded-lg border border-border/50 bg-card animate-pulse p-5 space-y-3">
+      <div className="h-4 w-40 bg-muted/50 rounded" />
+      <div className="h-5 w-56 bg-muted/50 rounded" />
       <div className="flex gap-3">
-        <div className="h-9 w-28 bg-muted rounded" />
-        <div className="h-9 w-28 bg-muted rounded" />
+        <div className="h-9 w-28 bg-muted/50 rounded-md" />
+        <div className="h-9 w-28 bg-muted/50 rounded-md" />
       </div>
     </div>
   );
@@ -52,10 +52,10 @@ export function DailyChallengeCard({
       <div className="md:col-span-2">
         <div
           className={cn(
-            'relative rounded-xl border transition-colors',
+            'relative rounded-lg border transition-colors',
             dailyCompleted
-              ? 'border-emerald-500/30 bg-emerald-500/5'
-              : 'border-primary/20',
+              ? 'border-emerald-500/20 bg-emerald-500/[0.03]'
+              : 'border-border',
           )}
         >
           <CardContent className="p-5">
@@ -67,7 +67,7 @@ export function DailyChallengeCard({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">{today}</p>
-                    <h2 className="text-lg font-semibold text-foreground">Daily Challenge</h2>
+                    <h2 className="text-base font-semibold text-foreground">Daily Challenge</h2>
                   </div>
                 </div>
 
@@ -78,16 +78,16 @@ export function DailyChallengeCard({
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="text-xs gap-1 py-0.5 border-primary/30">
+                  <Badge variant="outline" className="text-xs gap-1 py-0.5 border-primary/20">
                     <Zap className="w-3 h-3 text-primary" /> +{daily?.xpBonus || 50} XP Bonus
                   </Badge>
                   {dailyCompleted && !dailyClaimed && (
-                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-xs py-0.5 gap-1">
+                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs py-0.5 gap-1">
                       Ready to claim!
                     </Badge>
                   )}
                   {dailyClaimed && (
-                    <Badge className="bg-primary/10 text-primary border-primary/30 text-xs py-0.5 gap-1">
+                    <Badge className="bg-primary/10 text-primary border-primary/20 text-xs py-0.5 gap-1">
                       <CheckCircle2 className="w-3 h-3" /> Claimed
                     </Badge>
                   )}
@@ -114,7 +114,7 @@ export function DailyChallengeCard({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border/50 bg-card/40 overflow-hidden">
+      <div className="rounded-lg border border-border bg-card/30 overflow-hidden">
         <CardContent className="p-5">
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
@@ -140,7 +140,7 @@ export function DailyChallengeCard({
                 <span className="text-xs font-medium text-muted-foreground">{weeklyPct}%</span>
               </div>
               {weekly && weekly.xpBonus > 0 && (
-                <Badge variant="outline" className="text-xs gap-1 border-secondary/30 text-secondary">
+                <Badge variant="outline" className="text-xs gap-1 border-secondary/20 text-secondary">
                   <Zap className="w-3 h-3" /> +{weekly.xpBonus} XP
                 </Badge>
               )}

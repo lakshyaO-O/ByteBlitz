@@ -373,8 +373,8 @@ function AuthForm() {
     <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
       <Card className="max-w-md w-full bg-background/95 border-border">
         <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center mb-2 text-primary">
-            <Zap className="h-8 w-8 fill-primary" />
+          <div className="flex justify-center mb-2">
+            <img src="/logo.svg" alt="DevRann" className="h-10 w-10" />
           </div>
           <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">
             {isSignUp ? 'Join DevRann' : 'Welcome Back'}

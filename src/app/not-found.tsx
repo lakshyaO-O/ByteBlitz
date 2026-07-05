@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Zap, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: '404 - Page Not Found',
@@ -26,11 +26,8 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Zap className="w-5 h-5 text-primary fill-primary" />
-            <span className="text-lg font-headline font-bold text-foreground">
-              DevRann
-            </span>
+          <div className="flex items-center justify-center mb-2">
+            <img src="/logo.svg" alt="DevRann" className="h-8 w-8" />
           </div>
           <h2 className="text-xl font-headline font-bold">Page Not Found</h2>
           <p className="text-sm text-muted-foreground">

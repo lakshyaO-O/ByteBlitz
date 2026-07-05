@@ -58,8 +58,8 @@ export function TopicMasteryGrid({ topics, loading, onTopicClick }: TopicMastery
         {Array.from({ length: 12 }).map((_, i) => (
           <Card key={i} className="border-border animate-pulse">
             <CardContent className="p-3 space-y-2">
-              <div className="h-3 w-20 bg-muted rounded" />
-              <div className="h-4 w-12 bg-muted rounded" />
+              <div className="h-3 w-20 bg-muted/50 rounded" />
+              <div className="h-4 w-12 bg-muted/50 rounded" />
             </CardContent>
           </Card>
         ))}
@@ -83,7 +83,7 @@ export function TopicMasteryGrid({ topics, loading, onTopicClick }: TopicMastery
           pct >= 80 ? 'bg-emerald-500/10' :
           pct >= 50 ? 'bg-yellow-500/10' :
           pct >= 20 ? 'bg-orange-500/10' :
-          'bg-muted/30';
+          'bg-muted/20';
 
         return (
           <button
@@ -91,7 +91,7 @@ export function TopicMasteryGrid({ topics, loading, onTopicClick }: TopicMastery
             onClick={() => onTopicClick?.(topic.topic)}
             className="text-left"
           >
-            <Card className="border-border hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <Card className="border-border hover:border-primary/30 transition-colors cursor-pointer h-full">
               <CardContent className="p-3 space-y-1.5">
                 <div className="flex items-center gap-2">
                   <div className={cn('w-6 h-6 rounded flex items-center justify-center shrink-0', bgColor)}>

@@ -146,7 +146,6 @@ export async function submitSolution(
       submissionsCount: increment(1),
       lastSubmittedAt: serverTimestamp(),
       lastVerdict: verdict,
-      bookmarked: false,
     }, { merge: true });
 
     await setDoc(doc(db, 'users', userId, 'progress', problemId), {
