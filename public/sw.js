@@ -1,5 +1,5 @@
 const CACHE_NAME = 'devrann-shell-v1';
-const SHELL_ASSETS = ['/', '/manifest.webmanifest', '/icons/icon.svg'];
+const SHELL_ASSETS = ['/', '/manifest.webmanifest', '/logo.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
