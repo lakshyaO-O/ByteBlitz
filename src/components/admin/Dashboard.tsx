@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Users, Code2, ShoppingBag, Crown, ShieldBan, Shield, Zap, Coins, Activity, ArrowUpRight, Loader2 } from 'lucide-react';
+import { Users, Code2, ShoppingBag, Crown, ShieldBan, Shield, Zap, Coins, Activity, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getAdminDashboardStats } from '@/services/admin';

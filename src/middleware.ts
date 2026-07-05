@@ -17,6 +17,8 @@ const PUBLIC_ROUTES = new Set([
   '/api/shop',
   '/api/github',
   '/api/projects',
+  '/api/judge',
+  '/api/battles',
   '/sw.js',
   '/sitemap.xml',
   '/robots.txt',

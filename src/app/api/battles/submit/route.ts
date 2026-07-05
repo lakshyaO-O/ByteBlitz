@@ -1,47 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { executeBattleCode } from '@/services/judge-engine';
 
 interface TestCase {
+  input?: string;
+  expected?: any;
   [key: string]: any;
-  expected: any;
 }
 
-function runTests(sourceCode: string, problemId: string, testCases: TestCase[]): { passed: number; total: number } {
-  let passed = 0;
-  const total = testCases.length;
-
-  const fnName = problemId === 'valid-parentheses' ? 'isValid'
-    : problemId === 'two-sum' ? 'twoSum'
-    : problemId === 'reverse-string' ? 'reverseString'
-    : null;
-
-  if (!fnName || total === 0) return { passed: 0, total };
-
-  try {
-    const wrappedCode = `${sourceCode}\nreturn typeof ${fnName} !== 'undefined' ? ${fnName} : undefined;`;
-    const runUserCode = new Function(wrappedCode);
-    const userFn = runUserCode();
-
-    if (typeof userFn !== 'function') return { passed: 0, total };
-
-    for (const tc of testCases) {
-      try {
-        const inputs = { ...tc };
-        delete inputs.expected;
-        const result = userFn(...Object.values(inputs));
-        if (JSON.stringify(result) === JSON.stringify(tc.expected)) {
-          passed++;
-        }
-      } catch {
-        // Test failed
-      }
+function convertBattleTestCases(testCases: TestCase[]): Array<{ input: string; expected: string; isHidden?: boolean }> {
+  return testCases.map((tc) => {
+    if (tc.input !== undefined && tc.expected !== undefined) {
+      return { input: tc.input, expected: String(tc.expected) };
     }
-  } catch {
-    // Code compilation failed
-  }
-
-  return { passed, total };
+    const entries = Object.entries(tc).filter(([k]) => k !== 'expected');
+    const inputStr = entries.map(([k, v]) => `${k} = ${JSON.stringify(v)}`).join(', ');
+    return { input: inputStr, expected: String(tc.expected) };
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -100,7 +76,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid battle problem' }, { status: 400 });
     }
 
-    const { passed, total } = runTests(code, problem.id, problem.testCases);
+    const language = (body.language as string) || 'javascript';
+    const battleTestCases = convertBattleTestCases(problem.testCases);
+    const { passed, total } = await executeBattleCode(
+      code,
+      language as any,
+      problem.id,
+      battleTestCases,
+      5000,
+      512000,
+    );
     const score = total > 0 ? Math.round((passed / total) * 100) : 0;
 
     const writeData: Record<string, any> = {

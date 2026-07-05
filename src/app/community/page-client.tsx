@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ const POST_TYPES: { value: string; label: string }[] = [
 
 export default function CommunityPage() {
   const { user } = useUser();
+  const router = useRouter();
   const { toast } = useToast();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +91,17 @@ export default function CommunityPage() {
   const handleLike = async (postId: string) => {
     if (!user) return;
     await likePost(postId, user.uid);
-    setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + (p.likedBy?.includes(user.uid) ? -1 : 1) } as any : p));
+    setPosts(prev => prev.map(p => {
+      if (p.id !== postId) return p;
+      const liked = p.likedBy?.includes(user.uid);
+      return {
+        ...p,
+        likes: p.likes + (liked ? -1 : 1),
+        likedBy: liked
+          ? (p.likedBy || []).filter((id: string) => id !== user.uid)
+          : [...(p.likedBy || []), user.uid],
+      };
+    }));
   };
 
   const getTimeAgo = (date: string) => {
@@ -155,7 +167,7 @@ export default function CommunityPage() {
                           <Clock className="w-3 h-3" /> {getTimeAgo(post.createdAt)}
                         </span>
                       </div>
-                      <h3 className="font-medium mt-1">{post.title}</h3>
+                      <h3 className="font-medium mt-1 cursor-pointer hover:text-primary transition-colors" onClick={() => router.push(`/community/posts/${post.id}`)}>{post.title}</h3>
                       <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{post.content}</p>
                       {post.code && (
                         <pre className="mt-2 p-3 rounded bg-muted/30 border border-border text-sm font-mono overflow-x-auto">
@@ -177,11 +189,11 @@ export default function CommunityPage() {
                       <Heart className={cn('w-3.5 h-3.5', post.likedBy?.includes(user?.uid || '') && 'fill-primary text-primary')} />
                       {post.likes}
                     </Button>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => router.push(`/community/posts/${post.id}`)}>
                       <MessageSquare className="w-3.5 h-3.5" />
                       {post.comments}
                     </Button>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`); toast({ title: 'Link copied!' }); }}>
                       <Share2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>

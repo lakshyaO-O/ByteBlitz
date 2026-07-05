@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { getDoc, doc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, increment } from 'firebase/firestore';
+import { getDoc, doc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, increment, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
@@ -50,16 +50,13 @@ export default function PostDetailPage() {
     const { firestore: db } = initializeFirebase();
     if (!db) return;
     const ref = doc(db, 'communityPosts', post.id);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data();
-    const likedBy = data.likedBy || [];
-    if (likedBy.includes(user.uid)) {
-      await updateDoc(ref, { likes: increment(-1), likedBy: likedBy.filter((u: string) => u !== user.uid) });
-      setPost({ ...post, likes: post.likes - 1 });
+    const liked = post.likedBy?.includes(user.uid);
+    if (liked) {
+      await updateDoc(ref, { likes: increment(-1), likedBy: arrayRemove(user.uid) });
+      setPost({ ...post, likes: post.likes - 1, likedBy: (post.likedBy || []).filter((u: string) => u !== user.uid) });
     } else {
-      await updateDoc(ref, { likes: increment(1), likedBy: [...likedBy, user.uid] });
-      setPost({ ...post, likes: post.likes + 1 });
+      await updateDoc(ref, { likes: increment(1), likedBy: arrayUnion(user.uid) });
+      setPost({ ...post, likes: post.likes + 1, likedBy: [...(post.likedBy || []), user.uid] });
     }
   };
 
@@ -168,14 +165,14 @@ export default function PostDetailPage() {
 
             <div className="flex items-center gap-1 pt-3 border-t border-border">
               <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={handleLike}>
-                <Heart className={cn('w-3.5 h-3.5')} />
+                <Heart className={cn('w-3.5 h-3.5', post.likedBy?.includes(user?.uid || '') && 'fill-primary text-primary')} />
                 {post.likes}
               </Button>
               <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
                 <MessageSquare className="w-3.5 h-3.5" />
                 {post.comments}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`); toast({ title: 'Link copied!' }); }}>
                 <Share2 className="w-3.5 h-3.5" />
               </Button>
             </div>

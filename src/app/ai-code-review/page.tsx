@@ -62,12 +62,14 @@ export default function AICodeReviewPage() {
     setFeedback(null);
 
     try {
-      const res = await fetch('/api/ai/mentor', {
+      const res = await fetch('/api/ai/debugger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `Review this ${language} code:\n\n${code}`,
-          mode: 'code-review',
+          code,
+          language,
+          action: 'review',
+          expectedBehavior: 'Review this code for quality, best practices, and potential issues.',
         }),
       });
 

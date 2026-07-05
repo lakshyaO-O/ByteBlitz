@@ -27,7 +27,7 @@ import {
   Zap, Trophy, Target, UserCheck, UserX, Crown, Ban, Upload,
 } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
-import { UserProfile } from '@/app/lib/types';
+import { fetchAllUsers, toggleBanUser, getPlatformAnalytics } from '@/services/admin';
 import { seedProblemsToFirestore } from '@/services/seed-data';
 
 function generateSearchTokens(title: string, topics: string[], category: string): string[] {
@@ -502,24 +502,86 @@ function FeatureFlagsPanel() {
 }
 
 function ContentModeration() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAllUsers().then(data => { setUsers(data.filter((u: any) => u.banned)); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  const handleToggleBan = async (uid: string, banned: boolean) => {
+    try {
+      await toggleBanUser(uid, !banned);
+      if (banned) {
+        setUsers(prev => prev.filter(u => u.id !== uid));
+      }
+    } catch { /* ignore */ }
+  };
+
+  if (loading) return <div className="p-8 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>;
+
   return (
     <Card className="bg-card/50 border-border">
-      <CardContent className="p-8 text-center">
-        <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-        <p className="text-muted-foreground">Content moderation tools ready. Add reported content and user reports here.</p>
+      <CardHeader><CardTitle className="text-sm">Banned Users</CardTitle></CardHeader>
+      <CardContent>
+        {users.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No banned users.</p>
+        ) : (
+          <div className="space-y-2">
+            {users.map((u: any) => (
+              <div key={u.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                <div>
+                  <p className="text-sm font-medium">{u.username || u.email || u.id}</p>
+                  <p className="text-xs text-muted-foreground">{u.email}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => handleToggleBan(u.id, true)}>Unban</Button>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
 function ReportsAnalytics() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPlatformAnalytics().then(data => { setStats(data); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="p-8 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>;
+  if (!stats) return <p className="text-sm text-muted-foreground p-8 text-center">Failed to load analytics.</p>;
+
   return (
-    <Card className="bg-card/50 border-border">
-      <CardContent className="p-8 text-center">
-        <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-        <p className="text-muted-foreground">Platform analytics and reports dashboard.</p>
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{stats.totalUsers}</p>
+        <p className="text-xs text-muted-foreground">Total Users</p>
+      </Card>
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{stats.totalSubmissions}</p>
+        <p className="text-xs text-muted-foreground">Submissions</p>
+      </Card>
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{stats.totalProblems}</p>
+        <p className="text-xs text-muted-foreground">Problems</p>
+      </Card>
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{stats.solvedProblems}</p>
+        <p className="text-xs text-muted-foreground">Solved</p>
+      </Card>
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{(stats.totalXp || 0).toLocaleString()}</p>
+        <p className="text-xs text-muted-foreground">Total XP</p>
+      </Card>
+      <Card className="bg-card/50 border-border p-4 text-center">
+        <p className="text-xl font-bold">{(stats.totalCoins || 0).toLocaleString()}</p>
+        <p className="text-xs text-muted-foreground">Total Coins</p>
+      </Card>
+    </div>
   );
 }
 

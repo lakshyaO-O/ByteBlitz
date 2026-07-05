@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, Code2, Calendar, ShoppingBag, Brain,
   BarChart3, Settings, ChevronLeft, LogOut, Menu, Shield,
-  X, Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -72,7 +71,7 @@ function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?: () => 
                   : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/30',
               )}
             >
-              <item.icon className={cn('w-4.5 h-4.5 shrink-0', isActive && 'text-primary')} />
+              <item.icon className={cn('w-4 h-4 shrink-0', isActive && 'text-primary')} />
               {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );

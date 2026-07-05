@@ -41,6 +41,10 @@ export default function ProblemsPage() {
     return matchesSearch && matchesFilter;
   });
 
+  const easyCount = (problems || []).filter((p: any) => p.difficulty === 'Easy').length;
+  const mediumCount = (problems || []).filter((p: any) => p.difficulty === 'Medium').length;
+  const hardCount = (problems || []).filter((p: any) => p.difficulty === 'Hard').length;
+
   return (
     <Shell>
       <div className="space-y-8">
@@ -54,9 +58,9 @@ export default function ProblemsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DifficultyCard label="Easy" color="text-emerald-400" bgColor="bg-emerald-500/10" />
-          <DifficultyCard label="Medium" color="text-primary" bgColor="bg-primary/10" />
-          <DifficultyCard label="Hard" color="text-destructive" bgColor="bg-destructive/10" />
+          <DifficultyCard label="Easy" color="text-emerald-400" bgColor="bg-emerald-500/10" count={easyCount} />
+          <DifficultyCard label="Medium" color="text-primary" bgColor="bg-primary/10" count={mediumCount} />
+          <DifficultyCard label="Hard" color="text-destructive" bgColor="bg-destructive/10" count={hardCount} />
         </div>
 
         <Card className="bg-card/50 border-border">
@@ -138,7 +142,7 @@ export default function ProblemsPage() {
                       </td>
                       <td className="p-4 text-right">
                         <Button asChild variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link href={`/practice`}>
+                          <Link href={`/practice?problem=${problem.id}`}>
                             SOLVE <ChevronRight className="ml-1 w-4 h-4" />
                           </Link>
                         </Button>
@@ -164,7 +168,7 @@ export default function ProblemsPage() {
   );
 }
 
-function DifficultyCard({ label, color, bgColor }: { label: string; color: string; bgColor: string }) {
+function DifficultyCard({ label, color, bgColor, count }: { label: string; color: string; bgColor: string; count: number }) {
   return (
     <Card className="bg-card/50 border-border relative overflow-hidden group">
       <CardContent className="p-6 space-y-4">
@@ -172,11 +176,7 @@ function DifficultyCard({ label, color, bgColor }: { label: string; color: strin
           <div className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest", bgColor, color)}>
             {label}
           </div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex justify-between text-2xl font-headline font-black text-foreground">
-             <Brain className={cn("w-6 h-6", color)} />
-          </div>
+          <span className="text-2xl font-headline font-black text-foreground">{count}</span>
         </div>
       </CardContent>
     </Card>

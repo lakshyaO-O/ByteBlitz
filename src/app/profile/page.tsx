@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,26 +9,23 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  User, Zap, Trophy, BookOpen, Target, Medal, Calendar, Edit3, Loader2,
-  Activity, Gift, Share2, Flame, Star, CheckCircle2, Sword, Sparkles,
-  GraduationCap, Code2, Swords, Clock, TrendingUp, Gem,
+  Zap, Trophy, BookOpen, Target, Medal, Edit3, Loader2,
+  Activity, Gift, Flame, Star, CheckCircle2, Sword, Sparkles,
+  GraduationCap, Swords, TrendingUp,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
 import { useDoc } from '@/firebase/firestore/use-doc';
-import { useFirestore } from '@/firebase/provider';
 import { useAppStore } from '@/store/app-store';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { DailyLoginRewards } from '@/components/gamification/DailyLoginRewards';
-import { ActivityFeed } from '@/components/social/ActivityFeed';
 import { ShareAchievement } from '@/components/social/ShareAchievement';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useUser();
-  const db = useFirestore();
+  const router = useRouter();
   const { data: profile, loading: profileLoading } = useDoc(user ? `users/${user.uid}` : null);
   const { state } = useAppStore();
-  const { beginner } = state;
+  const beginner = state?.beginner || { name: '', xp: 0, streak: 0, lessonsCompleted: [] };
 
   const loading = authLoading || profileLoading;
 
@@ -86,7 +84,7 @@ export default function ProfilePage() {
                   <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-400" /> {beginner.streak} day streak</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" className="gap-1 text-xs">
+                  <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={() => router.push('/settings')}>
                     <Edit3 className="w-3 h-3" /> Edit Profile
                   </Button>
                   <ShareAchievement

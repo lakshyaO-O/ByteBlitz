@@ -90,12 +90,14 @@ export default function AIInterviewerPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/ai/mentor', {
+      const res = await fetch('/api/ai/interviewer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `Generate ${questionCount} ${difficulty} ${topic} interview questions. Return as JSON array with id, question, category, difficulty.`,
-          mode: 'interview-questions',
+          topic,
+          difficulty,
+          questionCount,
+          action: 'generate',
         }),
       });
 
@@ -129,12 +131,15 @@ export default function AIInterviewerPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/ai/mentor', {
+      const res = await fetch('/api/ai/interviewer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `Question: ${questions[currentIndex].question}\n\nMy Answer: ${answer}\n\nEvaluate this answer. Return JSON with score (0-100), feedback, strengths: string[], improvements: string[], suggestedAnswer: string.`,
-          mode: 'interview-feedback',
+          topic,
+          difficulty: questions[currentIndex].difficulty,
+          question: questions[currentIndex].question,
+          answer,
+          action: 'evaluate',
         }),
       });
 

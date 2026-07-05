@@ -11,9 +11,9 @@ import type {
   UserPracticeProgress, RecentlyViewedProblem, CodingLanguage,
   ProblemContent, ProblemDocumentMeta, PracticeDraft, TestCaseResult,
 } from '@/types';
-import { createMockJudge } from '@/features/practice/services/mock-judge';
+import { createApiJudge } from '@/features/practice/services/api-judge';
 
-const judge = createMockJudge();
+const judge = createApiJudge();
 
 export async function fetchProblems(): Promise<PracticeProblemDocument[]> {
   const { firestore: db } = initializeFirebase();

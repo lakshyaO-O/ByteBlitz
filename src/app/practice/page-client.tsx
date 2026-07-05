@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -239,12 +240,23 @@ export default function PracticePage() {
   const loading = problemsLoading || progressLoading || authLoading;
   const totalProblemsCount = problems.length;
 
+  const searchParams = useSearchParams();
+
   const handleStartProblem = useCallback((problem: PracticeProblemDocument | null) => {
     if (!problem) return;
     if (isBeginner && !canAccess(problem.difficulty)) return;
     trackRecent({ id: problem.id, title: problem.title, difficulty: problem.difficulty });
     setSelectedProblem(problem);
   }, [isBeginner, canAccess, trackRecent]);
+
+  useEffect(() => {
+    if (!problems.length || loading) return;
+    const problemId = searchParams.get('problem');
+    if (problemId) {
+      const p = problems.find(pr => pr.id === problemId) || getStaticProblemById(problemId);
+      if (p) handleStartProblem(p);
+    }
+  }, [searchParams, problems, loading, handleStartProblem]);
 
   const handleRandomProblem = useCallback(() => {
     const unsolved = problems.filter(p => !progress[p.id]?.solved);
@@ -271,8 +283,12 @@ export default function PracticePage() {
     if (p) handleStartProblem(p);
   }, [problems, handleStartProblem]);
 
-  const handleTopicClick = useCallback((_topicName: string) => {
-  }, []);
+  const handleTopicClick = useCallback((topicName: string) => {
+    const topicProblems = problems.filter(p => p.topics?.includes(topicName as any));
+    if (topicProblems.length > 0) {
+      setSelectedProblem(topicProblems[0]);
+    }
+  }, [problems]);
 
   const currentIndex = selectedProblem ? problems.findIndex(p => p.id === selectedProblem.id) : -1;
   const onPrevProblem = useCallback(() => {

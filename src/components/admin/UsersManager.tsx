@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Search, X, Shield, ShieldBan, ShieldCheck, UserCog, Ban, CheckCircle2,
-  Loader2, ChevronDown, ChevronUp, RefreshCw, Filter,
+  Loader2, ChevronDown, ChevronUp, RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
