@@ -32,6 +32,7 @@ const ALLOWED_REDIRECTS = new Set([
   '/learning',
   '/friends',
   '/achievements',
+  '/admin/setup',
   '/',
 ]);
 
