@@ -69,8 +69,8 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
-          const data = await res.json();
-          setUserRole(data.role || 'user');
+          const text = await res.text();
+          try { setUserRole(JSON.parse(text).role || 'user'); } catch {}
         }
       } catch {
         // fallback: keep default 'user' role

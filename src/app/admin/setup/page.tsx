@@ -24,7 +24,15 @@ export default function AdminSetupPage() {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setStatus('error');
+        setMessage(`Server returned HTML instead of JSON. Status ${res.status}. Your Firebase Admin env vars (FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY) may be missing in Vercel.`);
+        return;
+      }
       if (res.ok) {
         setStatus('success');
         setMessage(`Account promoted to ${data.role}. You can now access the admin panel.`);
