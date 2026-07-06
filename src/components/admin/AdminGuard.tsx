@@ -28,11 +28,8 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<AdminVerificationResult | null>(null);
   const [checked, setChecked] = useState(false);
 
-  if (EXEMPTED_PATHS.has(pathname)) {
-    return <>{children}</>;
-  }
-
   useEffect(() => {
+    if (EXEMPTED_PATHS.has(pathname)) return;
     if (authLoading) return;
     if (!user) {
       router.replace('/auth?mode=login&redirect=/admin');
@@ -72,7 +69,9 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     };
 
     verify();
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, pathname]);
+
+  if (EXEMPTED_PATHS.has(pathname)) return <>{children}</>;
 
   if (authLoading || !checked) return <LoadingScreen message="Verifying access..." />;
   if (!status?.isAdmin) {
