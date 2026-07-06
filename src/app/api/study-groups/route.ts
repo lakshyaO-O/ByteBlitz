@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ groups });
   } catch (err: any) {
     console.error('[Study Groups GET] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -75,6 +75,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ id: ref.id, success: true }, { status: 201 });
   } catch (err: any) {
     console.error('[Study Groups POST] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

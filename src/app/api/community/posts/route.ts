@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ posts, page, hasMore: posts.length === limitCount });
   } catch (err: any) {
     console.error('[Community Posts GET] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -77,6 +77,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ id: ref.id, success: true }, { status: 201 });
   } catch (err: any) {
     console.error('[Community Posts POST] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

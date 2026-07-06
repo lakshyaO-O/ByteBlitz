@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items });
   } catch (err: any) {
     console.error('[Shop Items GET] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -94,6 +94,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error('[Shop Purchase] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

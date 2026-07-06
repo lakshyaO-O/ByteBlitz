@@ -70,6 +70,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ logs, total: snapshot.size });
   } catch (err: any) {
     console.error('[Audit Logs] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

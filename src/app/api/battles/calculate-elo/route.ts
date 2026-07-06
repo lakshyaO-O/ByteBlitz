@@ -33,6 +33,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (err: any) {
     console.error('[ELO Calculate] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

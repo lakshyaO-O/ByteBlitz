@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ [section]: snap.exists ? snap.data() : null });
   } catch (err: any) {
     console.error('[Admin Settings GET] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -225,6 +225,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error('[Admin Settings POST] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

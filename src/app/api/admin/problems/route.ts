@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ problems, total: null, nextCursor, limit });
   } catch (err: any) {
     console.error('[Admin Problems GET] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -421,6 +421,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (err: any) {
     console.error('[Admin Problems] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }

@@ -68,6 +68,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: 'COMMUNITY',
     items: [
       { href: '/community', label: 'Feed', icon: MessageCircle },
+      { href: '/friends', label: 'Friends', icon: Users },
       { href: '/forum', label: 'Forum', icon: Globe },
       { href: '/code-share', label: 'Code Share', icon: Share2 },
       { href: '/chats', label: 'Messages', icon: MessageSquare },

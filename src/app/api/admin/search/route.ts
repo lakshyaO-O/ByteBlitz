@@ -128,6 +128,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results });
   } catch (err: any) {
     console.error('[Admin Search] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
   }
 }
