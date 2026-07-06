@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { executeBattleCode } from '@/services/judge-engine';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 interface TestCase {
   input?: string;
@@ -36,6 +37,8 @@ export async function POST(request: NextRequest) {
     }
 
     const uid = decodedToken.uid;
+    const rateCheck = checkRateLimit(uid, request);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
     const body = await request.json();
     const { battleId, code } = body;
 

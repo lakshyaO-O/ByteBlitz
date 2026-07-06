@@ -1,5 +1,9 @@
+import { verifyAuth } from '@/lib/verify-auth';
+
 export async function POST(req: Request) {
   try {
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
     const { topic, difficulty, questionCount, previousAnswers } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {

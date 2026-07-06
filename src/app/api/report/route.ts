@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +17,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
+    const uid = decodedToken.uid;
+    const rateCheck = checkRateLimit(uid, request);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
     const db = getAdminFirestore();
-    const reporterSnap = await db.collection('users').doc(decodedToken.uid).get();
+    const reporterSnap = await db.collection('users').doc(uid).get();
     if (!reporterSnap.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest) {
         targetType,
         targetId,
         targetLabel: targetLabel || '',
-        reporterId: decodedToken.uid,
+        reporterId: uid,
         reporterEmail: reporterSnap.data()!.email || '',
         reason,
         description: description || '',

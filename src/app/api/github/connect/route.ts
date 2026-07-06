@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,8 @@ export async function POST(request: NextRequest) {
     }
 
     const uid = decodedToken.uid;
+    const rateCheck = checkRateLimit(uid, request);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
     const { code } = await request.json();
 
     if (!code) {

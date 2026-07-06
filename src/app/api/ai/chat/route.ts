@@ -1,3 +1,5 @@
+import { verifyAuth } from '@/lib/verify-auth';
+
 const SYSTEM_PROMPT = `You are CodeAce — a friendly, enthusiastic coding assistant and platform guide built into DevRann (a competitive coding and learning platform).
 
 Your personality: upbeat, encouraging, use occasional emojis, and keep responses concise (2-4 paragraphs max).
@@ -38,6 +40,8 @@ Assistant:`;
 
 export async function POST(req: Request) {
   try {
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
     const { message, history } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {

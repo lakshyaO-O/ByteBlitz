@@ -62,33 +62,44 @@ export async function POST(request: NextRequest) {
     }
 
     const userRef = db.collection('users').doc(uid);
-    const userSnap = await userRef.get();
-
-    if (!userSnap.exists) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const userData = userSnap.data()!;
-    const balance = item.currency === 'coins' ? (userData.coins || 0) : item.currency === 'xp' ? (userData.xp || 0) : (userData.gems || 0);
-
-    if (balance < item.price) {
-      return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 });
-    }
-
-    const updateFields: Record<string, any> = {};
-    if (item.currency === 'coins') updateFields.coins = FieldValue.increment(-item.price);
-    else if (item.currency === 'xp') updateFields.xp = FieldValue.increment(-item.price);
-    else updateFields.gems = FieldValue.increment(-item.price);
-
-    await userRef.update(updateFields);
-
     const inventoryRef = db.collection('users').doc(uid).collection('inventory').doc('default');
-    const inventorySnap = await inventoryRef.get();
 
-    if (inventorySnap.exists) {
-      await inventoryRef.update({ items: FieldValue.arrayUnion(itemId) });
-    } else {
-      await inventoryRef.set({ userId: uid, items: [itemId], equipped: {} });
+    try {
+      await db.runTransaction(async (txn) => {
+        const userSnap = await txn.get(userRef);
+        if (!userSnap.exists) {
+          throw new Error('User not found');
+        }
+
+        const userData = userSnap.data()!;
+        const balance = item.currency === 'coins' ? (userData.coins || 0) : item.currency === 'xp' ? (userData.xp || 0) : (userData.gems || 0);
+
+        if (balance < item.price) {
+          throw new Error('Insufficient balance');
+        }
+
+        const updateFields: Record<string, any> = {};
+        if (item.currency === 'coins') updateFields.coins = FieldValue.increment(-item.price);
+        else if (item.currency === 'xp') updateFields.xp = FieldValue.increment(-item.price);
+        else updateFields.gems = FieldValue.increment(-item.price);
+
+        txn.update(userRef, updateFields);
+
+        const inventorySnap = await txn.get(inventoryRef);
+        if (inventorySnap.exists) {
+          txn.update(inventoryRef, { items: FieldValue.arrayUnion(itemId) });
+        } else {
+          txn.set(inventoryRef, { userId: uid, items: [itemId], equipped: {} });
+        }
+      });
+    } catch (txnErr: any) {
+      if (txnErr.message === 'User not found') {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+      if (txnErr.message === 'Insufficient balance') {
+        return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 });
+      }
+      throw txnErr;
     }
 
     return NextResponse.json({ success: true });

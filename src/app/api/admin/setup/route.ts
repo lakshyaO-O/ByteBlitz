@@ -34,6 +34,12 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getAdminFirestore();
+
+    const existing = await db.collection('users').where('role', '==', 'super_admin').limit(1).get();
+    if (!existing.empty && existing.docs[0].id !== uid) {
+      return NextResponse.json({ error: 'Setup already completed. A super_admin already exists.' }, { status: 403 });
+    }
+
     await db.collection('users').doc(uid).set(
       {
         role: 'super_admin',
