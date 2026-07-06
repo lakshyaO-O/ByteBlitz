@@ -3,20 +3,62 @@
 import { initializeFirebase } from '@/firebase';
 import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
-  query, where, orderBy, limit, serverTimestamp, runTransaction, increment,
+  query, where, orderBy, limit, serverTimestamp,
 } from 'firebase/firestore';
-import type { UserProfile, PracticeProblemDocument, SubmissionStatus } from '@/types';
+import { getAuth } from 'firebase/auth';
+import type { UserProfile } from '@/types';
+import type { AdminRole, AuditLog } from '@/types/admin';
+
+// ─── Helpers ───
+
+async function getAuthToken(): Promise<string | null> {
+  const auth = getAuth();
+  if (!auth?.currentUser) return null;
+  try {
+    return await auth.currentUser.getIdToken();
+  } catch {
+    return null;
+  }
+}
+
+async function adminApiCall(endpoint: string, body: Record<string, unknown>) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('Not authenticated');
+
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Admin API error');
+  return data;
+}
+
+async function adminApiGet(endpoint: string) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('Not authenticated');
+
+  const res = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Admin API error');
+  return data;
+}
 
 // ─── Auth Guard ───
 
-export async function checkAdmin(uid: string): Promise<{ isAdmin: boolean; role: string }> {
+export async function checkAdmin(uid: string): Promise<{ isAdmin: boolean; role: AdminRole }> {
   const { firestore: db } = initializeFirebase();
-  if (!db) return { isAdmin: false, role: '' };
+  if (!db) return { isAdmin: false, role: 'user' };
   const snap = await getDoc(doc(db, 'users', uid));
-  if (!snap.exists()) return { isAdmin: false, role: '' };
+  if (!snap.exists()) return { isAdmin: false, role: 'user' };
   const data = snap.data();
-  const role = data.role || (data.isAdmin ? 'admin' : 'user');
-  return { isAdmin: role === 'super_admin', role };
+  const role: AdminRole = data.role || (data.isAdmin ? 'admin' : 'user');
+  return { isAdmin: role === 'super_admin' || role === 'admin', role };
 }
 
 // ─── Dashboard Stats ───
@@ -36,13 +78,12 @@ export async function getAdminDashboardStats() {
   const proUsers = subsSnap.size;
   const shopItems = shopsSnap.size;
   const bannedUsers = usersSnap.docs.filter(d => d.data().banned === true).length;
-  const admins = usersSnap.docs.filter(d => d.data().isAdmin === true || d.data().role === 'super_admin').length;
+  const admins = usersSnap.docs.filter(d => d.data().isAdmin === true || d.data().role === 'super_admin' || d.data().role === 'admin').length;
 
   const totalXp = usersSnap.docs.reduce((sum, d) => sum + (d.data().xp || 0), 0);
   const totalCoins = usersSnap.docs.reduce((sum, d) => sum + (d.data().devcoins || 0), 0);
 
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
   const weekAgo = new Date(now.getTime() - 7 * 86400000);
   const activeUsers = usersSnap.docs.filter(d => {
     const la = d.data().lastActive?.toDate?.() || new Date(d.data().lastActive || 0);
@@ -73,87 +114,91 @@ export async function getAdminDashboardStats() {
   };
 }
 
-// ─── User Management ───
+// ─── User Management (reads via Firestore, writes via API) ───
 
 export async function fetchAllUsers(): Promise<UserProfile[]> {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return [];
-  const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(500));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as UserProfile));
+  const data = await adminApiGet('/api/admin/users?limit=500');
+  return data.users || [];
 }
 
-export async function updateUserRole(uid: string, role: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await updateDoc(doc(db, 'users', uid), {
-    role,
-    isAdmin: role === 'super_admin' || role === 'admin',
-    updatedAt: serverTimestamp(),
-  });
+export async function bulkUserAction(uids: string[], bulkAction: 'ban' | 'unban' | 'updateRole', role?: AdminRole) {
+  return adminApiCall('/api/admin/users', { action: 'bulk', data: { uids, bulkAction, role } });
+}
+
+export async function updateUserRole(uid: string, role: AdminRole) {
+  return adminApiCall('/api/admin/users', { action: 'updateRole', targetUid: uid, data: { role } });
 }
 
 export async function toggleBanUser(uid: string, banned: boolean) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await updateDoc(doc(db, 'users', uid), {
-    banned,
-    updatedAt: serverTimestamp(),
-  });
+  return adminApiCall('/api/admin/users', { action: banned ? 'ban' : 'unban', targetUid: uid, data: {} });
 }
 
 export async function updateUserProfile(uid: string, data: Partial<UserProfile>) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
   const { id, ...clean } = data as any;
-  await updateDoc(doc(db, 'users', uid), { ...clean, updatedAt: serverTimestamp() });
+  return adminApiCall('/api/admin/users', { action: 'updateProfile', targetUid: uid, data: clean });
 }
 
 export async function deleteUserDoc(uid: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await deleteDoc(doc(db, 'users', uid));
+  return adminApiCall('/api/admin/users', { action: 'delete', targetUid: uid, data: {} });
 }
 
-// ─── Problem Management ───
+// ─── Problem Management (reads via Firestore, writes via API) ───
 
 export async function fetchAdminProblems() {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return [];
-  const q = query(collection(db, 'problems'), orderBy('title', 'asc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const token = await getAuthToken();
+  if (!token) return [];
+  try {
+    const res = await fetch('/api/admin/problems', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.problems || [];
+    }
+  } catch {}
+  return [];
+}
+
+export async function fetchProblemWithContent(id: string) {
+  const token = await getAuthToken();
+  if (!token) return null;
+  const res = await fetch(`/api/admin/problems?id=${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 export async function createProblem(data: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const ref = await addDoc(collection(db, 'problems'), {
-    ...data,
-    isPublished: true,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return ref.id;
+  return adminApiCall('/api/admin/problems', { action: 'create', data });
 }
 
-export async function updateProblem(id: string, data: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await updateDoc(doc(db, 'problems', id), { ...data, updatedAt: serverTimestamp() });
+export async function saveProblemContent(id: string, data: any) {
+  return adminApiCall('/api/admin/problems', { action: 'saveContent', problemId: id, data });
 }
 
 export async function deleteProblem(id: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await deleteDoc(doc(db, 'problems', id));
-  try { await deleteDoc(doc(db, 'problemContent', id)); } catch { /* ignore */ }
+  return adminApiCall('/api/admin/problems', { action: 'delete', problemId: id, data: {} });
 }
 
-export async function saveProblemContent(id: string, content: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await setDoc(doc(db, 'problemContent', id), content, { merge: true });
+export async function toggleProblemPublish(id: string) {
+  return adminApiCall('/api/admin/problems', { action: 'togglePublish', problemId: id, data: {} });
+}
+
+export async function archiveProblem(id: string) {
+  return adminApiCall('/api/admin/problems', { action: 'archive', problemId: id, data: {} });
+}
+
+export async function restoreProblem(id: string) {
+  return adminApiCall('/api/admin/problems', { action: 'restore', problemId: id, data: {} });
+}
+
+export async function getProblemVersions(id: string) {
+  return adminApiCall('/api/admin/problems', { action: 'getVersions', problemId: id, data: {} });
+}
+
+export async function restoreProblemVersion(id: string, versionId: string) {
+  return adminApiCall('/api/admin/problems', { action: 'restoreVersion', problemId: id, data: { versionId } });
 }
 
 // ─── Challenge Management ───
@@ -188,7 +233,7 @@ export async function getAdminChallenges() {
   };
 }
 
-// ─── Shop Management ───
+// ─── Shop Management (reads via Firestore, writes via API) ───
 
 export async function fetchShopItems() {
   const { firestore: db } = initializeFirebase();
@@ -199,26 +244,15 @@ export async function fetchShopItems() {
 }
 
 export async function createShopItem(data: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const ref = await addDoc(collection(db, 'shop'), {
-    ...data,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return ref.id;
+  return adminApiCall('/api/admin/shop', { action: 'create', data });
 }
 
 export async function updateShopItem(id: string, data: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await updateDoc(doc(db, 'shop', id), { ...data, updatedAt: serverTimestamp() });
+  return adminApiCall('/api/admin/shop', { action: 'update', itemId: id, data });
 }
 
 export async function deleteShopItem(id: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await deleteDoc(doc(db, 'shop', id));
+  return adminApiCall('/api/admin/shop', { action: 'delete', itemId: id, data: {} });
 }
 
 // ─── AI Usage Monitoring ───
@@ -266,7 +300,6 @@ export async function getPlatformAnalytics() {
   const totalXp = usersSnap.docs.reduce((sum, d) => sum + (d.data().xp || 0), 0);
   const totalCoins = usersSnap.docs.reduce((sum, d) => sum + (d.data().devcoins || 0), 0);
 
-  // Submissions over time (last 14 days)
   const dailySubs: Record<string, number> = {};
   const dailyAccepted: Record<string, number> = {};
   const now = Date.now();
@@ -283,7 +316,6 @@ export async function getPlatformAnalytics() {
     }
   }
 
-  // Difficulty distribution
   const byDifficulty: Record<string, number> = { Easy: 0, Medium: 0, Hard: 0 };
   problemsSnap.docs.forEach(d => {
     const diff = d.data().difficulty || 'Easy';
@@ -303,7 +335,7 @@ export async function getPlatformAnalytics() {
   };
 }
 
-// ─── Settings ───
+// ─── Settings (reads via Firestore, writes via API) ───
 
 export async function getFeatureFlags() {
   const { firestore: db } = initializeFirebase();
@@ -313,9 +345,7 @@ export async function getFeatureFlags() {
 }
 
 export async function updateFeatureFlags(flags: Record<string, boolean>) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await setDoc(doc(db, 'config', 'featureFlags'), flags, { merge: true });
+  return adminApiCall('/api/admin/settings', { section: 'featureFlags', data: flags });
 }
 
 export async function getPlatformSettings() {
@@ -326,7 +356,25 @@ export async function getPlatformSettings() {
 }
 
 export async function updatePlatformSettings(settings: any) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await setDoc(doc(db, 'config', 'settings'), settings, { merge: true });
+  return adminApiCall('/api/admin/settings', { section: 'settings', data: settings });
+}
+
+// ─── Audit Logs ───
+
+export async function fetchAuditLogs(params?: {
+  limit?: number;
+  action?: string;
+  targetType?: string;
+  performedBy?: string;
+  severity?: string;
+}): Promise<{ logs: AuditLog[]; total: number }> {
+  const searchParams = new URLSearchParams();
+  if (params?.limit) searchParams.set('limit', String(params.limit));
+  if (params?.action) searchParams.set('action', params.action);
+  if (params?.targetType) searchParams.set('targetType', params.targetType);
+  if (params?.performedBy) searchParams.set('performedBy', params.performedBy);
+  if (params?.severity) searchParams.set('severity', params.severity);
+
+  const query = searchParams.toString();
+  return adminApiGet(`/api/admin/audit-logs${query ? `?${query}` : ''}`);
 }

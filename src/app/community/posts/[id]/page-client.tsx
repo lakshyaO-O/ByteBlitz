@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent } from '@/components/ui/card';
+import { ReportButton } from '@/components/admin/ReportButton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +15,7 @@ import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
-  Heart, MessageSquare, Share2, ArrowLeft, Clock, Loader2, Send, Reply,
+  Heart, MessageSquare, Share2, ArrowLeft, Clock, Loader2, Send, Reply, Flag,
 } from 'lucide-react';
 import type { CommunityPost, PostComment } from '@/types';
 
@@ -175,6 +176,7 @@ export default function PostDetailPage() {
               <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`); toast({ title: 'Link copied!' }); }}>
                 <Share2 className="w-3.5 h-3.5" />
               </Button>
+              <ReportButton targetType="post" targetId={post.id} targetLabel={post.title} />
             </div>
           </CardContent>
         </Card>

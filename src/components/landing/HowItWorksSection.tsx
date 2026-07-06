@@ -7,22 +7,22 @@ const steps = [
   {
     icon: UserPlus,
     title: 'Create Your Account',
-    desc: 'Sign up in seconds with email or Google. Pick your handle and enter the arena.',
+    desc: 'Sign up in seconds with email or Google. No credit card required.',
   },
   {
     icon: Code2,
-    title: 'Practice Coding',
-    desc: 'Hone your skills with challenges across multiple languages and difficulty levels.',
+    title: 'Practice Problems',
+    desc: 'Solve curated DSA challenges across multiple difficulty levels. Get instant test case feedback.',
   },
   {
     icon: Swords,
-    title: 'Compete with Players',
-    desc: 'Join matchmaking or create private rooms. Battle opponents in real-time coding duels.',
+    title: 'Battle in the Arena',
+    desc: 'Queue for matchmaking or create private rooms. Face opponents in real-time coding duels.',
   },
   {
     icon: TrendingUp,
-    title: 'Improve Your Rank',
-    desc: 'Climb the global leaderboard. Earn XP, unlock tiers, and master the craft.',
+    title: 'Climb the Ranks',
+    desc: 'Win battles to earn ELO rating. Track your progress, earn achievements, and level up.',
   },
 ];
 
@@ -50,12 +50,12 @@ export function HowItWorksSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tight text-foreground uppercase mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-bold tracking-tight text-foreground mb-4">
             How It{' '}
             <span className="text-primary">Works</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base">
-            Four simple steps to start your competitive coding journey.
+            Get started in minutes. Practice, battle, and improve.
           </p>
         </motion.div>
 
@@ -73,7 +73,7 @@ export function HowItWorksSection() {
               className="relative text-center group"
             >
               <div className="relative mb-6">
-                <div className="w-16 h-16 mx-auto bg-card border border-border group-hover:border-primary/50 transition-colors duration-300 flex items-center justify-center rounded-none">
+                <div className="w-16 h-16 mx-auto bg-card border border-border group-hover:border-primary/50 transition-colors duration-300 flex items-center justify-center">
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
                 {index < steps.length - 1 && (
@@ -85,7 +85,7 @@ export function HowItWorksSection() {
                 {index + 1}
               </div>
 
-              <h3 className="text-base font-headline font-bold text-foreground uppercase tracking-tight mb-2">
+              <h3 className="text-base font-headline font-bold text-foreground tracking-tight mb-2">
                 {step.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">

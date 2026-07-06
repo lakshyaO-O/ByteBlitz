@@ -3,15 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase/auth/use-user';
-import { checkAdmin } from '@/services/admin';
-import { ShieldBan } from 'lucide-react';
+import { getAuth } from 'firebase/auth';
+import { Shield } from 'lucide-react';
+import type { AdminRole, AdminVerificationResult } from '@/types/admin';
+import { ROLE_PERMISSIONS } from '@/types/admin';
 
 function LoadingScreen({ message }: { message?: string }) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="text-center space-y-3">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-muted-foreground font-mono">{message || 'Loading...'}</p>
+        <div className="w-5 h-5 border-[1.5px] border-foreground/20 border-t-foreground/60 rounded-full animate-spin mx-auto" />
+        <p className="text-xs text-muted-foreground">{message || 'Loading...'}</p>
       </div>
     </div>
   );
@@ -20,9 +22,8 @@ function LoadingScreen({ message }: { message?: string }) {
 export function AdminGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useUser();
   const router = useRouter();
-  const [adminStatus, setAdminStatus] = useState<{ checked: boolean; isAdmin: boolean; role: string }>({
-    checked: false, isAdmin: false, role: '',
-  });
+  const [status, setStatus] = useState<AdminVerificationResult | null>(null);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -30,23 +31,54 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
       router.replace('/auth?mode=login&redirect=/admin');
       return;
     }
-    checkAdmin(user.uid).then(result => {
-      setAdminStatus({ checked: true, ...result });
-      if (!result.isAdmin) {
-        setTimeout(() => router.replace('/dashboard'), 2000);
+
+    const verify = async () => {
+      try {
+        // Try server-side verification first
+        const auth = getAuth();
+        const token = await auth.currentUser?.getIdToken();
+        if (token) {
+          const res = await fetch('/api/admin/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setStatus({
+              uid: data.uid,
+              role: data.role,
+              isAdmin: data.isAdmin,
+              permissions: data.permissions || [],
+            });
+            setChecked(true);
+            if (!data.isAdmin) {
+              setTimeout(() => router.replace('/dashboard'), 2000);
+            }
+            return;
+          }
+        }
+      } catch {
+        // Server verification unavailable - deny access rather than trust client
       }
-    });
+
+      setStatus({ uid: user.uid, role: 'user', isAdmin: false, permissions: [] });
+      setChecked(true);
+    };
+
+    verify();
   }, [user, authLoading, router]);
 
-  if (authLoading || !adminStatus.checked) return <LoadingScreen message="Verifying access..." />;
-  if (!adminStatus.isAdmin) {
+  if (authLoading || !checked) return <LoadingScreen message="Verifying access..." />;
+  if (!status?.isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center space-y-4 max-w-md px-6">
-          <ShieldBan className="w-16 h-16 text-destructive mx-auto" />
-          <h1 className="text-2xl font-headline font-black text-foreground">Access Denied</h1>
-          <p className="text-muted-foreground">
-            You need the <strong>super_admin</strong> role to access the admin panel. Redirecting...
+        <div className="text-center space-y-3 max-w-sm px-6">
+          <div className="w-10 h-10 rounded-full bg-foreground/5 border border-border flex items-center justify-center mx-auto">
+            <Shield className="w-5 h-5 text-foreground/30" />
+          </div>
+          <h1 className="text-base font-semibold text-foreground">Access Denied</h1>
+          <p className="text-sm text-muted-foreground">
+            You need <strong>admin</strong> or <strong>super_admin</strong> role to access this panel.
           </p>
         </div>
       </div>

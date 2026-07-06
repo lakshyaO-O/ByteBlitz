@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 declare global {
   interface Window {
@@ -39,10 +39,35 @@ function usePageViewTracking() {
   }, [pathname]);
 }
 
+function useConsentState() {
+  const [consented, setConsented] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('devrann-cookie-consent');
+    if (stored === 'accepted') {
+      setConsented(true);
+    }
+
+    const handleAccept = () => setConsented(true);
+    const handleReject = () => setConsented(false);
+
+    window.addEventListener('cookie-consent-accepted', handleAccept);
+    window.addEventListener('cookie-consent-rejected', handleReject);
+
+    return () => {
+      window.removeEventListener('cookie-consent-accepted', handleAccept);
+      window.removeEventListener('cookie-consent-rejected', handleReject);
+    };
+  }, []);
+
+  return consented;
+}
+
 export default function GoogleAnalytics() {
+  const consented = useConsentState();
   usePageViewTracking();
 
-  if (!GA_MEASUREMENT_ID) return null;
+  if (!GA_MEASUREMENT_ID || !consented) return null;
 
   return (
     <>

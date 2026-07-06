@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Swords, Trophy, Settings, Menu, LogOut,
-  Users, BarChart3, UserCircle, Bell, Search, Gamepad2,
+  Users, BarChart3, UserCircle, Bell, Search,
   ChevronLeft, Code2, LogIn, UserPlus, GraduationCap, BookOpen,
-  Crown, Sparkles, Bug, Brain, Briefcase, MessageCircle,
-  Share2, Globe, Rocket, Store, MessageSquare, Eye,
-  ChevronDown, Lightbulb, X, Gem,
+  Crown, Sparkles, Bug, Target, MessageCircle, MessageSquare,
+  Share2, Globe, Eye,
+  ChevronDown, X, Gem,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -49,63 +49,35 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: 'CODING',
     items: [
-      { href: '/arena', label: 'Arena', icon: Swords },
-      { href: '/arena/custom-study', label: 'Study Room', icon: BookOpen },
       { href: '/practice', label: 'Practice', icon: Code2 },
-      { href: '/learning', label: 'Learning', icon: GraduationCap },
+      { href: '/arena', label: 'Arena', icon: Swords },
+      { href: '/learning', label: 'Learn', icon: GraduationCap },
       { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
     ],
   },
   {
-    label: 'AI TOOLS',
+    label: 'TOOLS',
     items: [
       { href: '/ai-mentor', label: 'AI Mentor', icon: Sparkles },
       { href: '/ai-code-review', label: 'Code Review', icon: Code2 },
-      { href: '/ai-debugger', label: 'AI Debugger', icon: Bug },
-      { href: '/ai-interviewer', label: 'AI Interviewer', icon: Brain },
+      { href: '/problems', label: 'Problems', icon: BookOpen },
+      { href: '/challenges', label: 'Challenges', icon: Target },
     ],
   },
   {
     label: 'COMMUNITY',
     items: [
-      { href: '/community', label: 'Community', icon: MessageCircle },
+      { href: '/community', label: 'Feed', icon: MessageCircle },
       { href: '/forum', label: 'Forum', icon: Globe },
       { href: '/code-share', label: 'Code Share', icon: Share2 },
-    ],
-  },
-  {
-    label: 'CAREER',
-    items: [
-      { href: '/career-hub', label: 'Career Hub', icon: Briefcase },
-    ],
-  },
-  {
-    label: 'EVENTS',
-    items: [
-      { href: '/hackathons', label: 'Hackathons', icon: Rocket },
-    ],
-  },
-  {
-    label: 'GAMIFICATION',
-    items: [
-      { href: '/missions', label: 'Missions', icon: Lightbulb },
-      { href: '/shop', label: 'Shop', icon: Store },
-      { href: '/progress', label: 'Progress', icon: BarChart3 },
-    ],
-  },
-  {
-    label: 'SOCIAL',
-    items: [
       { href: '/chats', label: 'Messages', icon: MessageSquare },
-      { href: '/friends', label: 'Friends', icon: Users },
-      { href: '/rooms', label: 'Rooms', icon: Gamepad2 },
     ],
   },
   {
     items: [
-      { href: '/profile', label: 'My Profile', icon: UserCircle },
-      { href: '/monetization', label: 'Premium', icon: Crown },
+      { href: '/profile', label: 'Profile', icon: UserCircle },
       { href: '/settings', label: 'Settings', icon: Settings },
+      { href: '/monetization', label: 'Premium', icon: Crown },
     ],
   },
 ];
@@ -442,7 +414,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       .then((snap) => {
         if (snap.exists()) setProfile({ id: snap.id, ...snap.data() });
       })
-      .catch(() => {});
+      .catch((err) => console.error('[Shell] Failed to load user profile', err));
   }, [firestore, user]);
 
   const profileData = profile;

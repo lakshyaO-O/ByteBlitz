@@ -191,7 +191,7 @@ function AuthForm() {
       name: displayName.toLowerCase(),
       userId,
       claimedAt: serverTimestamp(),
-    }).catch(() => {});
+    }).catch((err) => console.warn('[Auth] Username claim may have failed (possible duplicate)', err));
 
     await setDoc(doc(db, 'leaderboard', userId), {
       userId,
@@ -203,7 +203,7 @@ function AuthForm() {
       period: 'all-time',
       periodStart: serverTimestamp(),
       periodEnd: serverTimestamp(),
-    }, { merge: true }).catch(() => {});
+    }, { merge: true }).catch((err) => console.warn('[Auth] Leaderboard entry creation failed', err));
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -350,7 +350,7 @@ function AuthForm() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase rounded-none"
+                className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
@@ -490,7 +490,7 @@ function AuthForm() {
             <Button
               type="submit"
               disabled={loading || isGoogleLoading}
-              className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase rounded-none"
+              className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase"
             >
               {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
             </Button>

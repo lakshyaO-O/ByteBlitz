@@ -8,6 +8,9 @@ interface RouteConfig {
 
 const staticRoutes: RouteConfig[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1.0 },
+  { path: '/privacy', changeFrequency: 'monthly', priority: 0.3 },
+  { path: '/terms', changeFrequency: 'monthly', priority: 0.3 },
+  { path: '/contact', changeFrequency: 'monthly', priority: 0.3 },
   { path: '/practice', changeFrequency: 'daily', priority: 0.8 },
   { path: '/problems', changeFrequency: 'daily', priority: 0.8 },
   { path: '/arena', changeFrequency: 'daily', priority: 0.9 },

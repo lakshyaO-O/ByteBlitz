@@ -3,18 +3,18 @@ import { SITE_URL } from '@/lib/seo';
 import HomeClient from './home-client';
 
 export const metadata: Metadata = {
-  title: 'DevRann - Learn Coding, Practice DSA & Compete Live',
-  description: 'Learn programming from beginner to advanced, solve coding problems, compete in live coding arenas, track ELO, build projects, and grow with AI-powered learning.',
+  title: 'DevRann - Practice DSA, Compete in 1v1 Coding Battles',
+  description: 'Practice coding problems with real-time feedback. Battle opponents in 1v1 coding duels. Track ELO rating across Python, JavaScript, C++, Java, and TypeScript. AI-powered code reviews and hints.',
   alternates: {
     canonical: `${SITE_URL}`,
   },
   openGraph: {
     title: 'DevRann - Competitive Coding Platform',
-    description: 'Learn programming, practice DSA, compete in live arenas, and build your developer profile with AI-powered tools.',
+    description: 'Practice DSA problems, compete in 1v1 coding battles, and track your ELO rating. Supports multiple languages with AI-powered feedback.',
   },
   twitter: {
     title: 'DevRann - Competitive Coding Platform',
-    description: 'Learn programming, practice DSA, compete in live arenas, and build your developer profile with AI-powered tools.',
+    description: 'Practice DSA problems, compete in 1v1 coding battles, and track your ELO rating. Supports multiple languages with AI-powered feedback.',
   },
 };
 

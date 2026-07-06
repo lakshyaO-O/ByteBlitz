@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://devrann.vercel.app';
 export const SITE_NAME = 'DevRann';
 export const SITE_DESCRIPTION =
-  'Learn programming from beginner to advanced, solve coding problems, compete in live coding arenas, track ELO, build projects, and grow with AI-powered learning.';
+  'Practice coding problems with real-time feedback. Battle opponents in 1v1 coding duels. Track ELO rating across Python, JavaScript, C++, Java, and TypeScript. AI-powered code reviews and hints.';
 export const SITE_KEYWORDS = [
   'DevRann',
   'Competitive Programming',

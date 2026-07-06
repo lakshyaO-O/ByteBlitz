@@ -21,7 +21,7 @@ export function DiscussionPanel({ problemId, userId, username }: DiscussionPanel
 
   useEffect(() => {
     setLoading(true);
-    fetchDiscussion(problemId).then(setMessages).catch(() => {}).finally(() => setLoading(false));
+    fetchDiscussion(problemId).then(setMessages).catch((err) => console.error('[Practice] Failed to fetch discussion', err)).finally(() => setLoading(false));
   }, [problemId]);
 
   const handlePost = async () => {

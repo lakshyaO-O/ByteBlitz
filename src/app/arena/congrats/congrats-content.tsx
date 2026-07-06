@@ -23,7 +23,7 @@ function CongratsContent() {
     if (!battleId) { setLoading(false); return; }
     fetchBattle(battleId)
       .then((b) => { if (b) setBattle(b); })
-      .catch(() => {})
+      .catch((err) => console.error('[Arena] Congratulations save failed', err))
       .finally(() => setLoading(false));
   }, [battleId]);
 

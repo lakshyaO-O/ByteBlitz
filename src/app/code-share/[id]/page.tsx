@@ -11,8 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import {
   Heart, GitFork, Copy, Check, ArrowLeft, Eye,
-  Globe, Loader2, Share2, FileCode, ArrowUpRight,
+  Globe, Loader2, Share2, FileCode, ArrowUpRight, Flag,
 } from 'lucide-react';
+import { ReportButton } from '@/components/admin/ReportButton';
 import dynamic from 'next/dynamic';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
@@ -102,6 +103,7 @@ export default function CodeShareDetailPage() {
               <Button variant="outline" size="sm" className="gap-1.5"><Heart className="w-3.5 h-3.5" /> {snippet.likes}</Button>
               <Button variant="outline" size="sm" className="gap-1.5"><GitFork className="w-3.5 h-3.5" /> Fork</Button>
               <Button variant="outline" size="sm" className="gap-1.5"><Share2 className="w-3.5 h-3.5" /> Share</Button>
+              <ReportButton targetType="code" targetId={snippet.id} targetLabel={snippet.title} variant="text" className="ml-1" />
               <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
                 <Eye className="w-3 h-3" /> {snippet.views} views
               </span>

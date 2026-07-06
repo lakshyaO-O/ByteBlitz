@@ -126,7 +126,7 @@ export function useMatchmaking(userId: string | null, userRating: number, userTi
     if (!userId) return;
     const { firestore: db } = initializeFirebase();
     if (!db) return;
-    deleteDoc(doc(db, 'matchmaking', userId)).catch(() => {});
+    deleteDoc(doc(db, 'matchmaking', userId)).catch((err) => console.error('[Matchmaking] Failed to clean up matchmaking doc', err));
   }, [userId]);
 
   useEffect(() => {

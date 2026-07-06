@@ -315,22 +315,22 @@ export function usePresence(userId: string | null) {
     if (!db) return;
     const userRef = doc(db, 'users', userId);
     const setOnline = () => {
-      updateDoc(userRef, { onlineStatus: 'online', lastActive: serverTimestamp() }).catch(() => {});
+      updateDoc(userRef, { onlineStatus: 'online', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set online status', err));
     };
     setOnline();
     const interval = setInterval(setOnline, PRESENCE_INTERVAL);
     const onUnload = () => {
-      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch(() => {});
+      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on unload', err));
     };
     window.addEventListener('beforeunload', onUnload);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') setOnline();
-      else updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch(() => {});
+      else updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on visibility change', err));
     });
     return () => {
       clearInterval(interval);
       window.removeEventListener('beforeunload', onUnload);
-      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch(() => {});
+      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on cleanup', err));
     };
   }, [userId]);
 }

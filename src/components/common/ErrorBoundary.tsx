@@ -3,6 +3,18 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home, Zap } from 'lucide-react';
 
+function safeCaptureException(error: Error, errorInfo?: React.ErrorInfo) {
+  try {
+    import('@sentry/nextjs').then((Sentry) => {
+      if (Sentry?.captureException) {
+        Sentry.captureException(error, { extra: { componentStack: errorInfo?.componentStack } });
+      }
+    }).catch(() => {});
+  } catch {
+    // Sentry not available
+  }
+}
+
 interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -26,6 +38,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, errorInfo);
+    safeCaptureException(error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 

@@ -13,10 +13,11 @@ import {
   Zap, Trophy, Flame, Star, Code2, Github, Linkedin,
   Twitter, Globe, MapPin, Calendar, Medal, Target, Swords,
   BookOpen, Eye, Heart, GitFork, CheckCircle2, Loader2,
-  MessageCircle, UserPlus, Activity,
+  MessageCircle, UserPlus, Activity, Flag,
 } from 'lucide-react';
 import { cn, getTier, getTierColor } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
+import { ReportButton } from '@/components/admin/ReportButton';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, where, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 import type { UserProfile } from '@/types';
@@ -145,6 +146,7 @@ export default function PublicProfilePage() {
                       <Button variant="outline" className="gap-2" onClick={() => router.push(`/chats?userId=${profile.uid}`)}>
                         <MessageCircle className="w-3 h-3" /> Message
                       </Button>
+                      <ReportButton targetType="user" targetId={profile.uid} targetLabel={profile.username} variant="text" />
                     </>
                   )}
                 </div>

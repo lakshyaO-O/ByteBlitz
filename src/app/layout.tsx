@@ -10,6 +10,7 @@ import { GlobalErrorHandler } from '@/components/GlobalErrorHandler';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { AppStartupDecorations } from '@/components/AppStartupDecorations';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { CookieConsent } from '@/components/trust/CookieConsent';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, SITE_KEYWORDS, TWITTER_HANDLE } from '@/lib/seo';
 
 const dmSans = DM_Sans({
@@ -125,8 +126,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#05070f' },
@@ -140,7 +139,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -208,6 +207,7 @@ export default function RootLayout({
       </head>
       <body className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-body antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary`}>
         <GoogleAnalytics />
+        <CookieConsent />
         <FirebaseClientProvider>
           <GlobalErrorHandler />
           <SessionCookieSync />

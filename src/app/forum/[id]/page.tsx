@@ -16,9 +16,10 @@ import { initializeFirebase } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { ReportButton } from '@/components/admin/ReportButton';
 import {
   ArrowLeft, MessageSquare, Eye, Clock, Pin, CheckCircle2, Heart,
-  Send, Loader2, Code2, ThumbsUp,
+  Send, Loader2, Code2, ThumbsUp, Flag,
 } from 'lucide-react';
 import type { DiscussionForum, ForumReply } from '@/types';
 
@@ -165,6 +166,9 @@ export default function ForumThreadPage() {
             <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {thread.replies} replies</span>
               <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {thread.views} views</span>
+              <div className="ml-auto">
+                <ReportButton targetType="post" targetId={thread.id} targetLabel={thread.title} />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -206,6 +210,7 @@ export default function ForumThreadPage() {
                           <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground" onClick={() => handleLikeReply(reply)}>
                             <ThumbsUp className="w-3 h-3" /> {reply.likes}
                           </Button>
+                          <ReportButton targetType="comment" targetId={reply.id} targetLabel={`Reply by ${reply.username}`} />
                         </div>
                       </div>
                     </div>

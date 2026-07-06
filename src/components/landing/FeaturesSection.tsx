@@ -3,43 +3,45 @@
 import { motion } from 'framer-motion';
 import {
   Sword,
-  Brain,
+  Code2,
   Trophy,
-  Target,
+  Zap,
   Users,
   BarChart3,
+  Timer,
+  MessageSquare,
 } from 'lucide-react';
 
 const features = [
   {
     icon: Sword,
-    title: 'Competitive Coding Battles',
-    desc: 'Face opponents in real-time 1v1 coding duels. First to solve wins. Every millisecond counts.',
+    title: 'Real-time 1v1 Battles',
+    desc: 'Match against opponents at your skill level. Solve the same problem faster and with fewer errors to win. ELO rating adjusts after every match.',
   },
   {
-    icon: Brain,
-    title: 'AI Code Review',
-    desc: 'Get instant feedback on your solutions. Learn from AI-powered analysis and improve rapidly.',
+    icon: Code2,
+    title: 'Multi-language Editor',
+    desc: 'Built-in code editor with syntax highlighting for JavaScript, TypeScript, Python, Java, and C++. Write, test, and submit without leaving the browser.',
+  },
+  {
+    icon: Zap,
+    title: 'AI-Powered Feedback',
+    desc: 'Get instant code reviews, debugging assistance, and problem hints powered by Gemini. Learn from your mistakes with detailed explanations.',
   },
   {
     icon: Trophy,
-    title: 'Live Leaderboards',
-    desc: 'Climb the global ELO rankings. Compete for the top spot and earn exclusive rewards.',
-  },
-  {
-    icon: Target,
-    title: 'Coding Challenges',
-    desc: 'Sharpen your skills with curated problems across multiple difficulty levels and categories.',
+    title: 'ELO Ranking & Tiers',
+    desc: 'Every battle affects your ELO rating. Climb through Beginner to Grandmaster tiers. Compete on global and weekly leaderboards.',
   },
   {
     icon: Users,
-    title: 'Real-Time Multiplayer',
-    desc: 'Create private rooms or jump into matchmaking. Compete with friends or strangers worldwide.',
+    title: 'Private Rooms & Study Groups',
+    desc: 'Create private rooms to battle friends. Form study groups to solve problems collaboratively. Practice without ELO pressure in study rooms.',
   },
   {
     icon: BarChart3,
     title: 'Progress Tracking',
-    desc: 'Monitor your growth with detailed stats. Track wins, rating changes, and problem-solving trends.',
+    desc: 'Detailed stats, coding heatmaps, win/loss records, and problem-solving trends track your growth over time.',
   },
 ];
 
@@ -59,8 +61,6 @@ const itemVariants = {
 export function FeaturesSection() {
   return (
     <section className="relative py-32 border-t border-border/50">
-      <div className="absolute inset-0 bg-primary/[0.02] pointer-events-none" />
-
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
           className="text-center mb-20"
@@ -69,12 +69,12 @@ export function FeaturesSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-semibold tracking-tight text-foreground uppercase mb-4">
-            Built for{' '}
-            <span className="text-primary">Champions</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-bold tracking-tight text-foreground mb-4">
+            Everything you need to{' '}
+            <span className="text-primary">compete</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base">
-            Everything you need to sharpen your coding skills and compete at the highest level.
+            Practice problems, real-time battles, AI coaching, and rankings — all in one platform.
           </p>
         </motion.div>
 
@@ -89,22 +89,18 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group relative p-8 bg-card/30 border border-border/50 hover:border-border  transition-all duration-500"
+              className="group relative p-8 bg-card/30 border border-border/50 hover:border-border transition-all duration-500"
             >
-              <div className="absolute inset-0 bg-primary/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-              <div className="inline-flex p-3 rounded-lg bg-primary/20 mb-6">
-                <feature.icon className="w-6 h-6 text-background" />
+              <div className="inline-flex p-3 rounded-lg bg-primary/10 mb-6">
+                <feature.icon className="w-6 h-6 text-primary" />
               </div>
 
-              <h3 className="text-lg font-headline font-bold text-foreground uppercase tracking-tight mb-3">
+              <h3 className="text-lg font-headline font-bold text-foreground tracking-tight mb-3">
                 {feature.title}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {feature.desc}
               </p>
-
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/30 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center" />
             </motion.div>
           ))}
         </motion.div>

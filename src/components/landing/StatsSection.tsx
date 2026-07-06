@@ -1,15 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Users, Swords, Zap, Activity } from 'lucide-react';
-import { useGlobalStats } from '@/firebase/stats/use-stats';
-
-const statItems = [
-  { icon: Users, label: 'Registered Players', key: 'totalPlayers' as const, suffix: '' },
-  { icon: Swords, label: 'Total Battles', key: 'totalBattles' as const, suffix: '' },
-  { icon: Zap, label: 'Avg Execution', key: 'avgExecutionTime' as const, suffix: 'ms' },
-  { icon: Activity, label: 'Live Battles', key: 'activeBattles' as const, suffix: '' },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -25,21 +16,8 @@ const itemVariants = {
 };
 
 export function StatsSection() {
-  const { stats, loading } = useGlobalStats();
-
-  const getValue = (key: string): string => {
-    if (loading) return '...';
-    const value = (stats as any)[key];
-    if (value === undefined || value === null) return '0';
-    if (value === 0) return '0';
-    if (key === 'avgExecutionTime') return `${value}`;
-    return value.toLocaleString();
-  };
-
   return (
     <section className="relative py-32 border-t border-border/50">
-      <div className="absolute inset-0 bg-primary/[0.02] pointer-events-none" />
-
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
           className="text-center mb-16"
@@ -48,45 +26,36 @@ export function StatsSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-black tracking-tight text-foreground uppercase mb-4">
-            Platform{' '}
-            <span className="text-primary">Stats</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-bold tracking-tight text-foreground mb-4">
+            Built for{' '}
+            <span className="text-primary">Competitive Coding</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base">
-            Real-time metrics from the arena.
+            Practice, compete, and improve with real-time feedback and AI-powered tools.
           </p>
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto"
+          className="text-center max-w-xl mx-auto p-8 rounded-lg border border-border bg-card/30"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
         >
-          {statItems.map((item) => (
-            <motion.div
-              key={item.key}
-              variants={itemVariants}
-              className="relative p-8 bg-card/30 border border-border/50  text-center group hover:border-primary/30 transition-colors duration-300"
-            >
-              <div className="flex justify-center mb-4">
-                <div className="p-3 bg-primary/5 border border-primary/10 rounded-none">
-                  <item.icon className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-
-              <div className="text-3xl sm:text-4xl font-headline font-black text-foreground mb-2">
-                {getValue(item.key)}{item.suffix && getValue(item.key) !== '...' && getValue(item.key) !== '0' ? (
-                  <span className="text-primary text-lg ml-0.5">{item.suffix}</span>
-                ) : null}
-              </div>
-
-              <div className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-                {item.label}
-              </div>
-            </motion.div>
-          ))}
+          <motion.p
+            className="text-lg font-headline font-semibold text-foreground mb-2"
+            variants={itemVariants}
+          >
+            Early Access
+          </motion.p>
+          <motion.p
+            className="text-sm text-muted-foreground"
+            variants={itemVariants}
+          >
+            DevRann is in early access. We are actively building the platform
+            and growing our community. Join us and help shape the future of
+            competitive coding.
+          </motion.p>
         </motion.div>
       </div>
     </section>

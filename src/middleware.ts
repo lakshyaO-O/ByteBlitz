@@ -3,6 +3,9 @@ import type { NextRequest } from 'next/server';
 
 const PUBLIC_ROUTES = new Set([
   '/',
+  '/privacy',
+  '/terms',
+  '/contact',
   '/auth',
   '/_next',
   '/favicon.ico',
@@ -19,6 +22,8 @@ const PUBLIC_ROUTES = new Set([
   '/api/projects',
   '/api/judge',
   '/api/battles',
+  '/api/offline-sync',
+  '/api/admin',
   '/sw.js',
   '/sitemap.xml',
   '/robots.txt',
@@ -85,20 +90,29 @@ export async function middleware(request: NextRequest) {
 
   const sessionCookie = request.cookies.get('__session')?.value;
 
-  if (sessionCookie) {
-    const payload = decodeTokenPayload(sessionCookie);
-    if (payload && payload.sub) {
-      if (payload.exp && payload.exp * 1000 > Date.now()) {
-        const requestHeaders = new Headers(request.headers);
-        requestHeaders.set('x-user-id', payload.sub);
-        return NextResponse.next({ request: { headers: requestHeaders } });
-      }
-    }
+  if (!sessionCookie) {
+    const authUrl = new URL('/auth', request.url);
+    authUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(authUrl);
   }
 
-  const authUrl = new URL('/auth', request.url);
-  authUrl.searchParams.set('redirect', pathname);
-  return NextResponse.redirect(authUrl);
+  const payload = decodeTokenPayload(sessionCookie);
+  if (!payload || !payload.sub) {
+    const authUrl = new URL('/auth', request.url);
+    authUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(authUrl);
+  }
+
+  if (payload.exp && payload.exp * 1000 <= Date.now()) {
+    const authUrl = new URL('/auth', request.url);
+    authUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(authUrl);
+  }
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-user-id', payload.sub);
+
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

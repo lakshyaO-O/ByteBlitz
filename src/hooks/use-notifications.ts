@@ -45,7 +45,7 @@ export function useNotifications(userId: string | null) {
       const { firestore: db } = initializeFirebase();
       if (!db) return;
       const unread = notifications.filter(n => !n.read);
-      await Promise.all(unread.map(n => updateDoc(doc(db, 'users', userId, 'notifications', n.id), { read: true }).catch(() => {})));
+      await Promise.all(unread.map(n => updateDoc(doc(db, 'users', userId, 'notifications', n.id), { read: true }).catch((err) => console.error('[Notifications] Failed to mark as read', err))));
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch { /* ignore */ }

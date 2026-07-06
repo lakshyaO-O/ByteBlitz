@@ -18,10 +18,33 @@ service cloud.firestore {
         && !name.matches('.*[._]{2,}.*');
     }
 
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
     function isAdmin() {
       return isAuthenticated() && (
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+        getUserRole() == 'admin' || getUserRole() == 'super_admin'
       );
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserRole() == role;
+    }
+
+    function isAtLeast(role) {
+      let roles = ['user', 'support', 'moderator', 'admin', 'super_admin'];
+      let userRole = getUserRole();
+      let userIdx = roles.indexOf(userRole);
+      let reqIdx = roles.indexOf(role);
+      return isAuthenticated() && userIdx >= 0 && reqIdx >= 0 && userIdx >= reqIdx;
+    }
+
+    // ===== AUDIT LOGS (immutable, append-only) =====
+    match /auditLogs/{logId} {
+      allow read: if isAtLeast('admin');
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
     }
 
     // ===== USERNAMES COLLECTION =====
@@ -34,22 +57,22 @@ service cloud.firestore {
         && resource.data.userId == request.auth.uid;
     }
 
-    // ===== PROBLEMS COLLECTION (metadata only, read for all, write for admin) =====
+    // ===== PROBLEMS COLLECTION (metadata only, read for all, write for admin/moderator) =====
     match /problems/{problemId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isAtLeast('moderator');
     }
 
     // ===== PROBLEM CONTENT (separated for efficient reads) =====
     match /problemContent/{problemId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isAtLeast('moderator');
     }
 
     // ===== CHALLENGES (admin managed) =====
     match /challenges/{challengeId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isAtLeast('admin');
     }
 
     // ===== USERS COLLECTION =====
@@ -59,14 +82,21 @@ service cloud.firestore {
         && request.resource.data.uid == userId
         && request.resource.data.publicId is string
         && request.resource.data.publicId.matches('^u_[a-z0-9]+$')
-        && isValidUsername(request.resource.data.username);
-      allow update: if isOwner(userId)
+        && isValidUsername(request.resource.data.username)
+        && !request.resource.data.keys().hasAny(['role', 'isAdmin']);
+      allow update: if (isOwner(userId)
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.email == resource.data.email
         && request.resource.data.publicId == resource.data.publicId
         && (request.resource.data.username == resource.data.username
             || (request.resource.data.username is string
-                && isValidUsername(request.resource.data.username)));
+                && isValidUsername(request.resource.data.username)))
+        && !request.resource.data.keys().hasAny(['role', 'isAdmin']))
+        || (isAtLeast('admin')
+            && request.resource.data.keys().hasAny(['role', 'isAdmin'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'isAdmin', 'updatedAt']))
+        || (isAtLeast('support')
+            && !request.resource.data.keys().hasAny(['role', 'isAdmin']));
 
       match /combatLogs/{logId} {
         allow read: if isOwner(userId);
@@ -254,24 +284,27 @@ service cloud.firestore {
       allow create: if isAuthenticated()
         && request.resource.data.userId == request.auth.uid;
       allow update: if isAuthenticated()
-        && request.resource.data.userId == request.auth.uid
+        && (request.resource.data.userId == request.auth.uid
+            || isAtLeast('moderator'))
         && request.resource.data.keys().hasAll(['title', 'content', 'type', 'tags', 'updatedAt']);
       allow delete: if isAuthenticated()
-        && request.resource.data.userId == request.auth.uid;
+        && (request.resource.data.userId == request.auth.uid
+            || isAtLeast('moderator'));
 
       match /comments/{commentId} {
         allow read: if isAuthenticated();
         allow create: if isAuthenticated()
           && request.resource.data.userId == request.auth.uid;
-        allow update, delete: if isOwner(request.resource.data.userId);
+        allow update, delete: if isOwner(request.resource.data.userId)
+          || isAtLeast('moderator');
       }
     }
 
     // ===== HACKATHONS =====
     match /hackathons/{hackathonId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid in ['admin'];
-      allow update, delete: if false;
+      allow create: if isAtLeast('admin');
+      allow update, delete: if isAtLeast('admin');
 
       match /teams/{teamId} {
         allow read: if isAuthenticated();
@@ -285,8 +318,8 @@ service cloud.firestore {
     // ===== CAREER LISTINGS =====
     match /careerListings/{listingId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid in ['admin'];
-      allow update, delete: if false;
+      allow create: if isAtLeast('admin');
+      allow update, delete: if isAtLeast('admin');
 
       match /applications/{applicationId} {
         allow read: if isOwner(request.resource.data.userId);
@@ -298,7 +331,7 @@ service cloud.firestore {
     // ===== COMPANY PREP =====
     match /companyPrep/{companyId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid in ['admin'];
+      allow write: if isAtLeast('admin');
     }
 
     // ===== DISCUSSION FORUM =====
@@ -308,7 +341,7 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid;
       allow update: if isOwner(request.resource.data.userId);
       allow delete: if isAuthenticated()
-        && (request.auth.uid == resource.data.userId || request.auth.uid in ['admin']);
+        && (request.auth.uid == resource.data.userId || isAtLeast('moderator'));
 
       match /replies/{replyId} {
         allow read: if isAuthenticated();
@@ -318,22 +351,35 @@ service cloud.firestore {
       }
     }
 
+    // ===== REPORTS =====
+    match /reports/{reportId} {
+      allow read: if isAtLeast('moderator');
+      allow create: if isAuthenticated()
+        && request.resource.data.targetType in ['user', 'post', 'comment', 'code']
+        && request.resource.data.targetId is string
+        && request.resource.data.reason is string
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAtLeast('moderator');
+      allow delete: if false;
+    }
+
     // ===== SHOP =====
     match /shop/{itemId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid in ['admin'];
+      allow write: if isAtLeast('admin');
     }
 
     // ===== CONTEST CALENDAR =====
     match /contestCalendar/{contestId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid in ['admin'];
+      allow write: if isAtLeast('admin');
     }
 
     // ===== DAILY FEED =====
     match /dailyFeed/{entryId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid in ['admin'];
+      allow write: if isAtLeast('admin');
     }
 
     // ===== LEARNING PROGRESS =====
@@ -422,6 +468,20 @@ service cloud.firestore {
       allow create: if isAuthenticated()
         && request.resource.data.players is list
         && request.resource.data.players.size() >= 2;
+      allow update, delete: if false;
+    }
+
+    // ===== CONFIG COLLECTION (admin-managed platform settings) =====
+    match /config/{docId} {
+      allow read: if isAtLeast('admin');
+      allow write: if isAtLeast('admin');
+      allow delete: if false;
+    }
+
+    // ===== SYSTEM LOGS (server-side, append-only) =====
+    match /systemLogs/{logId} {
+      allow read: if isAtLeast('admin');
+      allow create: if isAuthenticated();
       allow update, delete: if false;
     }
   }

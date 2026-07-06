@@ -88,7 +88,7 @@ export function useRecentlyViewed(userId: string | null) {
 
   useEffect(() => {
     if (!userId) { setLoading(false); return; }
-    fetchRecentlyViewed(userId).then(setRecent).catch(() => {}).finally(() => setLoading(false));
+    fetchRecentlyViewed(userId).then(setRecent).catch((err) => console.error('[Practice] Failed to fetch recently viewed', err)).finally(() => setLoading(false));
   }, [userId]);
 
   const track = useCallback(async (problem: { id: string; title: string; difficulty: Difficulty }) => {
