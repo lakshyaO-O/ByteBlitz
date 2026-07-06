@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useUser } from '@/firebase/auth/use-user';
 import { getAuth } from 'firebase/auth';
 import { Shield } from 'lucide-react';
 import type { AdminRole, AdminVerificationResult } from '@/types/admin';
 import { ROLE_PERMISSIONS } from '@/types/admin';
+
+const EXEMPTED_PATHS = new Set(['/admin/setup']);
 
 function LoadingScreen({ message }: { message?: string }) {
   return (
@@ -21,9 +23,14 @@ function LoadingScreen({ message }: { message?: string }) {
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useUser();
+  const pathname = usePathname();
   const router = useRouter();
   const [status, setStatus] = useState<AdminVerificationResult | null>(null);
   const [checked, setChecked] = useState(false);
+
+  if (EXEMPTED_PATHS.has(pathname)) {
+    return <>{children}</>;
+  }
 
   useEffect(() => {
     if (authLoading) return;
@@ -34,7 +41,6 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
     const verify = async () => {
       try {
-        // Try server-side verification first
         const auth = getAuth();
         const token = await auth.currentUser?.getIdToken();
         if (token) {
