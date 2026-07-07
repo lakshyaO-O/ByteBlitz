@@ -14,7 +14,7 @@ $EnvPath = Join-Path $ProjectRoot $EnvFile
 
 if (-not (Test-Path $EnvPath)) {
   Write-Error "Environment file not found: $EnvPath"
-  Write-Error "Copy .env.judge0.example to $EnvPath and fill in secrets."
+  Write-Error "Copy judge0.env.example to $EnvPath and fill in secrets."
   exit 1
 }
 
