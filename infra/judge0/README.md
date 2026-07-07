@@ -7,9 +7,9 @@ for DevRann. Supports JavaScript, TypeScript, Python, Java, C++, Go, and Rust.
 
 ```
 ┌──────────┐    ┌──────────┐    ┌────────────────┐
-│  DevRann │───▶│  Judge0  │───▶│  PostgreSQL 13  │
+│  DevRann │───▶│  Judge0  │───▶│  PostgreSQL 16  │
 │   App    │    │  Server  │    │  (persistent DB)│
-└──────────┘    │  :3000   │    └────────────────┘
+└──────────┘    │  :2358   │    └────────────────┘
                 │          │    ┌────────────────┐
                 │  Workers │───▶│  Redis 7        │
                 └──────────┘    │  (job queue)    │
@@ -30,7 +30,7 @@ for DevRann. Supports JavaScript, TypeScript, Python, Java, C++, Go, and Rust.
 cd infra/judge0
 
 # Copy environment file and fill in secrets
-cp judge0.env.example .env
+cp judge0.conf.example .env
 ```
 
 Edit `.env` and set:
@@ -62,13 +62,13 @@ Wait ~2–3 minutes for the server to become healthy.
 
 ```bash
 # Health check
-curl http://localhost:3000/api/v1/about
+curl http://localhost:2358/api/v1/about
 
 # List supported languages/runtimes
-curl http://localhost:3000/api/v1/languages
+curl http://localhost:2358/api/v1/languages
 
 # Test a code execution
-curl -X POST http://localhost:3000/api/v1/submissions \
+curl -X POST http://localhost:2358/api/v1/submissions \
   -H "Content-Type: application/json" \
   -H "X-Auth-Token: YOUR_TOKEN" \
   -d '{
@@ -89,10 +89,10 @@ curl -X POST http://localhost:3000/api/v1/submissions \
 | `POSTGRES_USER` | no | `judge0` | PostgreSQL user |
 | `POSTGRES_PASSWORD` | **yes** | — | PostgreSQL password |
 | `REDIS_PASSWORD` | **yes** | — | Redis password (used in `REDIS_URL`) |
-| `JUDGE0_PORT` | no | `3000` | Host-side port mapping |
+| `JUDGE0_PORT` | no | `2358` | Host-side port mapping |
 | `CPU_COUNT` | no | `4` | CPU cores for resource calculation |
 | `MAX_QUEUE_SIZE` | no | `200` | Maximum queued submissions |
-| `CONCURRENCY` | no | `4` | Sidekiq worker concurrency |
+| `CONCURRENCY` | no | `4` | Resque worker concurrency |
 | `RAILS_ENV` | no | `production` | Rails environment |
 | `POSTGRES_MEM_LIMIT` | no | `512M` | PostgreSQL container memory limit |
 | `REDIS_MEM_LIMIT` | no | `256M` | Redis container memory limit |
@@ -103,7 +103,7 @@ curl -X POST http://localhost:3000/api/v1/submissions \
 
 | Variable | Required | Description |
 |---|---|---|
-| `JUDGE0_API_URL` | **yes** | Judge0 server URL + path (e.g. `http://localhost:3000/api/v1`) |
+| `JUDGE0_API_URL` | **yes** | Judge0 server URL + path (e.g. `http://localhost:2358/api/v1`) |
 | `JUDGE0_API_KEY` | **yes** | Must match `JUDGE0_AUTH_TOKEN` from Judge0 .env |
 | `JUDGE_RATE_LIMIT` | no | Max API calls per 60s per user (default: 10) |
 
@@ -143,15 +143,17 @@ docker compose -f infra/judge0/docker-compose.yml down -v
 2. **Copy** the `infra/judge0/` directory to the VM.
 3. **Set secrets** in `.env` on the VM.
 4. **Start** with `docker compose up -d`.
-5. **Configure firewall** to allow inbound on port 3000 only from DevRann's IP(s).
+5. **Configure firewall** to allow inbound on port 2358 only from DevRann's IP(s).
 6. **Set up monitoring** — add the VM to your observability stack.
-7. **Set `JUDGE0_API_URL`** in DevRann's Vercel environment variables to `http://<VM_IP>:3000/api/v1`.
+7. **Set `JUDGE0_API_URL`** in DevRann's Vercel environment variables to `http://<VM_IP>:2358/api/v1`.
 8. **Set `JUDGE0_API_KEY`** to match the VM's `JUDGE0_AUTH_TOKEN`.
 
 ### Security Notes
 
-- Place Judge0 on a **private network** or restrict port 3000 to DevRann's IPs only.
+- Place Judge0 on a **private network** or restrict port 2358 to DevRann's IPs only.
 - Do **not** expose Judge0 to the public internet without auth.
+- Both server and workers use `cap_add` (SYS_ADMIN, NET_ADMIN, SETUID, SETGID, SYS_RESOURCE, SYS_PTRACE) instead of `privileged: true` — this drops unnecessary capabilities (module loading, raw I/O, etc.) while still giving isolate the access it needs. The cgroup filesystem is bind-mounted at `/sys/fs/cgroup:rw` and the default seccomp profile is disabled (`seccomp=unconfined`) because isolate needs `clone()` with `CLONE_NEW*`, `mount()`, and `chroot()` which the default Docker seccomp profile blocks.
 - The `JUDGE0_AUTH_TOKEN` is the only authentication — treat it like a database password.
 - Judge0 executes arbitrary user code in isolated containers. This is by design, but ensure the host VM is not running other sensitive workloads.
 - Regularly update the Judge0 image: `docker compose pull && docker compose up -d`.
+- This deployment requires **cgroup v1**. If your host uses cgroup v2 (default on newer Linux distros), add `systemd.unified_cgroup_hierarchy=0` to the kernel cmdline (see [Judge0 CHANGELOG](https://github.com/judge0/judge0/blob/master/CHANGELOG.md) for details).

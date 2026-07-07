@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
-import { PracticeWorkbench } from '@/components/practice/PracticeWorkbench';
+import { LearningHub } from '@/components/learning/LearningHub';
 import { DailyChallengeCard } from '@/components/practice/DailyChallengeCard';
 import { AchievementPopupContainer } from '@/components/practice/AchievementPopup';
 import { PracticeDashboard, ProblemBrowser } from '@/features/practice/components';
@@ -300,18 +300,11 @@ export default function PracticePage() {
 
   if (selectedProblem) {
     return (
-      <Shell>
-        <PracticeWorkbench
-          problem={selectedProblem}
-          onBack={() => setSelectedProblem(null)}
-          userId={user?.uid || null}
-          username={username}
-          onPrevProblem={onPrevProblem}
-          onNextProblem={onNextProblem}
-          hasPrev={currentIndex > 0}
-          hasNext={currentIndex < problems.length - 1}
-        />
-      </Shell>
+      <LearningHub
+        problem={selectedProblem}
+        onBack={() => setSelectedProblem(null)}
+        userId={user?.uid || null}
+      />
     );
   }
 

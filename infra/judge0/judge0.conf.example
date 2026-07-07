@@ -1,9 +1,10 @@
-# ─── Judge0 CE Configuration ────────────────────────────────────────────
-# Copy to .env and fill in secrets before running docker compose up.
+# ─── Judge0 CE Configuration ────────────────────────────────────
+# Copy to .env (or judge0.conf) and fill in secrets before running.
+#   cp judge0.conf.example .env
 
 # --- Authentication ---
 # Generate with: openssl rand -hex 32
-# This token is used to authenticate DevRann API requests to Judge0.
+# This token authenticates DevRann API requests to Judge0.
 JUDGE0_AUTH_TOKEN=change_me_generate_with_openssl_rand_hex_32
 
 # --- PostgreSQL ---
@@ -16,7 +17,7 @@ REDIS_PASSWORD=change_me_strong_redis_password
 
 # --- Judge0 Server ---
 # Port the Judge0 API listens on (host side).
-JUDGE0_PORT=3000
+JUDGE0_PORT=2358
 
 # --- Resource Limits per Container ---
 POSTGRES_MEM_LIMIT=512M
@@ -25,13 +26,9 @@ SERVER_MEM_LIMIT=1G
 WORKERS_MEM_LIMIT=2G
 
 # --- Performance Tuning ---
-# Set CPU_COUNT to match your host CPU cores.
 CPU_COUNT=4
-# Maximum number of submissions the queue will accept.
 MAX_QUEUE_SIZE=200
-# Number of concurrent worker threads processing submissions.
 CONCURRENCY=4
 
 # --- Rails Environment ---
-# Use 'production' for VPS/cloud, 'development' for local.
 RAILS_ENV=production

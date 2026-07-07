@@ -14,7 +14,7 @@ $EnvPath = Join-Path $ProjectRoot $EnvFile
 
 if (-not (Test-Path $EnvPath)) {
   Write-Error "Environment file not found: $EnvPath"
-  Write-Error "Copy judge0.env.example to $EnvPath and fill in secrets."
+  Write-Error "Copy infra/judge0/judge0.conf.example to $EnvPath and fill in secrets."
   exit 1
 }
 
@@ -33,7 +33,7 @@ if ($LASTEXITCODE -eq 0) {
   Write-Host "  docker compose --env-file $EnvFile -f $ComposeFile logs -f"
   Write-Host ""
   Write-Host "Check server health:" -ForegroundColor Yellow
-  Write-Host "  curl http://localhost:3000/api/v1/about"
+  Write-Host "  curl http://localhost:2358/api/v1/about"
   Write-Host ""
   Write-Host "Stop with:" -ForegroundColor Yellow
   Write-Host "  docker compose --env-file $EnvFile -f $ComposeFile down"
@@ -45,7 +45,7 @@ if ($LASTEXITCODE -eq 0) {
   $elapsed = 0
   while ($elapsed -lt $timeout) {
     try {
-      $response = Invoke-WebRequest -Uri "http://localhost:3000/api/v1/about" -UseBasicParsing -TimeoutSec 5
+      $response = Invoke-WebRequest -Uri "http://localhost:2358/api/v1/about" -UseBasicParsing -TimeoutSec 5
       if ($response.StatusCode -eq 200) {
         Write-Host "Judge0 server is ready!" -ForegroundColor Green
         Write-Host "About: $($response.Content)" -ForegroundColor Gray

@@ -65,6 +65,13 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    label: 'LEARN',
+    items: [
+      { href: '/learn/concepts', label: 'Encyclopedia', icon: BookOpen },
+      { href: '/analytics/learning', label: 'Analytics', icon: BarChart3 },
+    ],
+  },
+  {
     label: 'COMMUNITY',
     items: [
       { href: '/community', label: 'Feed', icon: MessageCircle },
