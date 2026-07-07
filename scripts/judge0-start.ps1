@@ -4,7 +4,7 @@
 
 param(
   [Parameter(Mandatory = $false)]
-  [string]$EnvFile = "infra/judge0/.env.judge0"
+  [string]$EnvFile = "infra/judge0/.env"
 )
 
 $ErrorActionPreference = "Stop"

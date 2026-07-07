@@ -30,7 +30,7 @@ for DevRann. Supports JavaScript, TypeScript, Python, Java, C++, Go, and Rust.
 cd infra/judge0
 
 # Copy environment file and fill in secrets
-cp .env.judge0 .env
+cp .env.judge0.example .env
 ```
 
 Edit `.env` and set:
