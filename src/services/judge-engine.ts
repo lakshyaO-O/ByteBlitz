@@ -30,7 +30,7 @@ interface ExecutionResult {
   memory: number | null;
 }
 
-const SUPPORTED_LANGUAGES: CodingLanguage[] = ['javascript', 'typescript', 'python', 'java', 'cpp'];
+const SUPPORTED_LANGUAGES: CodingLanguage[] = ['javascript', 'typescript', 'python', 'java', 'cpp', 'go', 'rust'];
 
 export function isLanguageSupported(language: CodingLanguage): boolean {
   return SUPPORTED_LANGUAGES.includes(language);
@@ -415,7 +415,7 @@ async function callExecutionApi(code: string, language: CodingLanguage, timeLimi
         compileOutput: compile?.stderr ?? compile?.output ?? null,
         compileCode: compile?.code ?? null,
         time: run?.time ?? null,
-        memory: null,
+        memory: run?.memory ?? null,
       };
     } catch (err: any) {
       clearTimeout(timeout);

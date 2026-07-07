@@ -298,9 +298,34 @@ export function JudgeMonitor() {
                       </div>
                     ))
                   )}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="mt-2 pt-2 border-t border-border/30">
+                <button
+                  onClick={async () => {
+                    const btn = document.getElementById('test-connection-btn');
+                    if (btn) { btn.textContent = 'Testing...'; (btn as HTMLButtonElement).disabled = true; }
+                    try {
+                      const auth = getAuth();
+                      const token = await auth.currentUser?.getIdToken();
+                      const res = await fetch('/api/judge/health', {
+                        headers: token ? { Authorization: `Bearer ${token}` } : {},
+                      });
+                      const info = await res.json();
+                      alert(`Judge0: ${info.judge0.reachable ? 'Connected' : 'Unreachable'}${info.judge0.version ? ` (${info.judge0.version})` : ''} ${info.judge0.latencyMs !== null ? `${info.judge0.latencyMs}ms` : ''}\nPiston: ${info.piston.reachable ? 'Connected' : 'Unreachable'}${info.piston.version ? ` (${info.piston.version})` : ''} ${info.piston.latencyMs !== null ? `${info.piston.latencyMs}ms` : ''}\n\n${!info.judge0.configured && !info.piston.configured ? '⚠ No execution backend configured. Set JUDGE0_API_URL or PISTON_API_URL.' : ''}`);
+                    } catch (err: any) {
+                      alert(`Connection test failed: ${err.message}`);
+                    } finally {
+                      if (btn) { btn.textContent = 'Test Connection'; (btn as HTMLButtonElement).disabled = false; }
+                    }
+                  }}
+                  className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                  id="test-connection-btn"
+                >
+                  Test Connection
+                </button>
+              </div>
+            </CardContent>
+          </Card>
           </div>
 
           {/* Execution History */}
