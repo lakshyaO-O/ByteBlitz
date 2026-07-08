@@ -16,6 +16,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const { user, loading, error } = useUser();
 
+  const isAdminRoute = pathname?.startsWith('/admin');
+
   useEffect(() => {
     if (loading) return;
     if (!user) {
@@ -41,6 +43,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
   if (!user) {
     return <LoadingScreen message="Redirecting to sign in..." />;
   }
+
+  if (isAdminRoute) return <>{children}</>;
 
   return <Shell>{children}</Shell>;
 }
