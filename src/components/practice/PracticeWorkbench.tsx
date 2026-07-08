@@ -4,6 +4,7 @@ import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { CodeEditor } from '@/components/editor/CodeEditor';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import {
   Play, Send, RotateCcw, ArrowLeft, Loader2, BookOpen, ChevronLeft, ChevronRight,
   Share2,
@@ -17,6 +18,8 @@ import { usePracticeSession } from '@/hooks/use-practice-session';
 import { useUserProgress } from '@/hooks/use-practice-problems';
 import { toggleBookmark } from '@/services/practice';
 import { useAppStore } from '@/store/app-store';
+import { useJudgeStatus } from '@/hooks/use-judge-status';
+import { JudgeStatusBanner, JudgeStatusBadge } from '@/components/judge';
 import type { PracticeProblemDocument, CodingLanguage } from '@/types';
 
 interface PracticeWorkbenchProps {
@@ -43,6 +46,8 @@ export function PracticeWorkbench({
   const userProgress = progress[problem.id];
 
   const session = usePracticeSession(userId, username, problem);
+  const judgeStatus = useJudgeStatus();
+  const judgeAvailable = judgeStatus.status === 'ONLINE';
 
   useEffect(() => {
     if (session.testResults.length > 0) setActiveTab('results');
@@ -197,7 +202,7 @@ export function PracticeWorkbench({
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          <Toolbar session={session} problem={problem} />
+          <Toolbar session={session} problem={problem} judgeAvailable={judgeAvailable} judgeStatus={judgeStatus} />
           <div className="flex-1 min-h-0">
             <CodeEditor
               initialCode={session.code}
@@ -215,6 +220,7 @@ export function PracticeWorkbench({
             session={session}
             timeLimitMs={problem.timeLimitMs}
             memoryLimitKb={problem.memoryLimitKb}
+            judgeStatus={judgeStatus}
           />
         </div>
       </div>
@@ -250,19 +256,32 @@ export function PracticeWorkbench({
                 session={session}
                 timeLimitMs={problem.timeLimitMs}
                 memoryLimitKb={problem.memoryLimitKb}
+                judgeStatus={judgeStatus}
               />
             </>
           )}
         </div>
         <div className="shrink-0 border-t border-border bg-card/30 p-2">
-          <Toolbar session={session} problem={problem} />
+          <Toolbar session={session} problem={problem} judgeAvailable={judgeAvailable} judgeStatus={judgeStatus} />
         </div>
       </div>
     </div>
   );
 }
 
-function Toolbar({ session, problem }: { session: ReturnType<typeof usePracticeSession>; problem: PracticeProblemDocument }) {
+function Toolbar({ session, problem, judgeAvailable, judgeStatus }: {
+  session: ReturnType<typeof usePracticeSession>;
+  problem: PracticeProblemDocument;
+  judgeAvailable: boolean;
+  judgeStatus: ReturnType<typeof useJudgeStatus>;
+}) {
+  const runDisabled = session.isRunning || session.isSubmitting || !judgeAvailable;
+  const submitDisabled = session.isRunning || session.isSubmitting || !judgeAvailable;
+
+  const tooltipContent = !judgeAvailable
+    ? 'Code execution is temporarily unavailable. Infrastructure upgrade in progress.'
+    : undefined;
+
   return (
     <div className="flex items-center justify-between px-3 py-1.5 bg-muted/20 border-b border-border">
       <div className="flex items-center gap-2">
@@ -275,42 +294,75 @@ function Toolbar({ session, problem }: { session: ReturnType<typeof usePracticeS
             <option key={lang} value={lang}>{lang}</option>
           ))}
         </select>
+        <JudgeStatusBadge status={judgeStatus.status} />
       </div>
-      <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          onClick={session.runTests}
-          disabled={session.isRunning || session.isSubmitting}
-          className="gap-1.5 text-xs h-7 bg-emerald-600 hover:bg-emerald-700"
-        >
-          {session.isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-          Run
-          <span className="hidden md:inline text-[10px] text-emerald-200">(Ctrl+Enter)</span>
-        </Button>
-        <Button
-          size="sm"
-          onClick={session.submit}
-          disabled={session.isRunning || session.isSubmitting}
-          className="gap-1.5 text-xs h-7"
-        >
-          {session.isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-          Submit
-          <span className="hidden md:inline text-[10px] text-primary-foreground/70">(Ctrl+Shift+Enter)</span>
-        </Button>
-      </div>
+      <TooltipProvider delayDuration={300}>
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span tabIndex={0}>
+                <Button
+                  size="sm"
+                  onClick={session.runTests}
+                  disabled={runDisabled}
+                  className={cn(
+                    'gap-1.5 text-xs h-7',
+                    judgeAvailable ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-emerald-600/50',
+                  )}
+                  aria-disabled={runDisabled}
+                >
+                  {session.isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                  Run
+                  <span className="hidden md:inline text-[10px] text-emerald-200">(Ctrl+Enter)</span>
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {tooltipContent && (
+              <TooltipContent side="bottom" className="max-w-[240px] text-xs">
+                {tooltipContent}
+              </TooltipContent>
+            )}
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span tabIndex={0}>
+                <Button
+                  size="sm"
+                  onClick={session.submit}
+                  disabled={submitDisabled}
+                  className="gap-1.5 text-xs h-7"
+                  aria-disabled={submitDisabled}
+                >
+                  {session.isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                  Submit
+                  <span className="hidden md:inline text-[10px] text-primary-foreground/70">(Ctrl+Shift+Enter)</span>
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {tooltipContent && (
+              <TooltipContent side="bottom" className="max-w-[240px] text-xs">
+                {tooltipContent}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
+      </TooltipProvider>
     </div>
   );
 }
 
 function ConsolePanel({
-  activeTab, setActiveTab, session, timeLimitMs, memoryLimitKb,
+  activeTab, setActiveTab, session, timeLimitMs, memoryLimitKb, judgeStatus,
 }: {
   activeTab: 'output' | 'results' | 'submission';
   setActiveTab: (t: 'output' | 'results' | 'submission') => void;
   session: ReturnType<typeof usePracticeSession>;
   timeLimitMs?: number;
   memoryLimitKb?: number;
+  judgeStatus?: ReturnType<typeof useJudgeStatus>;
 }) {
+  const judgeAvailable = judgeStatus?.status === 'ONLINE';
+
   return (
     <div className="h-[260px] border-t border-border bg-card/10 flex flex-col shrink-0">
       <div className="flex items-center border-b border-border bg-muted/20">
@@ -337,7 +389,10 @@ function ConsolePanel({
         ))}
       </div>
       <ScrollArea className="flex-1 p-3">
-        {activeTab === 'output' && (
+        {activeTab === 'output' && !judgeAvailable && judgeStatus && (
+          <JudgeStatusBanner judge={judgeStatus} />
+        )}
+        {activeTab === 'output' && judgeAvailable && (
           <div className="text-xs font-mono text-muted-foreground space-y-1">
             <p className="text-muted-foreground/60">&gt; Click "Run" to test your code against sample cases, or "Submit" for full evaluation.</p>
             <p className="text-muted-foreground/60">&gt; Use <kbd className="px-1 py-0.5 rounded bg-muted border border-border text-[10px]">Ctrl+Enter</kbd> to run, <kbd className="px-1 py-0.5 rounded bg-muted border border-border text-[10px]">Ctrl+Shift+Enter</kbd> to submit.</p>

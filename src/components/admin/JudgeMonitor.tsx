@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   Loader2, CheckCircle, XCircle, AlertTriangle, Clock, Cpu, RotateCcw,
   Activity, HardDrive, RefreshCw, Zap, Terminal, AlertOctagon, Ban,
+  Wrench, Construction,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getAuth } from 'firebase/auth';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { useJudgeStatus } from '@/hooks/use-judge-status';
+import { motion } from 'framer-motion';
 
 interface BackendStatus {
   status: string;
@@ -91,6 +94,7 @@ const VERDICT_COLORS: Record<string, string> = {
 };
 
 export function JudgeMonitor() {
+  const judgeStatus = useJudgeStatus();
   const [data, setData] = useState<MonitoringData | null>(null);
   const [loading, setLoading] = useState(true);
   const [retrying, setRetrying] = useState(false);
@@ -163,6 +167,10 @@ export function JudgeMonitor() {
     e.verdict !== 'Accepted' && e.verdict !== 'Pending' && e.userId
   ) || [];
 
+  const showMaintenanceView = judgeStatus.status === 'MAINTENANCE';
+  const showOfflineView = judgeStatus.status === 'OFFLINE';
+  const isUnavailable = showMaintenanceView || showOfflineView;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -178,19 +186,84 @@ export function JudgeMonitor() {
         </div>
       </div>
 
-      {loading && !data ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-5 h-5 animate-spin text-primary" />
-        </div>
-      ) : !data ? (
-        <Card className="bg-card/50 border-border">
-          <CardContent className="p-6 text-center">
-            <Cpu className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Failed to load judge data</p>
-            <Button variant="outline" size="sm" onClick={fetchData} className="mt-2 text-xs">Retry</Button>
-          </CardContent>
-        </Card>
-      ) : (
+      {isUnavailable && judgeStatus.status !== 'LOADING' && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4"
+        >
+          <Card className="bg-card/50 border-border">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                  <Construction className="w-6 h-6 text-amber-400" />
+                </div>
+                <div className="min-w-0 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-semibold text-amber-300">
+                      Judge Status: {showMaintenanceView ? 'Maintenance' : 'Offline'}
+                    </h3>
+                    <Badge variant="outline" className={cn(
+                      'text-[10px]',
+                      showMaintenanceView
+                        ? 'text-amber-400 border-amber-500/30 bg-amber-500/10'
+                        : 'text-red-400 border-red-500/30 bg-red-500/10',
+                    )}>
+                      <Wrench className="w-2.5 h-2.5 mr-1" />
+                      {showMaintenanceView ? 'Maintenance' : 'Offline'}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Reason: {showMaintenanceView ? 'Execution server not configured' : 'Execution backend unreachable'}
+                  </p>
+                  <p className="text-xs text-muted-foreground/60 max-w-lg">
+                    {showMaintenanceView ? (
+                      <>
+                        To enable code execution, configure either{' '}
+                        <code className="px-1 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">JUDGE0_API_URL</code>{' '}
+                        or{' '}
+                        <code className="px-1 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">PISTON_API_URL</code>{' '}
+                        in your environment variables. The monitoring dashboard will populate automatically once a backend becomes available.
+                      </>
+                    ) : (
+                      'Configured execution backends are currently unreachable. Check network connectivity and backend service status.'
+                    )}
+                  </p>
+                  <div className="flex items-center gap-3 pt-1">
+                    <span className="text-[10px] text-muted-foreground/40 font-mono">
+                      Status auto-updates every 30s
+                    </span>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const auth = getAuth();
+                          const token = await auth.currentUser?.getIdToken();
+                          const res = await fetch('/api/judge/health', {
+                            headers: token ? { Authorization: `Bearer ${token}` } : {},
+                          });
+                          const info = await res.json();
+                          alert(
+                            `Judge0: ${info.judge0.configured ? (info.judge0.reachable ? 'Connected' : 'Unreachable') : 'Not configured'}\n` +
+                            `Piston: ${info.piston.configured ? (info.piston.reachable ? 'Connected' : 'Unreachable') : 'Not configured'}\n\n` +
+                            `${!info.judge0.configured && !info.piston.configured ? 'No execution backend configured. Set JUDGE0_API_URL or PISTON_API_URL.' : ''}`
+                          );
+                        } catch (err: any) {
+                          alert(`Connection test failed: ${err.message}`);
+                        }
+                      }}
+                      className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                    >
+                      Test Connection
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {data && !isUnavailable && (
         <>
           {/* Judge Health */}
           <Card className="bg-card/50 border-border">
@@ -378,6 +451,22 @@ export function JudgeMonitor() {
             </Card>
           </div>
         </>
+      )}
+
+      {!data && !isUnavailable && loading && (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+        </div>
+      )}
+
+      {!data && !isUnavailable && !loading && (
+        <Card className="bg-card/50 border-border">
+          <CardContent className="p-6 text-center">
+            <Cpu className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Failed to load judge data</p>
+            <Button variant="outline" size="sm" onClick={fetchData} className="mt-2 text-xs">Retry</Button>
+          </CardContent>
+        </Card>
       )}
 
       <ConfirmDialog
