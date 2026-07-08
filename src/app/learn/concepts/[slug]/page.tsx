@@ -4,15 +4,16 @@ import { ConceptDetail } from './concept-detail';
 import { CONCEPTS } from '@/data/concepts';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export function generateStaticParams() {
   return Object.keys(CONCEPTS).map(slug => ({ slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const entry = CONCEPTS[params.slug];
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const entry = CONCEPTS[slug];
   if (!entry) return { title: 'Concept Not Found' };
   return {
     title: `${entry.title} — Concept Encyclopedia`,
@@ -20,8 +21,9 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function ConceptPage({ params }: Props) {
-  const entry = CONCEPTS[params.slug];
+export default async function ConceptPage({ params }: Props) {
+  const { slug } = await params;
+  const entry = CONCEPTS[slug];
   if (!entry) notFound();
   return <ConceptDetail entry={entry} />;
 }
