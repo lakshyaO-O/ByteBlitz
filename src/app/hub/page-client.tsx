@@ -325,7 +325,7 @@ function BugReportSection({ user, toast }: { user: any; toast: any }) {
       ) : reports.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12">
-            <Shield className="w-12 h-12 text-muted-foreground/40" />
+            <Shield className="w-12 h-12 text-muted-foreground/60" />
             <p className="text-muted-foreground font-medium">No bug reports yet</p>
             <p className="text-sm text-muted-foreground/60">Be the first to report an issue</p>
           </CardContent>
@@ -595,7 +595,7 @@ function FeatureRequestsSection({ user, toast }: { user: any; toast: any }) {
       ) : features.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12">
-            <Lightbulb className="w-12 h-12 text-muted-foreground/40" />
+            <Lightbulb className="w-12 h-12 text-muted-foreground/60" />
             <p className="text-muted-foreground font-medium">No feature requests yet</p>
             <p className="text-sm text-muted-foreground/60">Be the first to suggest an idea</p>
           </CardContent>
@@ -839,7 +839,7 @@ function EventsSection({ user }: { user: any }) {
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-16">
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/50">
-              <CalendarDays className="w-10 h-10 text-muted-foreground/40" />
+              <CalendarDays className="w-10 h-10 text-muted-foreground/60" />
             </div>
             <div className="text-center">
               <p className="text-lg font-semibold text-muted-foreground">No upcoming events</p>
@@ -914,7 +914,7 @@ function ChallengesSection() {
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16">
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50">
-            <Target className="w-10 h-10 text-muted-foreground/40" />
+            <Target className="w-10 h-10 text-muted-foreground/60" />
           </div>
           <div className="text-center">
             <p className="text-lg font-semibold text-muted-foreground">No active challenges</p>
@@ -966,7 +966,7 @@ function CareersSection() {
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16">
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50">
-            <Briefcase className="w-10 h-10 text-muted-foreground/40" />
+            <Briefcase className="w-10 h-10 text-muted-foreground/60" />
           </div>
           <div className="text-center">
             <p className="text-lg font-semibold text-muted-foreground">No opportunities available</p>
@@ -1212,7 +1212,7 @@ function RoadmapSection({ user, toast }: { user: any; toast: any }) {
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-16">
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/50">
-              <Map className="w-10 h-10 text-muted-foreground/40" />
+              <Map className="w-10 h-10 text-muted-foreground/60" />
             </div>
             <div className="text-center">
               <p className="text-lg font-semibold text-muted-foreground">Roadmap is being prepared</p>

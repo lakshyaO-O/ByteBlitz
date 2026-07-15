@@ -203,7 +203,7 @@ export default function CommunityPage() {
           </div>
         ) : (
           <div className="text-center py-20 text-muted-foreground">
-            <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <Users className="w-10 h-10 mx-auto mb-3 opacity-60" />
             <p className="font-medium">No posts yet. Be the first to share!</p>
           </div>
         )}

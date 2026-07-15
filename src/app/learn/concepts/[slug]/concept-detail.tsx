@@ -52,7 +52,7 @@ export function ConceptDetail({ entry }: { entry: ConceptEntry }) {
             <h2 className="text-xs font-semibold text-foreground">Complexity</h2>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 rounded-lg bg-muted/10 border border-border/30">
+            <div className="p-3 rounded-lg bg-muted/20 border border-border/50">
               <div className="flex items-center gap-1.5 mb-1.5">
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
                 <span className="text-[10px] font-medium text-muted-foreground uppercase">Time</span>
@@ -72,7 +72,7 @@ export function ConceptDetail({ entry }: { entry: ConceptEntry }) {
                 </div>
               </div>
             </div>
-            <div className="p-3 rounded-lg bg-muted/10 border border-border/30">
+            <div className="p-3 rounded-lg bg-muted/20 border border-border/50">
               <div className="flex items-center gap-1.5 mb-1.5">
                 <HardDrive className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[10px] font-medium text-muted-foreground uppercase">Space</span>
@@ -162,7 +162,7 @@ export function ConceptDetail({ entry }: { entry: ConceptEntry }) {
                 animate={{ height: 'auto', opacity: 1 }}
                 transition={{ duration: 0.2 }}
               >
-                <pre className="p-3 rounded-lg bg-muted/20 border border-border/30 text-[11px] font-mono leading-relaxed overflow-x-auto">
+                <pre className="p-3 rounded-lg bg-muted/20 border border-border/50 text-[11px] font-mono leading-relaxed overflow-x-auto">
                   <code>{entry.codeExample}</code>
                 </pre>
               </motion.div>

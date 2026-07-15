@@ -361,7 +361,7 @@ export function SystemSettings() {
       <Section title="Feature Flags" desc="Toggle platform features on and off. Every change is logged.">
         <div className="space-y-0.5">
           {items.map(item => (
-            <div key={item.key} className="flex items-center justify-between py-2.5 border-b border-border/30 last:border-0">
+            <div key={item.key} className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0">
               <div>
                 <p className="text-xs font-medium">{item.label}</p>
                 <p className="text-[10px] text-muted-foreground">{item.desc}</p>
@@ -445,7 +445,7 @@ export function SystemSettings() {
             </thead>
             <tbody>
               {features.map(f => (
-                <tr key={f} className="border-b border-border/30">
+                <tr key={f} className="border-b border-border/50">
                   <td className="py-2 pr-3 font-medium text-xs">{labels[f] || f}</td>
                   {tiers.map(t => {
                     const val = aiConfig?.[f]?.[t];
@@ -512,8 +512,8 @@ export function SystemSettings() {
             return (
               <div key={role} className="border border-border/50 rounded-lg overflow-hidden">
                 <div className={cn(
-                  'px-3 py-2 flex items-center justify-between border-b border-border/30',
-                  role === 'super_admin' ? 'bg-amber-500/5' : 'bg-muted/10',
+                  'px-3 py-2 flex items-center justify-between border-b border-border/50',
+                  role === 'super_admin' ? 'bg-amber-500/5' : 'bg-muted/20',
                 )}>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold">{ROLE_LABELS[role] || role}</span>
@@ -556,7 +556,7 @@ export function SystemSettings() {
                               'px-1.5 py-0.5 rounded text-[8px] font-mono border transition-colors',
                               has
                                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                                : 'bg-muted/10 border-border/30 text-muted-foreground/50 hover:text-foreground/70',
+                                : 'bg-muted/20 border-border/50 text-muted-foreground/50 hover:text-foreground/70',
                             )}
                           >
                             {has ? <CheckCircle className="w-2 h-2 inline mr-0.5" /> : <XCircle className="w-2 h-2 inline mr-0.5" />}
@@ -613,7 +613,7 @@ export function SystemSettings() {
                     'px-2.5 py-1 rounded text-[10px] font-medium border transition-colors',
                     selectedRole === r
                       ? 'bg-foreground/10 border-foreground/30 text-foreground'
-                      : 'bg-muted/10 border-border/30 text-muted-foreground hover:text-foreground',
+                      : 'bg-muted/20 border-border/50 text-muted-foreground hover:text-foreground',
                   )}
                 >
                   {ROLE_LABELS[r]}
@@ -652,7 +652,7 @@ export function SystemSettings() {
                           'px-1.5 py-0.5 rounded text-[8px] font-mono border transition-colors',
                           has
                             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                            : 'bg-muted/10 border-border/30 text-muted-foreground/40',
+                            : 'bg-muted/20 border-border/50 text-muted-foreground/60',
                           selectedRole === 'super_admin' && 'opacity-60 cursor-not-allowed',
                         )}
                       >
@@ -665,7 +665,7 @@ export function SystemSettings() {
             ))}
           </div>
 
-          <div className="border-t border-border/30 pt-3">
+          <div className="border-t border-border/50 pt-3">
             <p className="text-[10px] font-medium text-muted-foreground mb-2">Grant Permission to User</p>
             <div className="flex gap-2">
               <Input
@@ -682,7 +682,7 @@ export function SystemSettings() {
             {userResults.length > 0 && (
               <div className="mt-2 space-y-1">
                 {userResults.map((u: any) => (
-                  <div key={u.uid || u.id} className="flex items-center justify-between p-2 rounded border border-border/30 bg-muted/10">
+                  <div key={u.uid || u.id} className="flex items-center justify-between p-2 rounded border border-border/50 bg-muted/20">
                     <div>
                       <p className="text-[10px] font-medium">{u.displayName || u.email || u.uid}</p>
                       <p className="text-[8px] text-muted-foreground font-mono">{u.email} · {u.uid}</p>
@@ -767,11 +767,11 @@ export function SystemSettings() {
       <Section title="Environment Status" desc="Current environment configuration (read-only)">
         <div className="space-y-0.5">
           {envEntries.map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+            <div key={key} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
               <span className="text-[10px] font-mono text-foreground/80">{key}</span>
               <span className={cn(
                 'text-[10px] font-mono',
-                value === 'not set' || value === '' ? 'text-muted-foreground/40 italic' : 'text-foreground',
+                value === 'not set' || value === '' ? 'text-muted-foreground/60 italic' : 'text-foreground',
               )}>
                 {value || 'not set'}
               </span>
@@ -793,7 +793,7 @@ export function SystemSettings() {
             <p className="text-[10px] text-muted-foreground italic">No API key data available</p>
           ) : (
             keyEntries.map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+              <div key={key} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                 <span className="text-[10px] font-mono text-foreground/80">{key}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono text-foreground/60">
@@ -841,7 +841,7 @@ export function SystemSettings() {
             { key: 'sms', label: 'SMS Notifications', desc: 'Send SMS for critical alerts' },
             { key: 'discord', label: 'Discord Webhook', desc: 'Post notifications to a Discord channel' },
           ].map(item => (
-            <div key={item.key} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+            <div key={item.key} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
               <div>
                 <p className="text-xs font-medium">{item.label}</p>
                 <p className="text-[10px] text-muted-foreground">{item.desc}</p>
@@ -901,7 +901,7 @@ export function SystemSettings() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-8 text-center">
-            <Terminal className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+            <Terminal className="w-6 h-6 text-muted-foreground/50 mx-auto mb-2" />
             <p className="text-[10px] text-muted-foreground">No system logs found</p>
           </div>
         ) : (
@@ -913,7 +913,7 @@ export function SystemSettings() {
                   ? 'text-yellow-400'
                   : 'text-muted-foreground';
               return (
-                <div key={log.id || i} className="flex items-start gap-2 py-1.5 border-b border-border/10 last:border-0 font-mono text-[9px]">
+                <div key={log.id || i} className="flex items-start gap-2 py-1.5 border-b border-border/30 last:border-0 font-mono text-[9px]">
                   <span className={cn('shrink-0 w-12', levelColor)}>
                     {log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '—'}
                   </span>
@@ -934,13 +934,13 @@ export function SystemSettings() {
       <Section title="Audit Logs" desc="Immutable record of all admin actions. Only the last 10 entries shown.">
         {auditLogs.length === 0 ? (
           <div className="py-8 text-center">
-            <ScrollText className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+            <ScrollText className="w-6 h-6 text-muted-foreground/50 mx-auto mb-2" />
             <p className="text-[10px] text-muted-foreground">No audit entries found</p>
           </div>
         ) : (
           <div className="space-y-1">
             {auditLogs.map(log => (
-              <div key={log.id} className="flex items-center gap-2 py-1.5 border-b border-border/10 last:border-0 text-[9px] font-mono">
+              <div key={log.id} className="flex items-center gap-2 py-1.5 border-b border-border/30 last:border-0 text-[9px] font-mono">
                 <span className="text-muted-foreground/50 shrink-0">
                   {log.timestamp ? new Date(log.timestamp).toLocaleString() : '—'}
                 </span>

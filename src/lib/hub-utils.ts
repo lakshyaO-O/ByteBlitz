@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
+import { getAdminAuth, getAdminFirestore, initializeAdmin } from '@/firebase/admin';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import { hasPermission, AdminRole } from '@/types/admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -10,6 +10,9 @@ export async function authenticateRequest(request: NextRequest, requireAdmin = f
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) as NextResponse;
+  }
+  if (!initializeAdmin()) {
+    return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 }) as NextResponse;
   }
   try {
     const decodedToken = await getAdminAuth().verifyIdToken(authHeader.slice(7));

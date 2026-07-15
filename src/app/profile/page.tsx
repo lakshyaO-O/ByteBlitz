@@ -229,7 +229,7 @@ function AchievementBadge({ achieved, label, icon: Icon }: { achieved: boolean; 
   return (
     <div className={cn(
       'flex flex-col items-center gap-2 p-3 rounded-lg border text-center',
-      achieved ? 'border-secondary/30 bg-secondary/5' : 'border-border bg-muted/20 opacity-50'
+      achieved ? 'border-secondary/30 bg-secondary/5' : 'border-border bg-muted/20 opacity-80'
     )}>
       <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', achieved ? 'bg-secondary/10' : 'bg-muted')}>
         {achieved ? (

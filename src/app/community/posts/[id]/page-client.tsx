@@ -251,7 +251,7 @@ function CommentThread({ comment, replies, onReply, isReplying, replyText, setRe
 }) {
   return (
     <div className="space-y-3">
-      <Card className="bg-card/30 border-border">
+      <Card className="bg-card/50 border-border">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Avatar className="h-8 w-8 border border-muted shrink-0">
@@ -277,7 +277,7 @@ function CommentThread({ comment, replies, onReply, isReplying, replyText, setRe
       {replies.length > 0 && (
         <div className="ml-8 space-y-3">
           {replies.map(reply => (
-            <Card key={reply.id} className="bg-card/20 border-border/50">
+            <Card key={reply.id} className="bg-card/40 border-border/70">
               <CardContent className="p-3">
                 <div className="flex items-start gap-2">
                   <Avatar className="h-6 w-6 border border-muted shrink-0">

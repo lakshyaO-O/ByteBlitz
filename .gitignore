@@ -44,15 +44,20 @@ next-env.d.ts
 # local env files (contain secrets)
 .env
 .env.local
+.env.production
+.env.vercel
+.env.vercel.pulled
+
+# vercel (already listed above)
+.vercel/
+!.vercel/repo.json
 
 # firebase
 firebase-debug.log
 firestore-debug.log
 
-.env.production
-.env.vercel
 dev-server.log
 public1/
 
-.vercel
+# catch any remaining .env files
 .env*

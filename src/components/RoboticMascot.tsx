@@ -78,7 +78,7 @@ export function RoboticMascot() {
   const initialStateRef = useRef({ x: defaultX, y: defaultY });
 
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hello! I'm **CodeAce** — don't feel embarres to ask for help! I can assist with algorithms, debugging, code reviews, and anything coding. What do you need?" },
+    { role: 'assistant', content: "Hello! I'm **CodeAce** — don't feel embarrassed to ask for help! I can assist with algorithms, debugging, code reviews, and anything coding. What do you need?" },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -186,9 +186,10 @@ export function RoboticMascot() {
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     setIsLoading(true);
     try {
+      const token = await (await import('firebase/auth')).getAuth().currentUser?.getIdToken();
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ message, history: messages.slice(-10) }),
       });
       const data = await response.json();

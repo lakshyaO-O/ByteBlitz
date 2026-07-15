@@ -1,17 +1,23 @@
-'use client';
+import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
+import SecurityPage from './page-client';
 
-import React from 'react';
-import { SecuritySettings } from '@/components/security/SecuritySettings';
-import { Shield } from 'lucide-react';
+export const metadata: Metadata = {
+  title: 'Security Settings',
+  description: 'Manage your DevRann account security settings, privacy controls, and authentication methods. Keep your coding profile safe.',
+  alternates: {
+    canonical: `${SITE_URL}/security`,
+  },
+  openGraph: {
+    title: 'Security Settings | DevRann',
+    description: 'Manage your DevRann account security settings and privacy controls.',
+  },
+  twitter: {
+    title: 'Security Settings | DevRann',
+    description: 'Manage your DevRann account security settings and privacy controls.',
+  },
+};
 
-export default function SecurityPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Shield className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-headline font-bold">Security</h1>
-      </div>
-      <SecuritySettings />
-    </div>
-  );
+export default function SecurityPageWrapper() {
+  return <SecurityPage />;
 }

@@ -77,7 +77,7 @@ export function QuickSearch() {
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
         <input
           ref={inputRef}
           type="text"
@@ -90,13 +90,13 @@ export function QuickSearch() {
           onFocus={() => setOpen(true)}
           className={cn(
             'w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-background',
-            'text-xs text-foreground placeholder:text-muted-foreground/40',
+            'text-xs text-foreground placeholder:text-muted-foreground/60',
             'focus:outline-none focus:ring-1 focus:ring-foreground/10 focus:border-foreground/20',
             'transition-colors',
           )}
         />
         {loading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/40 animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/60 animate-spin" />
         )}
       </div>
 
@@ -134,7 +134,7 @@ export function QuickSearch() {
                 href={`/admin/users`}
                 className="flex items-center gap-2.5 px-3 py-2 hover:bg-foreground/[0.02] transition-colors"
               >
-                <Users className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                <Users className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-foreground truncate">{user.username || user.email}</p>
                   <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
@@ -149,7 +149,7 @@ export function QuickSearch() {
                 href={`/admin/problems`}
                 className="flex items-center gap-2.5 px-3 py-2 hover:bg-foreground/[0.02] transition-colors"
               >
-                <Code2 className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                <Code2 className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-foreground truncate">{problem.title}</p>
                 </div>
@@ -170,7 +170,7 @@ export function QuickSearch() {
                 href={`/admin/community`}
                 className="flex items-center gap-2.5 px-3 py-2 hover:bg-foreground/[0.02] transition-colors"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-foreground truncate">{post.title || 'Untitled'}</p>
                   <p className="text-[10px] text-muted-foreground">by {post.username || 'Unknown'}</p>
@@ -181,7 +181,7 @@ export function QuickSearch() {
 
           {results && totalResults > 0 && (
             <div className="border-t border-border px-3 py-1.5">
-              <p className="text-[9px] text-muted-foreground/40">{totalResults} result{totalResults !== 1 ? 's' : ''}</p>
+              <p className="text-[9px] text-muted-foreground/60">{totalResults} result{totalResults !== 1 ? 's' : ''}</p>
             </div>
           )}
         </div>

@@ -4,29 +4,29 @@
 
 @layer base {
   :root {
-    --background: 0 0% 3%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 95%;
+    --background: 0 0% 2%;
+    --foreground: 40 15% 93%;
+    --card: 0 0% 8%;
+    --card-foreground: 40 15% 93%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 40 15% 93%;
     --primary: 217 76% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 9%;
-    --secondary-foreground: 0 0% 75%;
-    --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 45%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 84%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 64%;
     --accent: 217 76% 52%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 78% 56%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
     --ring: 217 76% 52%;
     --radius: 0.5rem;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.5), 0 4px 12px -2px rgb(0 0 0 / 0.3);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+    --shadow-md: 0 4px 14px -2px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 12px 36px -8px rgb(0 0 0 / 0.7), 0 4px 12px -2px rgb(0 0 0 / 0.4);
   }
 
   .light {
@@ -53,6 +53,15 @@
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
     --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
     --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.08), 0 4px 12px -2px rgb(0 0 0 / 0.04);
+  }
+}
+
+@layer base {
+  .dark-card-elevation {
+    box-shadow: 0 0 0 1px hsl(var(--border)), var(--shadow-sm);
+  }
+  .dark-card-elevation-hover {
+    box-shadow: 0 0 0 1px hsl(var(--border)), var(--shadow-md);
   }
 }
 

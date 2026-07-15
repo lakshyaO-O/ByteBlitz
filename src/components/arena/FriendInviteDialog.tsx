@@ -142,7 +142,7 @@ export function FriendInviteDialog({ roomId, roomCode }: FriendInviteDialogProps
                               'text-[10px] px-1.5 py-0 h-4',
                               friend.onlineStatus === 'online' && 'border-green-500/50 text-green-500',
                               friend.onlineStatus === 'in-game' && 'border-yellow-500/50 text-yellow-500',
-                              friend.onlineStatus === 'offline' && 'border-gray-500/50 text-gray-500',
+                              friend.onlineStatus === 'offline' && 'border-muted-foreground/30 text-muted-foreground/60',
                             )}
                           >
                             {friend.onlineStatus === 'online' ? 'Online' : friend.onlineStatus === 'in-game' ? 'In Game' : 'Offline'}

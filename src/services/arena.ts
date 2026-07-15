@@ -254,140 +254,30 @@ export async function submitBattleCode(
   battleId: string, userId: string, code: string, language: CodingLanguage,
   testCases: Array<{ input: string; expected: string }>,
 ) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return { passed: 0, total: 0, verdict: 'Accepted' as const };
+  try {
+    const user = (await import('firebase/auth')).getAuth().currentUser;
+    if (!user) return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
+    const idToken = await user.getIdToken();
 
-  let passed = 0;
-  const total = testCases.length;
-  let verdict: 'Accepted' | 'Wrong Answer' | 'Runtime Error' = 'Accepted';
-
-  for (const tc of testCases) {
-    try {
-      const fn = new Function('input', `
-        const lines = input.trim().split('\\n');
-        const parse = (line) => {
-          try { return JSON.parse(line); } catch { return line; }
-        };
-        const parsed = lines.map(parse);
-        const result = (function() {
-          ${code}
-        }).apply(null, parsed.length === 1 ? [parsed[0]] : parsed);
-        return typeof result === 'object' ? JSON.stringify(result) : String(result);
-      `);
-      const actualOutput = fn(tc.input);
-      if (actualOutput.trim() === tc.expected.trim()) {
-        passed++;
-      } else {
-        if (verdict === 'Accepted') verdict = 'Wrong Answer';
-      }
-    } catch {
-      if (verdict === 'Accepted') verdict = 'Runtime Error';
-    }
-  }
-
-  const battleSnap = await getDoc(doc(db, 'battles', battleId));
-  if (battleSnap.exists()) {
-    const battle = battleSnap.data() as BattleDocument;
-    const players = battle.players.map(p => {
-      if (p.userId === userId) {
-        return {
-          ...p,
-          code,
-          language,
-          passedTestCases: passed,
-          submissionCount: p.submissionCount + 1,
-          lastSubmittedAt: new Date().toISOString(),
-        };
-      }
-      return p;
+    const res = await fetch('/api/battles/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ battleId, code, language }),
     });
 
-    const allDone = players.every(p => p.submissionCount > 0);
-    let phase: BattlePhase = battle.phase;
-    let winnerIds: string[] = battle.winnerIds;
-
-    if (allDone && phase === 'coding') {
-      phase = 'scoring';
-      const p1 = players[0];
-      const p2 = players[1];
-      if (p1.passedTestCases > p2.passedTestCases) {
-        winnerIds = [p1.userId];
-        players.forEach(p => { p.result = p.userId === p1.userId ? 'win' : 'loss'; });
-      } else if (p2.passedTestCases > p1.passedTestCases) {
-        winnerIds = [p2.userId];
-        players.forEach(p => { p.result = p.userId === p2.userId ? 'win' : 'loss'; });
-      } else {
-        winnerIds = [p1.userId, p2.userId];
-        players.forEach(p => { p.result = 'draw'; });
-      }
-
-      if (battle.rated && winnerIds.length === 1) {
-        const winnerId = winnerIds[0];
-        const loserId = players.find(p => p.userId !== winnerId)!.userId;
-        const winnerRating = players.find(p => p.userId === winnerId)!.rating;
-        const loserRating = players.find(p => p.userId !== winnerId)!.rating;
-
-        await runTransaction(db, async (tx) => {
-          const winnerRef = doc(db, 'users', winnerId);
-          const loserRef = doc(db, 'users', loserId);
-          const [winnerSnap, loserSnap] = await Promise.all([
-            tx.get(winnerRef), tx.get(loserRef),
-          ]);
-          if (winnerSnap.exists() && loserSnap.exists()) {
-            const newWinnerRating = calculateNewRating(winnerRating, loserRating, 1);
-            const newLoserRating = calculateNewRating(loserRating, winnerRating, 0);
-            const eloWin = newWinnerRating - winnerRating;
-            const eloLoss = loserRating - newLoserRating;
-            tx.update(winnerRef, {
-              rating: newWinnerRating,
-              wins: increment(1),
-              xp: increment(100),
-              lastActive: serverTimestamp(),
-            });
-            tx.update(loserRef, {
-              rating: newLoserRating,
-              losses: increment(1),
-              xp: increment(20),
-              lastActive: serverTimestamp(),
-            });
-            players.forEach(p => {
-              if (p.userId === winnerId) p.eloChange = Math.round(eloWin);
-              if (p.userId === loserId) p.eloChange = -Math.round(eloLoss);
-            });
-          }
-        });
-      } else if (battle.rated && winnerIds.length > 1) {
-        await runTransaction(db, async (tx) => {
-          for (const p of players) {
-            const userRef = doc(db, 'users', p.userId);
-            const userSnap = await tx.get(userRef);
-            if (userSnap.exists()) {
-              tx.update(userRef, {
-                draws: increment(1),
-                xp: increment(50),
-                lastActive: serverTimestamp(),
-              });
-            }
-          }
-        });
-      }
-
-      phase = 'finished';
-      const finishedAt = new Date().toISOString();
-      await updateDoc(doc(db, 'battles', battleId), {
-        players, phase, winnerIds, status: 'completed',
-        updatedAt: serverTimestamp(),
-      });
-
-      await createMatchRecord(battle, players, winnerIds);
-    } else {
-      await updateDoc(doc(db, 'battles', battleId), {
-        players, updatedAt: serverTimestamp(),
-      });
-    }
+    const data = await res.json();
+    if (!res.ok) return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
+    return {
+      passed: data.passed || 0,
+      total: data.total || testCases.length,
+      verdict: (data.result === 'WIN' ? 'Accepted' : data.result === 'LOSS' ? 'Wrong Answer' : 'Accepted') as 'Accepted' | 'Wrong Answer' | 'Runtime Error',
+    };
+  } catch {
+    return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
   }
-
-  return { passed, total, verdict };
 }
 
 async function createMatchRecord(

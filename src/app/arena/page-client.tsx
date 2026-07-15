@@ -348,7 +348,7 @@ export default function ArenaPage() {
                   <div className="divide-y divide-border/30">
                     {recentMatches.length === 0 ? (
                       <div className="p-6 text-center">
-                        <Gamepad2 className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                        <Gamepad2 className="w-8 h-8 text-muted-foreground/60 mx-auto mb-2" />
                         <p className="text-xs text-muted-foreground">No matches yet. Enter the arena!</p>
                       </div>
                     ) : (
@@ -357,7 +357,7 @@ export default function ArenaPage() {
                         const result = myPlayer?.result || 'DRAW';
                         const eloChange = myPlayer?.eloChange || 0;
                         return (
-                          <div key={match.id || i} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                          <div key={match.id || i} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/40 transition-colors">
                             <div className={cn("w-2 h-2 rounded-full shrink-0", result === 'WIN' ? 'bg-emerald-400' : result === 'LOSS' ? 'bg-red-400' : 'bg-yellow-400')} />
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium truncate">vs {match.players?.find(p => p.uid !== user?.uid)?.username || 'Unknown'}</p>

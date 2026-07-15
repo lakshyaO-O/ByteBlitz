@@ -240,7 +240,7 @@ export function ModerationPanel() {
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
           <Input
             placeholder="Search reports..."
             className="pl-8 h-8 text-xs bg-muted/30 border-border"
@@ -302,7 +302,7 @@ export function ModerationPanel() {
                 const config = getConfirmConfig(report, 'approve');
                 const isHighReportCount = report.reportCount >= 3;
                 return (
-                  <div key={report.id} className="p-3 hover:bg-muted/10 transition-colors">
+                  <div key={report.id} className="p-3 hover:bg-muted/30 transition-colors">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0 flex-1 space-y-1.5">
                         {/* Target & Status badges */}
@@ -361,7 +361,7 @@ export function ModerationPanel() {
 
                         {/* Resolution info */}
                         {report.status !== 'pending' && (
-                          <div className="flex items-center gap-2 text-[9px] text-muted-foreground/40">
+                          <div className="flex items-center gap-2 text-[9px] text-muted-foreground/60">
                             <span>Resolved by {report.resolvedByEmail || report.resolvedBy}</span>
                             {report.resolvedAt && <span>· {new Date(report.resolvedAt).toLocaleDateString()}</span>}
                             {report.resolutionNote && <span>· Note: {report.resolutionNote}</span>}
@@ -375,21 +375,21 @@ export function ModerationPanel() {
                           <button
                             onClick={() => setConfirmAction({ report, action: 'approve' })}
                             disabled={actionLoading === report.id}
-                            className="px-2 py-1 text-[10px] font-medium text-emerald-600 hover:bg-emerald-500/5 rounded-md transition-colors disabled:opacity-40"
+                            className="px-2 py-1 text-[10px] font-medium text-emerald-600 hover:bg-emerald-500/5 rounded-md transition-colors disabled:opacity-60"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => setConfirmAction({ report, action: 'reject' })}
                             disabled={actionLoading === report.id}
-                            className="px-2 py-1 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-md transition-colors disabled:opacity-40"
+                            className="px-2 py-1 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-md transition-colors disabled:opacity-60"
                           >
                             Reject
                           </button>
                           <div className="relative group">
                             <button
                               disabled={actionLoading === report.id}
-                              className="px-2 py-1 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-md transition-colors disabled:opacity-40 flex items-center gap-0.5"
+                              className="px-2 py-1 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 rounded-md transition-colors disabled:opacity-60 flex items-center gap-0.5"
                             >
                               Actions
                               <ChevronDown className="w-2.5 h-2.5" />
@@ -465,7 +465,7 @@ export function ModerationPanel() {
                 }
                 value={warnReason}
                 onChange={e => setWarnReason(e.target.value)}
-                className="w-full min-h-[60px] text-xs bg-muted/30 border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-foreground/20 placeholder:text-muted-foreground/40"
+                className="w-full min-h-[60px] text-xs bg-muted/30 border border-border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-foreground/20 placeholder:text-muted-foreground/60"
               />
             </div>
           )}

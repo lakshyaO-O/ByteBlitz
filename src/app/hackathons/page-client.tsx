@@ -86,7 +86,7 @@ function EmptySectionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className={cn(
-        'relative overflow-hidden rounded-xl border border-dashed border-border/40 bg-muted/5 p-8',
+        'relative overflow-hidden rounded-xl border border-dashed border-border/40 bg-muted/10 p-8',
         className
       )}
     >
@@ -135,7 +135,7 @@ function EventPlaceholderCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
     >
-      <Card className="group relative overflow-hidden border-border/50 bg-card/30 hover:border-primary/20 hover:bg-card/50 transition-all duration-300">
+      <Card className="group relative overflow-hidden border-border/50 bg-card/50 hover:border-primary/20 hover:bg-card/70 transition-all duration-300">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start gap-5">
@@ -151,7 +151,7 @@ function EventPlaceholderCard({
                     className={cn(
                       'text-[9px] uppercase tracking-widest font-bold',
                       badgeVariant === 'default' && 'bg-primary/10 text-primary border-primary/30',
-                      !badgeVariant && 'bg-muted/30 text-muted-foreground border-border/40'
+                      !badgeVariant && 'bg-muted/30 text-muted-foreground border-border/60'
                     )}
                   >
                     {badgeText}
@@ -164,7 +164,7 @@ function EventPlaceholderCard({
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 rounded-md bg-muted/20 text-[10px] font-mono text-muted-foreground/60 border border-border/30"
+                      className="px-2 py-0.5 rounded-md bg-muted/40 text-[10px] font-mono text-muted-foreground/60 border border-border/50"
                     >
                       {tag}
                     </span>
@@ -176,7 +176,7 @@ function EventPlaceholderCard({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-xs gap-1.5 border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40"
+                    className="text-xs gap-1.5 border-primary/20 text-primary/70 hover:text-primary hover:border-primary/60"
                     onClick={onAction}
                   >
                     {actionLabel}
@@ -241,7 +241,7 @@ export default function HackathonsPage() {
         {/* Tabs + Filters */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex gap-1.5 bg-muted/40 p-1 rounded-lg border border-border/30">
+              <div className="flex gap-1.5 bg-muted/40 p-1 rounded-lg border border-border/50">
               {tabs.map((tab) => (
                 <button
                   key={tab.value}
@@ -270,7 +270,7 @@ export default function HackathonsPage() {
                     'px-3 py-1.5 rounded-lg text-[11px] font-medium uppercase tracking-wider transition-all border',
                     activeCategory === cat
                       ? 'bg-primary/10 text-primary border-primary/30'
-                      : 'bg-transparent text-muted-foreground/50 border-transparent hover:text-muted-foreground hover:border-border/30'
+                      : 'bg-transparent text-muted-foreground/70 border-transparent hover:text-muted-foreground hover:border-border/50'
                   )}
                 >
                   {cat}
@@ -286,7 +286,7 @@ export default function HackathonsPage() {
                     'px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold transition-all',
                     activeDifficulty === d
                       ? 'text-primary'
-                      : 'text-muted-foreground/40 hover:text-muted-foreground/70'
+                      : 'text-muted-foreground/60 hover:text-muted-foreground/80'
                   )}
                 >
                   {d}
@@ -310,7 +310,7 @@ export default function HackathonsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.35 }}
             >
-              <Card className="bg-card/40 border-border/40 hover:border-primary/20 transition-colors">
+              <Card className="bg-card/60 border-border/60 hover:border-primary/20 transition-colors">
                 <CardContent className="p-5 text-center space-y-2">
                   <stat.icon className={cn('w-6 h-6 mx-auto', stat.color)} />
                   <div className={cn('text-2xl font-headline font-black', stat.color)}>{stat.value}</div>
@@ -337,7 +337,7 @@ export default function HackathonsPage() {
                     <Badge className="bg-primary/15 text-primary border-primary/30 text-[11px] uppercase tracking-wider font-bold px-3 py-1">
                       <Sparkles className="w-3 h-3 mr-1.5" /> Next Event
                     </Badge>
-                    <span className="text-[10px] font-mono text-muted-foreground/50">Season 2</span>
+                    <span className="text-[10px] font-mono text-muted-foreground/70">Season 2</span>
                   </div>
 
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-headline font-black tracking-tight">
@@ -355,11 +355,11 @@ export default function HackathonsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <CountdownUnit value={countdown.days} label="Days" />
-                      <span className="text-muted-foreground/20 font-mono text-lg">:</span>
-                      <CountdownUnit value={countdown.hours} label="Hrs" />
-                      <span className="text-muted-foreground/20 font-mono text-lg">:</span>
-                      <CountdownUnit value={countdown.minutes} label="Min" />
-                      <span className="text-muted-foreground/20 font-mono text-lg">:</span>
+              <span className="text-muted-foreground/40 font-mono text-lg">:</span>
+              <CountdownUnit value={countdown.hours} label="Hrs" />
+              <span className="text-muted-foreground/40 font-mono text-lg">:</span>
+              <CountdownUnit value={countdown.minutes} label="Min" />
+              <span className="text-muted-foreground/40 font-mono text-lg">:</span>
                       <CountdownUnit value={countdown.seconds} label="Sec" />
                     </div>
                   </div>
@@ -375,18 +375,18 @@ export default function HackathonsPage() {
                   </div>
                 </div>
 
-                <div className="hidden lg:flex flex-col items-center gap-4 p-6 rounded-xl bg-muted/10 border border-border/30 min-w-[200px]">
+                <div className="hidden lg:flex flex-col items-center gap-4 p-6 rounded-xl bg-muted/20 border border-border/50 min-w-[200px]">
                   <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/10">
                     <Trophy className="w-8 h-8 text-orange-400/80" />
                   </div>
                   <div className="text-center space-y-1">
                     <div className="text-2xl font-headline font-black text-orange-400/80">$25K+</div>
-                    <div className="text-[9px] text-muted-foreground/50 uppercase tracking-widest font-bold">Prize Pool</div>
+                    <div className="text-[9px] text-muted-foreground/70 uppercase tracking-widest font-bold">Prize Pool</div>
                   </div>
                   <div className="w-full h-px bg-border/30" />
                   <div className="text-center space-y-1">
                     <div className="text-lg font-headline font-bold text-foreground/60">500+</div>
-                    <div className="text-[9px] text-muted-foreground/50 uppercase tracking-widest font-bold">Expected Participants</div>
+                    <div className="text-[9px] text-muted-foreground/70 uppercase tracking-widest font-bold">Expected Participants</div>
                   </div>
                 </div>
               </div>

@@ -42,6 +42,11 @@ const staticRoutes: RouteConfig[] = [
   { path: '/resume-reviewer', changeFrequency: 'weekly', priority: 0.5 },
   { path: '/replay', changeFrequency: 'weekly', priority: 0.4 },
   { path: '/shop', changeFrequency: 'weekly', priority: 0.5 },
+  { path: '/replay', changeFrequency: 'weekly', priority: 0.4 },
+  { path: '/docs', changeFrequency: 'monthly', priority: 0.4 },
+  { path: '/security', changeFrequency: 'monthly', priority: 0.4 },
+  { path: '/community/guidelines', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/learn/concepts', changeFrequency: 'weekly', priority: 0.6 },
 ];
 
 function escapeXml(str: string): string {

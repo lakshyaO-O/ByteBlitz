@@ -112,8 +112,13 @@ service cloud.firestore {
 
       match /friends/{friendId} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendId);
-        allow update, delete: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.userId == userId
+          && request.resource.data.friendId == friendId
+          && request.resource.data.status in ['pending', 'accepted'];
+        allow update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['status', 'updatedAt']);
+        allow delete: if isOwner(userId);
       }
 
       match /friendRequests/{reqId} {
@@ -428,6 +433,9 @@ service cloud.firestore {
         && request.resource.data.players is list
         && request.resource.data.players.size() == 2
         && request.resource.data.players[0].userId == request.auth.uid
+        && request.resource.data.players[0].userId is string
+        && request.resource.data.players[1].userId is string
+        && request.resource.data.players[0].userId != request.resource.data.players[1].userId
         && request.resource.data.phase == 'countdown'
         && request.resource.data.status == 'active';
 

@@ -1,20 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase/auth/use-user';
 import { LoadingScreen } from '@/components/common/LoadingScreen';
-
-const LandingPage = dynamic(() => import('@/components/landing/LandingPage').then((mod) => mod.LandingPage), {
-  ssr: false,
-  loading: () => <LoadingScreen message="Preparing experience..." />,
-});
+import { LandingPage } from '@/components/landing/LandingPage';
 
 export default function Home() {
   const router = useRouter();
   const { user, loading: authLoading, error } = useUser();
   const [renderError, setRenderError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -27,6 +27,10 @@ export default function Home() {
       setRenderError(error);
     }
   }, [error]);
+
+  if (!isClient) {
+    return <LandingPage />;
+  }
 
   if (authLoading) {
     return <LoadingScreen message="Checking authentication..." />;

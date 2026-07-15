@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getAdminFirestore } from '@/firebase/admin';
 
 interface RateLimitEntry {
   count: number;
@@ -62,6 +63,52 @@ export function checkRateLimit(
   }
 
   return { allowed: true, retryAfterMs: 0 };
+}
+
+export async function checkRateLimitFirestore(
+  uid: string,
+  action: string,
+  config: RateLimitConfig = DEFAULT_CONFIG,
+): Promise<{ allowed: boolean; retryAfterMs: number }> {
+  try {
+    const db = getAdminFirestore();
+    const docId = `${action}_${uid}`;
+    const ref = db.collection('rateLimits').doc(docId);
+    const snap = await ref.get();
+    const now = Date.now();
+
+    if (!snap.exists) {
+      await ref.set({
+        count: 1,
+        windowStart: now,
+        action,
+        uid,
+      });
+      return { allowed: true, retryAfterMs: 0 };
+    }
+
+    const data = snap.data()!;
+    const windowStart = data.windowStart as number;
+
+    if (now - windowStart > config.windowMs) {
+      await ref.update({
+        count: 1,
+        windowStart: now,
+      });
+      return { allowed: true, retryAfterMs: 0 };
+    }
+
+    const count = (data.count as number) + 1;
+    if (count > config.maxRequests) {
+      const retryAfterMs = config.windowMs - (now - windowStart);
+      return { allowed: false, retryAfterMs };
+    }
+
+    await ref.update({ count });
+    return { allowed: true, retryAfterMs: 0 };
+  } catch {
+    return { allowed: true, retryAfterMs: 0 };
+  }
 }
 
 export function rateLimitResponse(retryAfterMs: number): NextResponse {

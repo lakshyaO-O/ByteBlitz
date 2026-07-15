@@ -9,12 +9,12 @@ type ValidationError = { message: string; variable?: string };
 function validateEnv(): ValidationError[] {
   const errors: ValidationError[] = [];
 
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
   if (!projectId) {
-    errors.push({ message: 'Missing NEXT_PUBLIC_FIREBASE_PROJECT_ID', variable: 'NEXT_PUBLIC_FIREBASE_PROJECT_ID' });
+    errors.push({ message: 'Missing FIREBASE_PROJECT_ID (or NEXT_PUBLIC_FIREBASE_PROJECT_ID)', variable: 'FIREBASE_PROJECT_ID' });
   }
 
   if (!clientEmail) {
@@ -34,6 +34,10 @@ function validateEnv(): ValidationError[] {
   return errors;
 }
 
+function getProjectId(): string {
+  return process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || '';
+}
+
 function logErrors(errors: ValidationError[]): void {
   for (const err of errors) {
     console.error(`[Firebase Admin] ${err.message}`);
@@ -51,7 +55,7 @@ export function initializeAdmin(): boolean {
     return false;
   }
 
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
+  const projectId = getProjectId();
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL!;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY!;
 

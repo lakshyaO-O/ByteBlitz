@@ -189,7 +189,7 @@ export function UserInspector() {
       {/* Search */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
           <input
             type="text"
             placeholder="Search by UID, username, or email..."
@@ -197,7 +197,7 @@ export function UserInspector() {
             onChange={e => setQuery(e.target.value)}
             className={cn(
               'w-full h-10 pl-10 pr-3 rounded-lg border border-border bg-background',
-              'text-sm text-foreground placeholder:text-muted-foreground/40',
+              'text-sm text-foreground placeholder:text-muted-foreground/60',
               'focus:outline-none focus:ring-1 focus:ring-foreground/10 focus:border-foreground/20',
             )}
           />
@@ -236,7 +236,7 @@ export function UserInspector() {
                 {data.profile.photoURL ? (
                   <img src={data.profile.photoURL} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-lg font-medium text-foreground/40">
+                  <span className="text-lg font-medium text-foreground/60">
                     {(data.profile.username?.[0] || data.profile.email?.[0] || '?').toUpperCase()}
                   </span>
                 )}
@@ -299,7 +299,7 @@ export function UserInspector() {
               <div key={stat.label} className="rounded-lg border border-border bg-background p-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] text-muted-foreground font-medium">{stat.label}</span>
-                  <stat.icon className="w-3 h-3 text-muted-foreground/40" />
+                  <stat.icon className="w-3 h-3 text-muted-foreground/60" />
                 </div>
                 <span className="text-sm font-semibold text-foreground">{stat.value}</span>
               </div>
@@ -311,7 +311,7 @@ export function UserInspector() {
             {/* Submissions */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Code2 className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Code2 className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Submission History
               </h3>
               <div className="rounded-lg border border-border divide-y divide-border max-h-[300px] overflow-y-auto">
@@ -343,7 +343,7 @@ export function UserInspector() {
             {/* Languages */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Code2 className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Code2 className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Languages Used
               </h3>
               <div className="rounded-lg border border-border p-4">
@@ -364,7 +364,7 @@ export function UserInspector() {
             {/* Community Posts */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Community Posts
               </h3>
               <div className="rounded-lg border border-border divide-y divide-border max-h-[200px] overflow-y-auto">
@@ -384,7 +384,7 @@ export function UserInspector() {
             {/* Forum Threads */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Forum Threads
               </h3>
               <div className="rounded-lg border border-border divide-y divide-border max-h-[200px] overflow-y-auto">
@@ -404,7 +404,7 @@ export function UserInspector() {
             {/* Achievements & Badges */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Award className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Award className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Achievements
               </h3>
               <div className="rounded-lg border border-border p-4">
@@ -423,7 +423,7 @@ export function UserInspector() {
             {/* Contest History */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Flag className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Flag className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Contest History
               </h3>
               <div className="rounded-lg border border-border p-4">
@@ -442,7 +442,7 @@ export function UserInspector() {
             {/* AI Usage */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Brain className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Brain className="w-3.5 h-3.5 text-muted-foreground/60" />
                 AI Usage
               </h3>
               <div className="rounded-lg border border-border p-4">
@@ -464,7 +464,7 @@ export function UserInspector() {
             {/* Audit Logs */}
             <section>
               <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Shield className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Shield className="w-3.5 h-3.5 text-muted-foreground/60" />
                 Recent Audit Logs
               </h3>
               <div className="rounded-lg border border-border divide-y divide-border max-h-[200px] overflow-y-auto">
@@ -482,7 +482,7 @@ export function UserInspector() {
                         )}>{log.action}</span>
                         <span className="text-muted-foreground/60">by {log.performedByEmail || log.performedBy}</span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground/40">{log.timestamp ? new Date(log.timestamp).toLocaleString() : '—'}</p>
+                      <p className="text-[10px] text-muted-foreground/60">{log.timestamp ? new Date(log.timestamp).toLocaleString() : '—'}</p>
                     </div>
                   ))
                 )}
@@ -493,7 +493,7 @@ export function UserInspector() {
             {data.session && (
               <section>
                 <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground/40" />
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
                   Session
                 </h3>
                 <div className="rounded-lg border border-border p-4">
@@ -506,7 +506,7 @@ export function UserInspector() {
           {/* Admin Actions */}
           <section>
             <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-              <Shield className="w-3.5 h-3.5 text-muted-foreground/40" />
+              <Shield className="w-3.5 h-3.5 text-muted-foreground/60" />
               Admin Actions
             </h3>
             <div className="rounded-lg border border-border p-4">

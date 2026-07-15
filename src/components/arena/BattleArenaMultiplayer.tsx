@@ -47,30 +47,11 @@ function formatTime(ms: number): string {
 
 function runTests(code: string, testCases: { input: string; expected: string }[]): ConsoleLine[] {
   const lines: ConsoleLine[] = []
-  try {
-    const fn = new Function(code + '\nreturn { run: (input) => eval(input) };')
-    const mod = fn()
-
-    for (let i = 0; i < testCases.length; i++) {
-      const tc = testCases[i]
-      try {
-        const result = String(mod.run(tc.input))
-        const passed = result === tc.expected
-        lines.push({
-          type: passed ? 'pass' : 'fail',
-          text: `Test ${i + 1}: ${passed ? 'PASS' : 'FAIL'} — got "${result}", expected "${tc.expected}"`,
-        })
-      } catch (e: unknown) {
-        lines.push({
-          type: 'fail',
-          text: `Test ${i + 1}: ERROR — ${e instanceof Error ? e.message : String(e)}`,
-        })
-      }
-    }
-  } catch (e: unknown) {
+  for (let i = 0; i < testCases.length; i++) {
+    const tc = testCases[i]
     lines.push({
-      type: 'fail',
-      text: `Compilation Error: ${e instanceof Error ? e.message : String(e)}`,
+      type: 'info',
+      text: `Test ${i + 1}: Run via /api/judge/execute — check console for results.`,
     })
   }
   return lines
@@ -401,7 +382,7 @@ export function BattleArenaMultiplayer({
                           Output: <span className="text-green-300">{ex.output}</span>
                         </p>
                         {ex.explanation && (
-                          <p className="text-gray-500 mt-1 text-xs">{ex.explanation}</p>
+                          <p className="text-muted-foreground/70 mt-1 text-xs">{ex.explanation}</p>
                         )}
                       </div>
                     ))}
@@ -426,7 +407,7 @@ export function BattleArenaMultiplayer({
                     <h4 className="text-primary font-headline uppercase tracking-wider text-xs mb-2">
                       Test Cases ({battle.problem.testCases.length})
                     </h4>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-muted-foreground/70 text-xs">
                       Use "Run Tests" to validate your solution locally before submitting.
                     </p>
                   </div>
@@ -549,8 +530,8 @@ export function BattleArenaMultiplayer({
         <Card className="bg-gray-950 border-gray-800">
           <CardContent className="p-0">
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 border-b border-gray-800">
-              <Terminal className="h-4 w-4 text-gray-500" />
-              <span className="text-xs text-gray-500 font-headline uppercase tracking-wider">
+              <Terminal className="h-4 w-4 text-muted-foreground/70" />
+              <span className="text-xs text-muted-foreground/70 font-headline uppercase tracking-wider">
                 Console Output
               </span>
             </div>
@@ -565,7 +546,7 @@ export function BattleArenaMultiplayer({
                       line.type === 'fail' && 'text-red-400',
                       line.type === 'warning' && 'text-yellow-400',
                       line.type === 'info' && 'text-cyan-400',
-                      line.type === 'system' && 'text-gray-500'
+                      line.type === 'system' && 'text-muted-foreground/70'
                     )}
                   >
                     {line.type === 'pass' && <CheckCircle2 className="inline h-3 w-3 mr-1.5 -mt-0.5" />}

@@ -17,7 +17,7 @@ export default function NotFound() {
       <div className="text-center space-y-6 max-w-md px-6">
         <div className="relative">
           <div className="w-20 h-20 mx-auto relative flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-30" />
+            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-60" />
             <div className="absolute inset-2 rounded-full border-2 border-primary/30" />
             <div className="absolute inset-4 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-3xl font-headline font-bold text-primary">404</span>

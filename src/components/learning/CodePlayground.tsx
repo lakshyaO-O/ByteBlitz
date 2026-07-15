@@ -20,16 +20,28 @@ interface CodePlaygroundProps {
   language?: string;
 }
 
-function runJavaScript(code: string, input: string = ''): string {
-  const logs: string[] = [];
-  const print = (...args: any[]) => logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
-
+async function runCodeViaApi(code: string): Promise<string> {
   try {
-    const fn = new Function('console', 'input', 'print', code);
-    fn({ log: print }, input, print);
-    return logs.join('\n');
+    const idToken = await fetch('/api/auth/session').then(r => r.text());
+    const res = await fetch('/api/judge/execute', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({
+        code,
+        language: 'javascript',
+        testCases: [{ input: '1', expected: '1' }],
+        timeLimitMs: 5000,
+        memoryLimitKb: 512000,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) return `Error: ${data.error || 'Execution failed'}`;
+    return data.testCaseResults?.[0]?.actualOutput || data.compileError || 'Execution completed (no output)';
   } catch (err: any) {
-    return `Error: ${err.message || 'Runtime error'}`;
+    return `Error: ${err.message || 'Failed to execute code'}`;
   }
 }
 
@@ -62,14 +74,14 @@ export function CodePlayground({
     setAllPassed(false);
   }, [starterCode]);
 
-  const handleRun = () => {
+  const handleRun = async () => {
     setIsRunning(true);
     setOutput(null);
     setTestResults(null);
     setAllPassed(false);
 
-    setTimeout(() => {
-      const result = runJavaScript(code);
+    try {
+      const result = await runCodeViaApi(code);
 
       if (testCases && testCases.length > 0) {
         const results = testCases.map(tc => ({
@@ -79,8 +91,7 @@ export function CodePlayground({
           actual: '',
         }));
 
-        const fullResult = runJavaScript(code, '');
-        const lines = fullResult.split('\n').filter(l => l);
+        const lines = result.split('\n').filter(l => l);
 
         let passedCount = 0;
         for (let i = 0; i < Math.min(results.length, lines.length); i++) {
@@ -91,7 +102,7 @@ export function CodePlayground({
         }
 
         setTestResults(results);
-        setOutput(fullResult);
+        setOutput(result);
 
         if (passedCount === results.length && results.length > 0) {
           setAllPassed(true);
@@ -106,8 +117,11 @@ export function CodePlayground({
       }
 
       onRun?.(result);
+    } catch (err: any) {
+      setOutput(`Error: ${err.message || 'Execution failed'}`);
+    } finally {
       setIsRunning(false);
-    }, 300);
+    }
   };
 
   const handleReset = () => {

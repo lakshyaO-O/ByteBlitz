@@ -302,7 +302,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
       {/* Sidebar */}
-      <div className="w-12 border-r border-border/30 flex flex-col items-center py-2 gap-0.5 bg-background/50">
+      <div className="w-12 border-r border-border/50 flex flex-col items-center py-2 gap-0.5 bg-background/50">
         {SIDEBAR_TABS.map(tab => (
           <button
             key={tab.id}
@@ -311,7 +311,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
               'w-9 h-9 rounded-lg flex items-center justify-center transition-all relative',
               activeTab === tab.id
                 ? 'bg-primary/10 text-primary'
-                : 'text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/10',
+                : 'text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/30',
             )}
             title={tab.label}
           >
@@ -326,7 +326,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <div className="flex items-center gap-2 px-4 h-10 border-b border-border/20 shrink-0">
+        <div className="flex items-center gap-2 px-4 h-10 border-b border-border/40 shrink-0">
           <Button variant="ghost" size="icon" className="h-7 w-7 -ml-1" onClick={onBack}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -359,7 +359,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
             </div>
 
             {problem.constraints && problem.constraints.length > 0 && (
-              <div className="p-3 rounded-lg bg-muted/10 border border-border/30">
+              <div className="p-3 rounded-lg bg-muted/20 border border-border/50">
                 <p className="text-[10px] font-medium text-foreground mb-1.5">Constraints</p>
                 <ul className="space-y-0.5">
                   {problem.constraints.map((c, i) => (
@@ -372,7 +372,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
             {problem.examples && problem.examples.length > 0 && (
               <div className="space-y-2">
                 {problem.examples.map((ex, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-muted/10 border border-border/30">
+                  <div key={i} className="p-3 rounded-lg bg-muted/20 border border-border/50">
                     <p className="text-[9px] font-medium text-muted-foreground uppercase mb-1.5">Example {i + 1}</p>
                     <div className="space-y-1 text-[11px]">
                       <div><span className="text-muted-foreground">Input:</span> <span className="font-mono">{ex.input}</span></div>
@@ -476,7 +476,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         onClick={() => setActiveTab('mentor')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Brain className="w-5 h-5 text-violet-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">AI Mentor</h4>
@@ -484,7 +484,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('hints')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Lightbulb className="w-5 h-5 text-amber-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Progressive Hints</h4>
@@ -492,7 +492,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('patterns')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Network className="w-5 h-5 text-indigo-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Pattern Analysis</h4>
@@ -500,7 +500,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('mistakes')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Common Mistakes</h4>
@@ -508,7 +508,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('complexity')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <BarChart3 className="w-5 h-5 text-rose-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Complexity Analyzer</h4>
@@ -516,7 +516,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('visualize')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Eye className="w-5 h-5 text-emerald-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Algorithm Visualizer</h4>
@@ -524,7 +524,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('interview')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Building2 className="w-5 h-5 text-blue-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Interview Context</h4>
@@ -532,7 +532,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('similar')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Layers className="w-5 h-5 text-indigo-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Similar Problems</h4>
@@ -540,7 +540,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('revision')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <Sparkles className="w-5 h-5 text-violet-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Revision</h4>
@@ -548,7 +548,7 @@ export function LearningHub({ problem, onBack, userId }: Props) {
                       </button>
                       <button
                         onClick={() => setActiveTab('knowledge')}
-                        className="p-4 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-muted/10 transition-all text-left group"
+                        className="p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:bg-muted/30 transition-all text-left group"
                       >
                         <FileText className="w-5 h-5 text-amber-400 mb-2" />
                         <h4 className="text-xs font-semibold mb-0.5">Knowledge Base</h4>

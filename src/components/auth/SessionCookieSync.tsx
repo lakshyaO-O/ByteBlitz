@@ -14,7 +14,7 @@ export function SessionCookieSync() {
       if (user) {
         try {
           const token = await user.getIdToken();
-          document.cookie = `__session=${token};path=/;max-age=604800;samesite=lax`;
+          document.cookie = `__session=${token};path=/;max-age=604800;samesite=lax;secure`;
         } catch {
           document.cookie = '__session=;path=/;max-age=0;samesite=lax';
         }

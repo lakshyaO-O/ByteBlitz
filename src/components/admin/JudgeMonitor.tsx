@@ -230,7 +230,7 @@ export function JudgeMonitor() {
                     )}
                   </p>
                   <div className="flex items-center gap-3 pt-1">
-                    <span className="text-[10px] text-muted-foreground/40 font-mono">
+                    <span className="text-[10px] text-muted-foreground/60 font-mono">
                       Status auto-updates every 30s
                     </span>
                     <button
@@ -317,9 +317,9 @@ export function JudgeMonitor() {
               <div className="flex items-center gap-4 text-[10px]">
                 <span className="text-muted-foreground font-medium">Execution Latency:</span>
                 <span>P50: <strong className="text-foreground">{data.performance.p50ExecutionTimeMs}ms</strong></span>
-                <span className="text-muted-foreground/40">|</span>
+                <span className="text-muted-foreground/60">|</span>
                 <span>P95: <strong className="text-foreground">{data.performance.p95ExecutionTimeMs}ms</strong></span>
-                <span className="text-muted-foreground/40">|</span>
+                <span className="text-muted-foreground/60">|</span>
                 <span>P99: <strong className="text-foreground">{data.performance.p99ExecutionTimeMs}ms</strong></span>
               </div>
             </CardContent>
@@ -372,7 +372,7 @@ export function JudgeMonitor() {
                     ))
                   )}
               </div>
-              <div className="mt-2 pt-2 border-t border-border/30">
+              <div className="mt-2 pt-2 border-t border-border/50">
                 <button
                   onClick={async () => {
                     const btn = document.getElementById('test-connection-btn');
@@ -411,13 +411,13 @@ export function JudgeMonitor() {
               <CardContent className="p-0 max-h-[400px] overflow-y-auto">
                 {data.recentExecutions.length === 0 ? (
                   <div className="p-6 text-center">
-                    <Cpu className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+                    <Cpu className="w-6 h-6 text-muted-foreground/50 mx-auto mb-2" />
                     <p className="text-[11px] text-muted-foreground">No execution history</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-border/30">
                     {data.recentExecutions.map(ex => (
-                      <div key={ex.id} className="px-3 py-2 hover:bg-muted/10 transition-colors">
+                      <div key={ex.id} className="px-3 py-2 hover:bg-muted/30 transition-colors">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <span className={cn(
@@ -462,7 +462,7 @@ export function JudgeMonitor() {
       {!data && !isUnavailable && !loading && (
         <Card className="bg-card/50 border-border">
           <CardContent className="p-6 text-center">
-            <Cpu className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+            <Cpu className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">Failed to load judge data</p>
             <Button variant="outline" size="sm" onClick={fetchData} className="mt-2 text-xs">Retry</Button>
           </CardContent>
@@ -489,7 +489,7 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
       <CardContent className="p-3">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[9px] text-muted-foreground font-medium uppercase tracking-wider">{label}</span>
-          <Icon className={cn('w-3 h-3', color ? `text-${color}-500/60` : 'text-muted-foreground/40')} />
+          <Icon className={cn('w-3 h-3', color ? `text-${color}-500/60` : 'text-muted-foreground/60')} />
         </div>
         <span className={cn('text-sm font-bold font-mono', color ? `text-${color}-500` : 'text-foreground')}>
           {value}

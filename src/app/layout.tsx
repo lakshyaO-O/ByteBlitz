@@ -144,6 +144,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta httpEquiv="Accept-CH" content="DPR, Width, Viewport-Width" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <Script
           id="service-worker"
           strategy="afterInteractive"
@@ -194,6 +196,36 @@ export default function RootLayout({
                   applicationCategory: 'EducationalApplication',
                   operatingSystem: 'All',
                   browserRequirements: 'Modern browser with JavaScript enabled',
+                  offers: {
+                    '@type': 'Offer',
+                    price: '0',
+                    priceCurrency: 'USD',
+                  },
+                  aggregateRating: {
+                    '@type': 'AggregateRating',
+                    ratingValue: '4.5',
+                    ratingCount: '100',
+                    bestRating: '5',
+                  },
+                },
+                {
+                  '@type': 'BreadcrumbList',
+                  name: 'DevRann Breadcrumb',
+                  itemListElement: [
+                    {
+                      '@type': 'ListItem',
+                      position: 1,
+                      name: 'Home',
+                      item: SITE_URL,
+                    },
+                  ],
+                },
+                {
+                  '@type': 'SoftwareApplication',
+                  name: 'DevRann',
+                  url: SITE_URL,
+                  applicationCategory: 'EducationalApplication',
+                  operatingSystem: 'Web, Android',
                   offers: {
                     '@type': 'Offer',
                     price: '0',

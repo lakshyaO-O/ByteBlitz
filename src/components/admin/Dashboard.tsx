@@ -190,7 +190,7 @@ export function Dashboard() {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-muted-foreground font-medium">{card.label}</span>
-                <Icon className="w-3.5 h-3.5 text-muted-foreground/40" />
+                <Icon className="w-3.5 h-3.5 text-muted-foreground/60" />
               </div>
               <StatValue value={formatted} status={card.status} />
             </div>
@@ -204,7 +204,7 @@ export function Dashboard() {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-medium text-foreground">Newest Users</h2>
-            <UserPlus className="w-3.5 h-3.5 text-muted-foreground/40" />
+            <UserPlus className="w-3.5 h-3.5 text-muted-foreground/60" />
           </div>
           <div className="rounded-lg border border-border divide-y divide-border">
             {data.newestUsers.length === 0 ? (
@@ -239,7 +239,7 @@ export function Dashboard() {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-medium text-foreground">Newest Problems</h2>
-            <Code2 className="w-3.5 h-3.5 text-muted-foreground/40" />
+            <Code2 className="w-3.5 h-3.5 text-muted-foreground/60" />
           </div>
           <div className="rounded-lg border border-border divide-y divide-border">
             {data.newestProblems.length === 0 ? (
@@ -269,7 +269,7 @@ export function Dashboard() {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-medium text-foreground">Newest Posts</h2>
-            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/40" />
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/60" />
           </div>
           <div className="rounded-lg border border-border divide-y divide-border">
             {data.newestPosts.length === 0 ? (
@@ -292,7 +292,7 @@ export function Dashboard() {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-medium text-foreground">Newest Reports</h2>
-            <Flag className="w-3.5 h-3.5 text-muted-foreground/40" />
+            <Flag className="w-3.5 h-3.5 text-muted-foreground/60" />
           </div>
           <div className="rounded-lg border border-border divide-y divide-border">
             {data.newestReports.length === 0 ? (

@@ -93,7 +93,7 @@ function MetricCard({ label, value, icon: Icon, color, infoKey, sub }: {
       <CardContent className="p-4 text-center space-y-2 relative">
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="absolute top-2 right-2 text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+            <button className="absolute top-2 right-2 text-muted-foreground/60 hover:text-muted-foreground transition-colors">
               <HelpCircle className="w-3.5 h-3.5" />
             </button>
           </TooltipTrigger>

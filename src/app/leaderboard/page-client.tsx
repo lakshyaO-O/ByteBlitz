@@ -163,7 +163,7 @@ function LeaderRow({ rank, name, rating, wins, games, isCurrentUser, isTop3, use
             <RankIcon className="w-4 h-4" />
           </span>
         ) : (
-          <span className="font-headline font-black text-sm italic opacity-30 group-hover:opacity-100 transition-opacity">#{rank}</span>
+          <span className="font-headline font-black text-sm italic opacity-60 group-hover:opacity-100 transition-opacity">#{rank}</span>
         )}
       </div>
       <div className="col-span-5 px-4 flex items-center gap-3 min-w-0">

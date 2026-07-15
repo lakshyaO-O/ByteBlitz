@@ -106,13 +106,13 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
     <div className="flex flex-col h-full bg-background">
       <div className={cn('border-b border-border shrink-0', collapsed ? 'px-3 py-4' : 'px-4 py-4')}>
         <Link href="/admin/dashboard" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded-md bg-foreground/5 border border-border flex items-center justify-center shrink-0">
-            <Shield className="w-3.5 h-3.5 text-foreground/60" />
+          <div className="w-7 h-7 rounded-md bg-muted border border-border/70 flex items-center justify-center shrink-0">
+            <Shield className="w-3.5 h-3.5 text-foreground/80" />
           </div>
           {!collapsed && (
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-semibold text-foreground">DevRann</span>
-              <span className="text-[10px] text-muted-foreground/50 font-medium">admin</span>
+              <span className="text-[10px] text-muted-foreground/70 font-medium">admin</span>
             </div>
           )}
         </Link>
@@ -129,24 +129,23 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
               className={cn(
                 'flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors',
                 isActive
-                  ? 'bg-foreground/5 text-foreground font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/[0.03]',
+                  ? 'bg-muted text-foreground font-medium'
+                  : 'text-muted-foreground/80 hover:text-foreground hover:bg-muted/50',
               )}
             >
-              <item.icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-foreground' : 'text-muted-foreground/60')} />
+              <item.icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-primary' : 'text-muted-foreground/70')} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className={cn('border-t border-border shrink-0', collapsed ? 'p-2' : 'p-3')}>
+      <div className={cn('border-t border-border/60 shrink-0', collapsed ? 'p-2' : 'p-3')}>
         <div className={cn('space-y-1', collapsed && 'flex flex-col items-center')}>
-          {/* Back to Site */}
           <Link
             href="/"
             className={cn(
-              'flex items-center gap-2 w-full text-xs text-muted-foreground/40 hover:text-foreground/60 hover:bg-foreground/[0.02] rounded-md px-2 py-1.5 transition-colors',
+              'flex items-center gap-2 w-full text-xs text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 rounded-md px-2 py-1.5 transition-colors',
               collapsed && 'justify-center px-0',
             )}
           >
@@ -154,11 +153,10 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
             {!collapsed && <span>Back to site</span>}
           </Link>
 
-          {/* Dark mode toggle */}
           <button
             onClick={toggleTheme}
             className={cn(
-              'flex items-center gap-2 w-full text-xs text-muted-foreground/40 hover:text-foreground/60 hover:bg-foreground/[0.02] rounded-md px-2 py-1.5 transition-colors',
+              'flex items-center gap-2 w-full text-xs text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 rounded-md px-2 py-1.5 transition-colors',
               collapsed && 'justify-center px-0',
             )}
           >
@@ -167,14 +165,14 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
           </button>
 
           {!collapsed && (
-            <div className="flex items-center gap-2.5 px-2 py-2 rounded-md bg-foreground/[0.02] border border-border/50 mt-1.5">
+            <div className="flex items-center gap-2.5 px-2 py-2 rounded-md bg-muted/30 border border-border/60 mt-1.5">
               <Avatar className="h-6 w-6 shrink-0">
                 <AvatarImage src={user?.photoURL || ''} />
-                <AvatarFallback className="text-[8px] font-medium bg-foreground/5 text-foreground/60">{initials}</AvatarFallback>
+                <AvatarFallback className="text-[8px] font-medium bg-muted text-muted-foreground">{initials}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium truncate text-foreground/80">{user?.displayName || 'Admin'}</p>
-                <p className="text-[9px] text-muted-foreground/50 truncate">{roleLabel}</p>
+                <p className="text-xs font-medium truncate text-foreground">{user?.displayName || 'Admin'}</p>
+                <p className="text-[9px] text-muted-foreground/70 truncate">{roleLabel}</p>
               </div>
             </div>
           )}
@@ -184,7 +182,7 @@ export function AdminSidebar({ collapsed, onNav }: { collapsed: boolean; onNav?:
               router.push('/');
             }}
             className={cn(
-              'flex items-center gap-2 w-full text-xs text-muted-foreground/40 hover:text-foreground/60 hover:bg-foreground/[0.02] rounded-md px-2 py-1.5 transition-colors',
+              'flex items-center gap-2 w-full text-xs text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 rounded-md px-2 py-1.5 transition-colors',
               collapsed && 'justify-center px-0',
             )}
           >

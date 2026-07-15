@@ -56,7 +56,7 @@ export function ConceptsIndex() {
                   'px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-all',
                   category === c
                     ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/10',
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30',
                 )}
               >
                 {c === 'all' ? 'All' : c.replace('-', ' ')}
@@ -68,13 +68,13 @@ export function ConceptsIndex() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
           {entries.map(entry => (
             <Link key={entry.slug} href={`/learn/concepts/${entry.slug}`}>
-              <Card className="p-4 h-full border-border/40 hover:border-primary/30 hover:bg-muted/10 transition-all group">
+              <Card className="p-4 h-full border-border/60 hover:border-primary/30 hover:bg-muted/30 transition-all group">
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                       {entry.title}
                     </h3>
-                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary/50 transition-colors shrink-0 mt-0.5" />
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors shrink-0 mt-0.5" />
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{entry.definition}</p>
                   <div className="flex items-center gap-2 text-[9px] text-muted-foreground">
@@ -98,7 +98,7 @@ export function ConceptsIndex() {
 
         {entries.length === 0 && (
           <div className="text-center py-12">
-            <BookOpen className="w-8 h-8 text-muted-foreground/20 mx-auto mb-2" />
+            <BookOpen className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
             <p className="text-xs text-muted-foreground">No concepts found matching your search.</p>
           </div>
         )}

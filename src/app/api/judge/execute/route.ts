@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
 import { executeTestCases, isLanguageSupported } from '@/services/judge-engine';
+import { checkRateLimit, checkRateLimitFirestore, rateLimitResponse } from '@/lib/rate-limit';
 import type { CodingLanguage, TestCaseResult, Verdict } from '@/types';
 
 interface JudgeRequest {
@@ -17,34 +18,7 @@ const MAX_TEST_CASES = 100;
 const DEFAULT_TIME_LIMIT_MS = 5000;
 const DEFAULT_MEMORY_LIMIT_KB = 512000;
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.JUDGE_RATE_LIMIT || '10', 10);
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
-
-function checkRateLimit(uid: string): { allowed: boolean; retryAfterMs: number } {
-  const now = Date.now();
-  const entry = rateLimitMap.get(uid);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    rateLimitMap.set(uid, { count: 1, windowStart: now });
-    return { allowed: true, retryAfterMs: 0 };
-  }
-  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
-    const retryAfterMs = RATE_LIMIT_WINDOW_MS - (now - entry.windowStart);
-    return { allowed: false, retryAfterMs };
-  }
-  entry.count++;
-  return { allowed: true, retryAfterMs: 0 };
-}
-
-// Periodically clean stale rate limit entries to prevent memory leak
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS * 2;
-    for (const [uid, entry] of rateLimitMap) {
-      if (entry.windowStart < cutoff) rateLimitMap.delete(uid);
-    }
-  }, RATE_LIMIT_WINDOW_MS);
-}
+const JUDGE_RATE_LIMIT = parseInt(process.env.JUDGE_RATE_LIMIT || '10', 10);
 
 async function resolveHiddenFlags(problemId: string | undefined, clientTestCases: Array<{ isHidden?: boolean }>): Promise<boolean[]> {
   if (problemId) {
@@ -81,13 +55,11 @@ export async function POST(request: NextRequest) {
 
     const uid = decodedToken.uid;
 
-    const { allowed, retryAfterMs } = checkRateLimit(uid);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: `Rate limit exceeded. Try again in ${Math.ceil(retryAfterMs / 1000)} seconds.` },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } },
-      );
-    }
+    const { allowed, retryAfterMs } = checkRateLimit(uid, request, { windowMs: 60_000, maxRequests: JUDGE_RATE_LIMIT });
+    if (!allowed) return rateLimitResponse(retryAfterMs);
+
+    const firestoreCheck = await checkRateLimitFirestore(uid, 'judge.execute', { windowMs: 60_000, maxRequests: JUDGE_RATE_LIMIT });
+    if (!firestoreCheck.allowed) return rateLimitResponse(firestoreCheck.retryAfterMs);
 
     const body: JudgeRequest = await request.json();
     const { code, language, testCases, timeLimitMs, memoryLimitKb, problemId } = body;

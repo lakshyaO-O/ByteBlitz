@@ -1,9 +1,13 @@
-import { getAdminAuth } from '@/firebase/admin';
+import { getAdminAuth, initializeAdmin } from '@/firebase/admin';
 
 export async function verifyAuth(request: Request): Promise<{ uid: string; email: string } | Response> {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!initializeAdmin()) {
+    return Response.json({ error: 'Authentication service unavailable' }, { status: 503 });
   }
 
   const idToken = authHeader.slice(7);

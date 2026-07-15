@@ -122,7 +122,7 @@ export default function BeginnerDashboard() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5">
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/10">
                       Level {currentLevel}
                     </Badge>
                     <Badge variant="outline" className="text-[10px] border-yellow-500/30 text-yellow-400 bg-yellow-500/5">
@@ -422,7 +422,7 @@ export default function BeginnerDashboard() {
               {/* Recommended Next */}
               <Button
                 variant="outline"
-                className="w-full gap-2 h-12 border-primary/30 text-primary hover:bg-primary/5"
+                className="w-full gap-2 h-12 border-primary/30 text-primary hover:bg-primary/10"
                 onClick={() => window.location.href = '/learning'}
               >
                 <Rocket className="w-4 h-4" />
@@ -462,7 +462,7 @@ function AchievementBadgeSmall({ achieved, label, icon: Icon }: { achieved: bool
   return (
     <div className={cn(
       'flex flex-col items-center gap-1 p-2 rounded-lg text-center',
-      achieved ? 'bg-primary/5 border border-primary/20' : 'opacity-40'
+      achieved ? 'bg-primary/10 border border-primary/20' : 'opacity-70'
     )}>
       <div className={cn('w-8 h-8 rounded-full flex items-center justify-center', achieved ? 'bg-primary/20' : 'bg-muted')}>
         <Icon className={cn('w-4 h-4', achieved ? 'text-primary' : 'text-muted-foreground')} />

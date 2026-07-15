@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/firebase/provider';
-import { isFirebaseConfigured } from '@/firebase/config';
 
 import {
   createUserWithEmailAndPassword,
@@ -97,7 +96,6 @@ function sanitizeFirebaseError(err: any): string {
 function AuthForm() {
   const auth = useAuth();
   const db = useFirestore();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [isSignUp, setIsSignUp] = useState(true);
@@ -110,13 +108,6 @@ function AuthForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const isLoggingIn = useRef(false);
-  const [firebaseAvailable, setFirebaseAvailable] = useState(true);
-
-  useEffect(() => {
-    setFirebaseAvailable(isFirebaseConfigured());
-  }, []);
-
   useEffect(() => {
     const mode = searchParams.get('mode');
     if (mode === 'login') {
@@ -128,10 +119,17 @@ function AuthForm() {
 
   useEffect(() => {
     if (!auth) return;
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser && !isLoggingIn.current) {
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const token = await firebaseUser.getIdToken();
+          document.cookie = `__session=${token};path=/;max-age=604800;samesite=lax;secure`;
+        } catch (e: any) {
+          console.error('[Auth] Failed to set session cookie:', e?.code || e?.message || e);
+        }
         const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-        router.replace(redirectTo);
+        await new Promise(r => setTimeout(r, 300));
+        window.location.href = redirectTo;
       }
     });
     return () => unsub();
@@ -211,7 +209,6 @@ function AuthForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    isLoggingIn.current = true;
 
     try {
       if (!email || !password) {
@@ -245,24 +242,19 @@ function AuthForm() {
       await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL, isSignUp);
 
       const idToken = await user.getIdToken();
-      document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
-
-      const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-      router.replace(redirectTo);
+      document.cookie = `__session=${idToken};path=/;max-age=604800;samesite=lax;secure`;
     } catch (err: any) {
       console.error('[Auth] Sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
       if (msg) setError(msg);
     } finally {
       setLoading(false);
-      isLoggingIn.current = false;
     }
   };
 
   const handleGoogleSignIn = async () => {
     setError(null);
     setIsGoogleLoading(true);
-    isLoggingIn.current = true;
 
     try {
       if (!auth) {
@@ -272,21 +264,18 @@ function AuthForm() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+
       const isNewGoogleUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
       await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '', isNewGoogleUser);
 
       const idToken = await user.getIdToken();
-      document.cookie = `__session=${idToken};path=/;max-age=3600;samesite=lax`;
-
-      const redirectTo = sanitizeRedirect(searchParams.get('redirect'));
-      router.replace(redirectTo);
+      document.cookie = `__session=${idToken};path=/;max-age=604800;samesite=lax;secure`;
     } catch (err: any) {
       console.error('[Auth] Google sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
       if (msg) setError(msg);
     } finally {
       setIsGoogleLoading(false);
-      isLoggingIn.current = false;
     }
   };
 
@@ -393,12 +382,13 @@ function AuthForm() {
             variant="outline"
             className="w-full h-12 mb-4 font-headline font-bold uppercase text-sm border-border hover:bg-muted"
             onClick={handleGoogleSignIn}
-            disabled={loading || isGoogleLoading || !firebaseAvailable}
+            disabled={loading || isGoogleLoading}
           >
-            {!firebaseAvailable ? (
-              'Firebase not configured'
-            ) : isGoogleLoading ? (
-              'Connecting...'
+            {isGoogleLoading ? (
+              <>
+                <Chrome className="w-5 h-5 mr-2" />
+                Signing in...
+              </>
             ) : (
               <>
                 <Chrome className="w-5 h-5 mr-2" />
