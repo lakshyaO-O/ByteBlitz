@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -737,37 +736,41 @@ export function LearningAnalyticsPage() {
           ) : (
             <div className="space-y-2">
               {weakTopics.map(t => (
-                <motion.div
+                <Link
+                  href={`/practice?topic=${encodeURIComponent(t.topic)}`}
                   key={t.topic}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="group relative p-3 rounded-xl border border-red-500/10 bg-red-500/[0.03] hover:bg-red-500/[0.06] transition-all cursor-pointer"
-                  onClick={() => window?.open?.(`/practice?topic=${encodeURIComponent(t.topic)}`, '_self')}
+                  className="block"
                 >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-foreground">{t.topic}</span>
-                      <Badge variant="destructive" className="text-[8px] px-1 py-0 h-4">{t.total - t.solved} left</Badge>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="group relative p-3 rounded-xl border border-red-500/10 bg-red-500/[0.03] hover:bg-red-500/[0.06] transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-foreground">{t.topic}</span>
+                        <Badge variant="destructive" className="text-[8px] px-1 py-0 h-4">{t.total - t.solved} left</Badge>
+                      </div>
+                      <span className="text-xs font-mono tabular-nums text-red-400 font-bold">{t.mastery}%</span>
                     </div>
-                    <span className="text-xs font-mono tabular-nums text-red-400 font-bold">{t.mastery}%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${t.mastery}%` }}
-                      transition={{ duration: 0.8, delay: 0.1 }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-[9px] text-muted-foreground">{t.solved}/{t.total} solved</span>
-                    <span className="text-[9px] text-blue-400/60 flex items-center gap-1">
-                      <Lightbulb className="w-2.5 h-2.5" />
-                      Practice more
-                    </span>
-                  </div>
-                </motion.div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${t.mastery}%` }}
+                        transition={{ duration: 0.8, delay: 0.1 }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className="text-[9px] text-muted-foreground">{t.solved}/{t.total} solved</span>
+                      <span className="text-[9px] text-blue-400/60 flex items-center gap-1">
+                        <Lightbulb className="w-2.5 h-2.5" />
+                        Practice more
+                      </span>
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
           )}
