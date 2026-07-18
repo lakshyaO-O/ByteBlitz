@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Code2, Loader2, Clock, CheckCircle2, AlertTriangle,
-  Lightbulb, ArrowRight, ChevronRight, MessageSquare, ThumbsUp,
-  FileCode, RefreshCw,
+  Code2, Loader2, Clock, AlertTriangle,
+  ChevronRight, MessageSquare, Check, Copy,
+  FileCode, RefreshCw, ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase/auth/use-user';
@@ -19,21 +18,247 @@ import { useAiUsage } from '@/hooks/use-ai-usage';
 import { useToast } from '@/hooks/use-toast';
 import { UsageCard } from '@/components/ai/UsageCard';
 import { PremiumUpgradeModal } from '@/components/ai/PremiumUpgradeModal';
+import { ThinkingIndicator } from '@/components/ai/ThinkingIndicator';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
 
-interface ReviewIssue {
-  line: number;
-  severity: 'critical' | 'warning' | 'suggestion';
-  message: string;
-  suggestion: string;
+const CATEGORIES = [
+  { key: 'correctness', label: 'Correctness' },
+  { key: 'readability', label: 'Readability' },
+  { key: 'performance', label: 'Performance' },
+  { key: 'security', label: 'Security' },
+  { key: 'maintainability', label: 'Maintainability' },
+  { key: 'bestPractices', label: 'Best Practices' },
+] as const;
+
+interface CategoryScores {
+  correctness: number;
+  readability: number;
+  performance: number;
+  security: number;
+  maintainability: number;
+  bestPractices: number;
 }
 
 interface ReviewFeedback {
-  summary: string;
-  strengths: string[];
-  issues: ReviewIssue[];
-  improvements: string[];
+  review: string;
   score: number;
+  categoryScores: CategoryScores;
 }
+
+// ---- Code Block ----
+
+function CodeBlock({ className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & { className?: string }) {
+  const match = /language-(\w+)/.exec(className || '');
+  const code = String(children || '').replace(/\n$/, '');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [code]);
+
+  if (match) {
+    return (
+      <div className="group relative my-4 rounded-xl overflow-hidden border border-border/40 bg-[#0d1117] shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-[#30363d]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#21262d] text-xs font-medium text-[#8b949e]">
+            <FileCode className="w-3 h-3" />
+            {match[1]}
+          </span>
+          <button
+            onClick={handleCopy}
+            className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d] transition-all duration-150"
+            aria-label="Copy code"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <pre className="p-4 text-sm leading-relaxed">
+            <code className={className} {...props}>{children}</code>
+          </pre>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <code className="px-1.5 py-0.5 rounded-md bg-muted/60 text-sm font-mono text-foreground border border-border/30" {...props}>
+      {children}
+    </code>
+  );
+}
+
+// ---- Score Bars ----
+
+function ScoreBars({ scores }: { scores: CategoryScores }) {
+  const maxScore = 10;
+
+  return (
+    <div className="space-y-2.5">
+      {CATEGORIES.map(({ key, label }) => {
+        const val = Math.max(0, Math.min(maxScore, scores[key as keyof CategoryScores]));
+        const pct = (val / maxScore) * 100;
+        return (
+          <div key={key} className="flex items-center gap-3">
+            <span className="w-28 text-xs font-medium text-muted-foreground shrink-0 text-right">{label}</span>
+            <div className="flex-1 h-2 rounded-full bg-muted/60 overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all duration-700 ease-out',
+                  val >= 8 ? 'bg-emerald-500' : val >= 5 ? 'bg-yellow-500' : 'bg-destructive'
+                )}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <span className={cn(
+              'w-8 text-xs font-bold shrink-0 text-right',
+              val >= 8 ? 'text-emerald-400' : val >= 5 ? 'text-yellow-400' : 'text-destructive'
+            )}>
+              {val}/10
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---- Overall Score Badge ----
+
+function OverallScore({ score, categoryScores }: { score: number; categoryScores: CategoryScores }) {
+  return (
+    <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl bg-muted/20 border border-border/40">
+      <div className="flex items-center gap-3 shrink-0">
+        <div className={cn(
+          'w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold',
+          score >= 80 ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30' :
+          score >= 50 ? 'bg-yellow-500/15 text-yellow-400 ring-1 ring-yellow-500/30' :
+          'bg-destructive/15 text-destructive ring-1 ring-destructive/30'
+        )}>
+          {score}
+        </div>
+        <div>
+          <p className="font-semibold text-sm">Overall Quality</p>
+          <p className="text-xs text-muted-foreground">
+            {score >= 80 ? 'Great work!' : score >= 50 ? 'Needs improvement' : 'Major issues'}
+          </p>
+        </div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <ScoreBars scores={categoryScores} />
+      </div>
+    </div>
+  );
+}
+
+// ---- Confidence Badge ----
+
+const CONFIDENCE_PATTERN = /(?:AI Confidence|Confidence)[:\s]*(🟢|🟡|🔵)\s*(High|Medium|Low)?/i;
+
+function ConfidenceBadge({ review }: { review: string }) {
+  const match = review.match(CONFIDENCE_PATTERN);
+  if (!match) return null;
+
+  const dot = match[1];
+  const level = match[2] || (dot === '🟢' ? 'High' : dot === '🟡' ? 'Medium' : 'Low');
+
+  const conf = dot === '🟢' ? 'high' : dot === '🟡' ? 'medium' : 'low';
+
+  return (
+    <div className={cn(
+      'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border',
+      conf === 'high' && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      conf === 'medium' && 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+      conf === 'low' && 'bg-destructive/10 text-destructive border-destructive/20',
+    )}>
+      <span className="text-base leading-none">{dot}</span>
+      <span className="font-semibold">{level} Confidence</span>
+    </div>
+  );
+}
+
+// ---- Divider ----
+
+function SectionDivider() {
+  return <hr className="my-6 border-border/40" />;
+}
+
+// ---- Markdown Review ----
+
+const LIST_PATTERN = /^☐\s(.+)$/m;
+
+function MarkdownReview({ content }: { content: string }) {
+  const components = useMemo(() => ({
+    code: CodeBlock,
+    pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+    hr: () => <SectionDivider />,
+    h1: ({ children, ...props }: React.ComponentPropsWithoutRef<'h1'>) => (
+      <h1 className="text-xl font-bold text-foreground mt-6 mb-3 flex items-center gap-2" {...props}>
+        {children}
+      </h1>
+    ),
+    h2: ({ children, ...props }: React.ComponentPropsWithoutRef<'h2'>) => (
+      <h2 className="text-lg font-semibold text-foreground mt-5 mb-2 flex items-center gap-2" {...props}>
+        {children}
+      </h2>
+    ),
+    h3: ({ children, ...props }: React.ComponentPropsWithoutRef<'h3'>) => (
+      <h3 className="text-base font-semibold text-primary mt-4 mb-2" {...props}>
+        {children}
+      </h3>
+    ),
+    ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => {
+      const hasChecklist = React.Children.toArray(children).some(
+        (child: any) => child?.props?.children?.[0]?.props?.children?.[0] === '☐'
+      );
+      if (hasChecklist) {
+        return <ul className="space-y-1.5 not-prose" {...props}>{children}</ul>;
+      }
+      return <ul className="space-y-1 text-sm text-muted-foreground pl-4 list-disc [&>li]:marker:text-muted-foreground/50" {...props}>{children}</ul>;
+    },
+    li: ({ children, ...props }: React.ComponentPropsWithoutRef<'li'>) => {
+      const firstChild = React.Children.toArray(children)[0];
+      const text = typeof firstChild === 'string' ? firstChild : '';
+      if (text.startsWith('☐')) {
+        const label = text.replace('☐', '').trim();
+        return (
+          <li className="flex items-start gap-2 text-sm" {...props}>
+            <span className="w-4 h-4 mt-0.5 rounded border-2 border-muted-foreground/40 shrink-0 inline-flex items-center justify-center" />
+            <span className="text-foreground/80">{label}</span>
+          </li>
+        );
+      }
+      return <li className="text-sm text-muted-foreground/90" {...props}>{children}</li>;
+    },
+    p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => {
+      const text = typeof children === 'string' ? children : '';
+      if (text.startsWith('🟢') || text.startsWith('🟡') || text.startsWith('🔵')) {
+        return <ConfidenceBadge review={text} />;
+      }
+      return <p className="text-sm text-muted-foreground/90 leading-relaxed" {...props}>{children}</p>;
+    },
+    strong: ({ children, ...props }: React.ComponentPropsWithoutRef<'strong'>) => (
+      <strong className="font-semibold text-foreground" {...props}>{children}</strong>
+    ),
+  }), []);
+
+  return (
+    <div className="prose prose-invert max-w-none prose-sm prose-headings:font-bold prose-headings:text-foreground prose-a:text-primary prose-code:before:content-none prose-code:after:content-none prose-pre:p-0 prose-pre:bg-transparent prose-pre:border-none">
+      <ReactMarkdown
+        rehypePlugins={[rehypeHighlight, rehypeRaw]}
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}
+
+// ---- Language Options ----
 
 const LANGUAGES = [
   { value: 'javascript', label: 'JavaScript' },
@@ -44,6 +269,8 @@ const LANGUAGES = [
   { value: 'go', label: 'Go' },
   { value: 'rust', label: 'Rust' },
 ];
+
+// ---- Main Page ----
 
 export default function AICodeReviewPage() {
   const { user, loading: authLoading } = useUser();
@@ -89,12 +316,12 @@ export default function AICodeReviewPage() {
         throw new Error(data.error);
       }
 
+      const defaultCat = { correctness: 0, readability: 0, performance: 0, security: 0, maintainability: 0, bestPractices: 0 };
+
       const parsed: ReviewFeedback = {
-        summary: data.summary || '',
-        strengths: Array.isArray(data.strengths) ? data.strengths : [],
-        issues: Array.isArray(data.issues) ? data.issues : [],
-        improvements: Array.isArray(data.improvements) ? data.improvements : [],
+        review: data.review || '',
         score: typeof data.score === 'number' ? data.score : 0,
+        categoryScores: data.categoryScores || defaultCat,
       };
 
       setFeedback(parsed);
@@ -125,13 +352,13 @@ export default function AICodeReviewPage() {
 
   return (
     <Shell>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
             <h1 className="text-2xl font-headline font-bold text-foreground">
               AI Code Review
             </h1>
-            <p className="text-sm text-muted-foreground">Get instant feedback on your code quality and best practices.</p>
+            <p className="text-sm text-muted-foreground">Instant AI-powered code quality analysis.</p>
           </div>
           <UsageCard
             userId={user?.uid || null}
@@ -140,8 +367,8 @@ export default function AICodeReviewPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-border">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <Card className="border-border h-fit">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <FileCode className="w-4 h-4 text-primary" /> Your Code
@@ -159,18 +386,18 @@ export default function AICodeReviewPage() {
                 </SelectContent>
               </Select>
               <Textarea
-                placeholder="Paste your code here for review..."
+                placeholder="Paste your code here..."
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="min-h-[300px] font-mono text-sm resize-y"
+                className="min-h-[280px] font-mono text-sm resize-y"
               />
               <Button
                 onClick={handleSubmit}
                 disabled={!code.trim() || isLoading || (isExhausted && !isPremium)}
-                className="w-full gap-2"
+                className="w-full gap-2 h-10"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Code2 className="w-4 h-4" />}
-                {isLoading ? 'Reviewing...' : 'Review Code'}
+                {isLoading ? 'Analyzing...' : 'Review Code'}
               </Button>
             </CardContent>
           </Card>
@@ -184,17 +411,14 @@ export default function AICodeReviewPage() {
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground">Analyzing your code with AI...</span>
-                  </div>
+                  <ThinkingIndicator text="Analyzing code" />
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 rounded bg-muted/50 animate-pulse" />
+                    <div key={i} className="h-14 rounded-xl bg-muted/40 skeleton-shimmer" />
                   ))}
                 </div>
               ) : error ? (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center space-y-4">
-                  <AlertTriangle className="w-10 h-10 text-destructive/60 mb-2" />
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
+                  <AlertTriangle className="w-10 h-10 text-destructive/60" />
                   <p className="text-sm font-medium text-destructive">Review Failed</p>
                   <p className="text-xs text-muted-foreground max-w-xs">{error}</p>
                   <Button
@@ -207,93 +431,23 @@ export default function AICodeReviewPage() {
                   </Button>
                 </div>
               ) : feedback ? (
-                <ScrollArea className="h-[400px] pr-2">
-                  <div className="space-y-5">
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center text-base font-bold',
-                        feedback.score >= 80 ? 'bg-emerald-500/20 text-emerald-400' :
-                        feedback.score >= 50 ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-destructive/20 text-destructive'
-                      )}>
-                        {feedback.score}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Code Quality Score</p>
-                        <p className="text-xs text-muted-foreground">
-                          {feedback.score >= 80 ? 'Great job!' : feedback.score >= 50 ? 'Needs improvement' : 'Major issues'}
-                        </p>
-                      </div>
+                <ScrollArea className="h-[500px] xl:h-[600px] pr-2">
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-5">
+                    <OverallScore score={feedback.score} categoryScores={feedback.categoryScores} />
+                    <div className="border-t border-border/30 pt-4">
+                      <MarkdownReview content={feedback.review} />
                     </div>
-
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Summary</p>
-                      <p className="text-sm">{feedback.summary}</p>
-                    </div>
-
-                    {feedback.strengths.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-emerald-400 mb-2 flex items-center gap-1">
-                          <ThumbsUp className="w-3 h-3" /> Strengths
-                        </p>
-                        <ul className="space-y-1">
-                          {feedback.strengths.map((s, i) => (
-                            <li key={i} className="text-sm flex items-start gap-2">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {feedback.issues.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-destructive mb-2 flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" /> Issues
-                        </p>
-                        <ul className="space-y-2">
-                          {feedback.issues.map((issue, i) => (
-                            <li key={i} className="text-sm p-3 rounded bg-muted/30 border border-border/50">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Badge variant={issue.severity === 'critical' ? 'destructive' : issue.severity === 'warning' ? 'default' : 'secondary'} className="text-xs">
-                                  {issue.severity}
-                                </Badge>
-                                <span className="text-xs font-mono text-muted-foreground">Line {issue.line}</span>
-                              </div>
-                              <p>{issue.message}</p>
-                              <p className="text-xs text-muted-foreground mt-1 flex items-start gap-1">
-                                <Lightbulb className="w-3 h-3 text-yellow-400 mt-0.5 shrink-0" />
-                                {issue.suggestion}
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {feedback.improvements.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-blue-400 mb-2 flex items-center gap-1">
-                          <Lightbulb className="w-3 h-3" /> Suggestions
-                        </p>
-                        <ul className="space-y-1">
-                          {feedback.improvements.map((imp, i) => (
-                            <li key={i} className="text-sm flex items-start gap-2">
-                              <ArrowRight className="w-3.5 h-3.5 text-blue-400 mt-0.5 shrink-0" />
-                              {imp}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 </ScrollArea>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center">
-                  <Code2 className="w-10 h-10 text-muted-foreground/50 mb-3" />
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mb-4">
+                    <Code2 className="w-7 h-7 text-muted-foreground/40" />
+                  </div>
                   <p className="text-sm font-medium text-muted-foreground">No review yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Submit your code to get AI-powered feedback.</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">
+                    Paste your code on the left and click Review Code.
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -308,10 +462,13 @@ export default function AICodeReviewPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {recentReviews.map((review, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground p-2 rounded hover:bg-muted/30 transition-colors cursor-pointer">
-                    <ChevronRight className="w-3 h-3 shrink-0" />
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 text-sm text-muted-foreground p-2 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-3 h-3 shrink-0 text-muted-foreground/40" />
                     <span className="font-mono text-xs truncate">{review}</span>
                   </div>
                 ))}

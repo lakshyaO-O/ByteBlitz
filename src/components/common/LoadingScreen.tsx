@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Zap, RefreshCw, RotateCcw } from 'lucide-react';
+import { RotateCcw, RefreshCw } from 'lucide-react';
 
 interface LoadingScreenProps {
   message?: string;
@@ -47,8 +47,8 @@ export function LoadingScreen({
   };
 
   const container = fullScreen
-    ? 'fixed inset-0 z-[9999] bg-[#05070f] flex items-center justify-center'
-    : 'min-h-[60vh] bg-[#05070f] flex items-center justify-center';
+    ? 'fixed inset-0 z-[9999] bg-background flex items-center justify-center'
+    : 'min-h-[60vh] bg-background flex items-center justify-center';
 
   return (
     <div className={container}>
@@ -64,49 +64,37 @@ export function LoadingScreen({
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-headline font-bold tracking-tight">
-            <span className="text-foreground">
-              DevRann
-            </span>
-          </h1>
-          <p className="text-muted-foreground text-sm font-mono animate-pulse">
-            {message}
-          </p>
+          <h1 className="text-3xl font-headline font-bold tracking-tight text-foreground">DevRann</h1>
+          <p className="text-muted-foreground text-sm font-mono animate-pulse">{message}</p>
         </div>
 
         {!timedOut ? (
           <div className="space-y-2 max-w-xs mx-auto">
             <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-200 ease-out"
+                className="h-full bg-gradient-to-r from-primary to-primary/50 rounded-full transition-all duration-200 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-[10px] text-muted-foreground font-mono">
-              {Math.round(progress)}%
-            </p>
+            <p className="text-[10px] text-muted-foreground font-mono">{Math.round(progress)}%</p>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30">
-              <p className="text-sm text-destructive font-medium">
-                Something took longer than expected.
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                The connection may be slow or an error occurred.
-              </p>
+              <p className="text-sm text-destructive font-medium">Something took longer than expected.</p>
+              <p className="text-xs text-muted-foreground mt-1">The connection may be slow or an error occurred.</p>
             </div>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={handleRetry}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
               >
                 <RotateCcw className="w-4 h-4" />
                 Retry
               </button>
               <button
                 onClick={handleRefresh}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-all active:scale-[0.97]"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh

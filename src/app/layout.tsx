@@ -11,6 +11,7 @@ import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { AppStartupDecorations } from '@/components/AppStartupDecorations';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { CookieConsent } from '@/components/trust/CookieConsent';
+import { AmbientBackground } from '@/components/premium/AmbientBackground';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, SITE_KEYWORDS, TWITTER_HANDLE } from '@/lib/seo';
 
 const dmSans = DM_Sans({
@@ -238,6 +239,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-body antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary`}>
+        <AmbientBackground />
         <GoogleAnalytics />
         <CookieConsent />
         <FirebaseClientProvider>

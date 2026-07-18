@@ -7,6 +7,17 @@ import { useAuth } from '@/firebase/provider';
 export function SessionCookieSync() {
   const auth = useAuth();
 
+  async function setSessionCookie(token: string) {
+    await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  async function clearSessionCookie() {
+    await fetch('/api/auth/session', { method: 'DELETE' });
+  }
+
   useEffect(() => {
     if (!auth) return;
 
@@ -14,12 +25,12 @@ export function SessionCookieSync() {
       if (user) {
         try {
           const token = await user.getIdToken();
-          document.cookie = `__session=${token};path=/;max-age=604800;samesite=lax;secure`;
+          await setSessionCookie(token);
         } catch {
-          document.cookie = '__session=;path=/;max-age=0;samesite=lax';
+          await clearSessionCookie();
         }
       } else {
-        document.cookie = '__session=;path=/;max-age=0;samesite=lax';
+        await clearSessionCookie();
       }
     });
 

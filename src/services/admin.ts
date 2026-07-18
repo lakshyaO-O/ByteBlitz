@@ -64,53 +64,18 @@ export async function checkAdmin(uid: string): Promise<{ isAdmin: boolean; role:
 // ─── Dashboard Stats ───
 
 export async function getAdminDashboardStats() {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const [usersSnap, problemsSnap, subsSnap, shopsSnap] = await Promise.all([
-    getDocs(collection(db, 'users')),
-    getDocs(collection(db, 'problems')),
-    getDocs(query(collection(db, 'users'), where('subscriptionTier', '==', 'pro'))),
-    getDocs(collection(db, 'shop')),
-  ]);
-
-  const totalUsers = usersSnap.size;
-  const totalProblems = problemsSnap.size;
-  const proUsers = subsSnap.size;
-  const shopItems = shopsSnap.size;
-  const bannedUsers = usersSnap.docs.filter(d => d.data().banned === true).length;
-  const admins = usersSnap.docs.filter(d => d.data().isAdmin === true || d.data().role === 'super_admin' || d.data().role === 'admin').length;
-
-  const totalXp = usersSnap.docs.reduce((sum, d) => sum + (d.data().xp || 0), 0);
-  const totalCoins = usersSnap.docs.reduce((sum, d) => sum + (d.data().devcoins || 0), 0);
-
-  const now = new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 86400000);
-  const activeUsers = usersSnap.docs.filter(d => {
-    const la = d.data().lastActive?.toDate?.() || new Date(d.data().lastActive || 0);
-    return la >= weekAgo;
-  }).length;
-
-  const recentUsers = usersSnap.docs
-    .filter(d => d.data().createdAt)
-    .sort((a, b) => {
-      const ta = a.data().createdAt?.toDate?.()?.getTime() || new Date(a.data().createdAt || 0).getTime();
-      const tb = b.data().createdAt?.toDate?.()?.getTime() || new Date(b.data().createdAt || 0).getTime();
-      return tb - ta;
-    })
-    .slice(0, 10)
-    .map(d => ({ id: d.id, ...d.data() })) as UserProfile[];
-
+  const data = await adminApiGet('/api/admin/dashboard');
   return {
-    totalUsers,
-    totalProblems,
-    proUsers,
-    shopItems,
-    bannedUsers,
-    admins,
-    totalXp,
-    totalCoins,
-    activeUsers,
-    recentUsers,
+    totalUsers: data.totalUsers ?? 0,
+    totalProblems: data.totalProblems ?? 0,
+    proUsers: 0,
+    shopItems: 0,
+    bannedUsers: 0,
+    admins: 0,
+    totalXp: 0,
+    totalCoins: 0,
+    activeUsers: data.activeUsers24h ?? 0,
+    recentUsers: data.newestUsers ?? [],
   };
 }
 
@@ -204,33 +169,20 @@ export async function restoreProblemVersion(id: string, versionId: string) {
 // ─── Challenge Management ───
 
 export async function setDailyChallenge(data: { date: string; problemId: string; xpBonus: number }) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  const snap = await getDoc(doc(db, 'challenges', 'daily'));
-  const challenges = snap.exists() ? snap.data().challenges || [] : [];
-  const idx = challenges.findIndex((c: any) => c.date === data.date);
-  if (idx >= 0) challenges[idx] = data;
-  else challenges.push(data);
-  await setDoc(doc(db, 'challenges', 'daily'), { challenges }, { merge: true });
+  return adminApiCall('/api/admin/challenges', { action: 'setDaily', data });
 }
 
 export async function setWeeklyChallenge(data: { week: string; problemIds: string[]; xpBonus: number }) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  await setDoc(doc(db, 'challenges', 'weekly'), data, { merge: true });
+  return adminApiCall('/api/admin/challenges', { action: 'setWeekly', data });
 }
 
 export async function getAdminChallenges() {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return { daily: null, weekly: null };
-  const [dailySnap, weeklySnap] = await Promise.all([
-    getDoc(doc(db, 'challenges', 'daily')),
-    getDoc(doc(db, 'challenges', 'weekly')),
-  ]);
-  return {
-    daily: dailySnap.exists() ? dailySnap.data() : null,
-    weekly: weeklySnap.exists() ? weeklySnap.data() : null,
-  };
+  try {
+    const data = await adminApiGet('/api/admin/challenges');
+    return { daily: data.daily ?? null, weekly: data.weekly ?? null };
+  } catch {
+    return { daily: null, weekly: null };
+  }
 }
 
 // ─── Shop Management (reads via Firestore, writes via API) ───
@@ -258,80 +210,34 @@ export async function deleteShopItem(id: string) {
 // ─── AI Usage Monitoring ───
 
 export async function getAIUsageStats() {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const usersSnap = await getDocs(query(collection(db, 'users'), limit(200)));
-  let totalAiCalls = 0;
-  let mentorCalls = 0;
-  let reviewCalls = 0;
-  let debugCalls = 0;
-  let interviewerCalls = 0;
-  let usersWithAi = 0;
-  for (const d of usersSnap.docs) {
-    const ai = d.data().aiUsage;
-    if (ai) {
-      usersWithAi++;
-      mentorCalls += ai.mentor?.total || 0;
-      reviewCalls += ai.codeReview?.total || 0;
-      debugCalls += ai.debugger?.total || 0;
-      interviewerCalls += ai.interviewer?.total || 0;
-    }
-  }
-  totalAiCalls = mentorCalls + reviewCalls + debugCalls + interviewerCalls;
-  const dailyLimits = { mentor: { free: 5, pro: 20, elite: 50 }, codeReview: { free: 3, pro: 15, elite: 40 }, debugger: { free: 5, pro: 25, elite: 60 }, interviewer: { free: 1, pro: 5, elite: 15 } };
-  return { totalAiCalls, mentorCalls, reviewCalls, debugCalls, interviewerCalls, usersWithAi, totalUsers: usersSnap.size, dailyLimits };
+  const data = await adminApiGet('/api/admin/analytics');
+  const ai = data.aiUsage ?? {};
+  return {
+    totalAiCalls: ai.totalCalls ?? 0,
+    mentorCalls: ai.mentor ?? 0,
+    reviewCalls: ai.codeReview ?? 0,
+    debugCalls: ai.debugger ?? 0,
+    interviewerCalls: ai.interviewer ?? 0,
+    usersWithAi: ai.usersWithAi ?? 0,
+    totalUsers: data.growth?.totalUsers ?? 0,
+    dailyLimits: { mentor: { free: 5, pro: 20, elite: 50 }, codeReview: { free: 3, pro: 15, elite: 40 }, debugger: { free: 5, pro: 25, elite: 60 }, interviewer: { free: 1, pro: 5, elite: 15 } },
+  };
 }
 
 // ─── Platform Analytics ───
 
 export async function getPlatformAnalytics() {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const [usersSnap, subsSnap, problemsSnap] = await Promise.all([
-    getDocs(collection(db, 'users')),
-    getDocs(collection(db, 'submissions')),
-    getDocs(collection(db, 'problems')),
-  ]);
-
-  const totalUsers = usersSnap.size;
-  const totalSubmissions = subsSnap.size;
-  const totalProblems = problemsSnap.size;
-  const solvedProblems = new Set(subsSnap.docs.filter(d => d.data().verdict === 'Accepted').map(d => d.data().problemId)).size;
-  const totalXp = usersSnap.docs.reduce((sum, d) => sum + (d.data().xp || 0), 0);
-  const totalCoins = usersSnap.docs.reduce((sum, d) => sum + (d.data().devcoins || 0), 0);
-
-  const dailySubs: Record<string, number> = {};
-  const dailyAccepted: Record<string, number> = {};
-  const now = Date.now();
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(now - i * 86400000).toISOString().slice(0, 10);
-    dailySubs[d] = 0;
-    dailyAccepted[d] = 0;
-  }
-  for (const d of subsSnap.docs) {
-    const ts = d.data().submittedAt?.toDate?.()?.toISOString()?.slice(0, 10);
-    if (ts && dailySubs[ts] !== undefined) {
-      dailySubs[ts]++;
-      if (d.data().verdict === 'Accepted') dailyAccepted[ts]++;
-    }
-  }
-
-  const byDifficulty: Record<string, number> = { Easy: 0, Medium: 0, Hard: 0 };
-  problemsSnap.docs.forEach(d => {
-    const diff = d.data().difficulty || 'Easy';
-    if (byDifficulty[diff] !== undefined) byDifficulty[diff]++;
-  });
-
+  const data = await adminApiGet('/api/admin/analytics');
   return {
-    totalUsers,
-    totalSubmissions,
-    totalProblems,
-    solvedProblems,
-    totalXp,
-    totalCoins,
-    dailySubmissions: Object.entries(dailySubs).map(([date, count]) => ({ date, count, accepted: dailyAccepted[date] || 0 })),
-    byDifficulty,
-    recentSubmissions: subsSnap.docs.slice(0, 100),
+    totalUsers: data.growth?.totalUsers ?? 0,
+    totalSubmissions: data.problems?.totalSubmissions ?? 0,
+    totalProblems: data.problems?.totalSubmissions ?? 0,
+    solvedProblems: data.problems?.totalAccepted ?? 0,
+    totalXp: 0,
+    totalCoins: 0,
+    dailySubmissions: data.problems?.dailySubmissions ?? [],
+    byDifficulty: {},
+    recentSubmissions: [],
   };
 }
 

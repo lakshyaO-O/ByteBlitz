@@ -1,115 +1,138 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Shell } from '@/components/layout/Shell';
-import { Card, CardContent } from '@/components/ui/card';
-import { ReportButton } from '@/components/admin/ReportButton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { getDoc, doc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, updateDoc, increment, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { TimeAgo } from '@/components/community/TimeAgo';
+import { CommentForm } from '@/components/community/CommentForm';
+import { CommentThread } from '@/components/community/CommentThread';
+import { PostSkeletonCard, CommentSkeleton } from '@/components/community/SkeletonCard';
+import { ReportButton } from '@/components/admin/ReportButton';
+import { getPostById, getComments, addComment, likePost } from '@/services/community';
 import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
-  Heart, MessageSquare, Share2, ArrowLeft, Clock, Loader2, Send, Reply, Flag,
+  ArrowLeft, Heart, MessageSquare, Share2, Clock, Code,
 } from 'lucide-react';
 import type { CommunityPost, PostComment } from '@/types';
 
 export default function PostDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const { user } = useUser();
   const { toast } = useToast();
+
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [comments, setComments] = useState<PostComment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [replyText, setReplyText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [liking, setLiking] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     const load = async () => {
-      const { firestore: db } = initializeFirebase();
-      if (!db) return;
-      const snap = await getDoc(doc(db, 'communityPosts', id));
-      if (snap.exists()) setPost({ id: snap.id, ...snap.data() } as CommunityPost);
-      const q = query(collection(db, 'communityPosts', id, 'comments'), orderBy('createdAt', 'asc'));
-      const snap2 = await getDocs(q);
-      setComments(snap2.docs.map(d => ({ id: d.id, ...d.data() } as PostComment)));
+      try {
+        const [postData, commentsData] = await Promise.all([
+          getPostById(id),
+          getComments(id),
+        ]);
+        if (postData) setPost(postData);
+        setComments(commentsData);
+      } catch {
+        toast({ variant: 'destructive', title: 'Failed to load post' });
+      }
       setLoading(false);
     };
     load();
-  }, [id]);
+  }, [id, toast]);
 
   const handleLike = async () => {
-    if (!user || !post) return;
-    const { firestore: db } = initializeFirebase();
-    if (!db) return;
-    const ref = doc(db, 'communityPosts', post.id);
-    const liked = post.likedBy?.includes(user.uid);
-    if (liked) {
-      await updateDoc(ref, { likes: increment(-1), likedBy: arrayRemove(user.uid) });
-      setPost({ ...post, likes: post.likes - 1, likedBy: (post.likedBy || []).filter((u: string) => u !== user.uid) });
-    } else {
-      await updateDoc(ref, { likes: increment(1), likedBy: arrayUnion(user.uid) });
-      setPost({ ...post, likes: post.likes + 1, likedBy: [...(post.likedBy || []), user.uid] });
+    if (!user || !post || liking) return;
+    setLiking(true);
+    try {
+      const result = await likePost(post.id, user.uid);
+      setPost({
+        ...post,
+        likes: post.likes + (result.liked ? 1 : -1),
+        likedBy: result.liked
+          ? [...(post.likedBy || []), user.uid]
+          : (post.likedBy || []).filter((u: string) => u !== user.uid),
+      });
+    } catch {
+      toast({ variant: 'destructive', title: 'Failed to like' });
     }
+    setLiking(false);
   };
 
-  const handleComment = async () => {
-    if (!user || !post || !replyText.trim()) return;
-    setSubmitting(true);
-    try {
-      const { firestore: db } = initializeFirebase();
-      if (!db) return;
-      const ref = await addDoc(collection(db, 'communityPosts', post.id, 'comments'), {
-        postId: post.id,
-        userId: user.uid,
-        username: user.displayName || 'Anonymous',
-        photoURL: user.photoURL || '',
-        content: replyText,
-        likes: 0,
-        parentId: replyTo,
-        createdAt: serverTimestamp(),
-      });
-      await updateDoc(doc(db, 'communityPosts', post.id), { comments: increment(1) });
+  const handleComment = useCallback(async (text: string) => {
+    if (!user || !post) return;
+    const commentId = await addComment(post.id, {
+      userId: user.uid,
+      username: user.displayName || 'Anonymous',
+      photoURL: user.photoURL || '',
+      content: text,
+      parentId: undefined,
+    });
+    if (commentId) {
       setComments(prev => [...prev, {
-        id: ref.id,
+        id: commentId,
         postId: post.id,
         userId: user.uid,
         username: user.displayName || 'Anonymous',
         photoURL: user.photoURL || '',
-        content: replyText,
+        content: text,
         likes: 0,
-        parentId: replyTo || undefined,
         createdAt: new Date().toISOString(),
       }]);
-      setReplyText('');
-      setReplyTo(null);
-      setPost({ ...post, comments: post.comments + 1 });
-    } catch { toast({ variant: 'destructive', title: 'Failed to comment' }); }
-    setSubmitting(false);
-  };
+      setPost(prev => prev ? { ...prev, comments: prev.comments + 1 } : prev);
+    }
+  }, [user, post]);
 
-  const getTimeAgo = (date: string) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    return `${Math.floor(hrs / 24)}d ago`;
-  };
+  const handleReply = useCallback(async (parentId: string, text: string) => {
+    if (!user || !post) return;
+    const commentId = await addComment(post.id, {
+      userId: user.uid,
+      username: user.displayName || 'Anonymous',
+      photoURL: user.photoURL || '',
+      content: text,
+      parentId,
+    });
+    if (commentId) {
+      setComments(prev => [...prev, {
+        id: commentId,
+        postId: post.id,
+        userId: user.uid,
+        username: user.displayName || 'Anonymous',
+        photoURL: user.photoURL || '',
+        content: text,
+        likes: 0,
+        parentId,
+        createdAt: new Date().toISOString(),
+      }]);
+      setPost(prev => prev ? { ...prev, comments: prev.comments + 1 } : prev);
+    }
+  }, [user, post]);
+
+  const rootComments = comments.filter(c => !c.parentId);
 
   if (loading) {
     return (
       <Shell>
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+        <div className="space-y-4 max-w-3xl pb-8">
+          <PostSkeletonCard />
+          <Separator />
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CommentSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </Shell>
     );
   }
@@ -117,200 +140,196 @@ export default function PostDetailPage() {
   if (!post) {
     return (
       <Shell>
-        <div className="text-center py-20 text-muted-foreground">Post not found.</div>
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <div className="w-14 h-14 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center mb-4">
+            <MessageSquare className="w-6 h-6 text-muted-foreground/60" />
+          </div>
+          <p className="font-medium mb-1">Post not found</p>
+          <p className="text-sm text-muted-foreground/70">This post may have been deleted or never existed.</p>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/community')}>
+            Back to community
+          </Button>
+        </div>
       </Shell>
     );
   }
 
-  const rootComments = comments.filter(c => !c.parentId);
-  const getReplies = (parentId: string) => comments.filter(c => c.parentId === parentId);
+  const isLiked = user ? post.likedBy?.includes(user.uid) : false;
 
   return (
     <Shell>
-      <div className="space-y-6 max-w-3xl">
-        <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground -ml-2" onClick={() => window.history.back()}>
-          <ArrowLeft className="w-4 h-4" /> Back
+      <div className="space-y-5 max-w-3xl pb-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1.5 text-muted-foreground hover:text-foreground -ml-2 press-effect"
+          onClick={() => router.push('/community')}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
         </Button>
 
-        <Card className="border-border">
-          <CardContent className="p-5 space-y-4">
+        <motion.article
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="rounded-xl border border-border bg-card overflow-hidden"
+        >
+          <div className="p-6 space-y-4">
             <div className="flex items-start gap-3">
-              <Avatar className="h-9 w-9 border border-muted shrink-0">
-                <AvatarImage src={post.photoURL} />
-                <AvatarFallback className="bg-muted text-xs">{(post.username || '?')[0]}</AvatarFallback>
+              <Avatar className="h-10 w-10 border border-border/60 shrink-0">
+                <AvatarImage src={post.photoURL} alt={post.username} />
+                <AvatarFallback className="bg-muted text-xs font-medium">
+                  {(post.username || '?')[0]?.toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">{post.username}</span>
-                  <Badge variant="outline" className="text-xs">{post.type.replace('_', ' ')}</Badge>
+                  <span className="font-semibold text-sm">{post.username}</span>
+                  <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 font-medium border-primary/20 text-primary">
+                    {post.type.replace('_', ' ')}
+                  </Badge>
                   <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
-                    <Clock className="w-3 h-3" /> {getTimeAgo(post.createdAt)}
+                    <Clock className="w-3 h-3" />
+                    <TimeAgo date={post.createdAt} />
+                    {post.isEdited && <span className="text-[10px] opacity-60">(edited)</span>}
                   </span>
                 </div>
-                <h1 className="text-lg font-semibold mt-2">{post.title}</h1>
-                <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{post.content}</p>
+                <h1 className="text-lg font-headline font-bold mt-2 leading-snug">
+                  {post.title}
+                </h1>
+                <div className="prose prose-invert prose-sm mt-3 max-w-none">
+                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    {post.content}
+                  </p>
+                </div>
+
                 {post.code && (
-                  <pre className="mt-3 p-3 rounded bg-muted/30 border border-border text-sm font-mono overflow-x-auto">
-                    <code>{post.code}</code>
-                  </pre>
+                  <div className="mt-4 rounded-xl border border-border/60 bg-muted/20 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-2 bg-muted/40 border-b border-border/40">
+                      <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                        <Code className="w-3.5 h-3.5" />
+                        {post.codeLanguage || 'code'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(post.code || '');
+                          toast({ title: 'Code copied to clipboard' });
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <pre className="p-4 text-sm font-code overflow-x-auto leading-relaxed">
+                      <code>{post.code}</code>
+                    </pre>
+                  </div>
                 )}
+
                 {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-3">
+                  <div className="flex flex-wrap gap-1.5 mt-4">
                     {post.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-[10px] px-2 py-0 h-5 font-medium"
+                      >
+                        #{tag}
+                      </Badge>
                     ))}
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-1 pt-3 border-t border-border">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={handleLike}>
-                <Heart className={cn('w-3.5 h-3.5', post.likedBy?.includes(user?.uid || '') && 'fill-primary text-primary')} />
+            <div className="flex items-center gap-1 pt-4 border-t border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 text-xs text-muted-foreground hover:text-primary transition-all duration-200 press-effect',
+                )}
+                onClick={handleLike}
+                disabled={liking}
+              >
+                <Heart
+                  className={cn(
+                    'w-4 h-4 transition-all duration-200',
+                    isLiked && 'fill-primary text-primary scale-110',
+                  )}
+                />
                 {post.likes}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
-                <MessageSquare className="w-3.5 h-3.5" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs text-muted-foreground hover:text-primary press-effect"
+              >
+                <MessageSquare className="w-4 h-4" />
                 {post.comments}
               </Button>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-primary" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`); toast({ title: 'Link copied!' }); }}>
-                <Share2 className="w-3.5 h-3.5" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs text-muted-foreground hover:text-primary press-effect"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`);
+                  toast({ title: 'Link copied!' });
+                }}
+              >
+                <Share2 className="w-4 h-4" />
               </Button>
-              <ReportButton targetType="post" targetId={post.id} targetLabel={post.title} />
+              <div className="ml-auto">
+                <ReportButton targetType="post" targetId={post.id} targetLabel={post.title} />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.article>
 
-        <Separator />
+        <Separator className="bg-border/50" />
 
-        <div className="space-y-4">
-          <h2 className="text-base font-semibold flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-primary" /> Comments ({comments.length})
-          </h2>
-
-          <div className="space-y-4">
-            {rootComments.map(comment => (
-              <CommentThread
-                key={comment.id}
-                comment={comment}
-                replies={getReplies(comment.id)}
-                onReply={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
-                isReplying={replyTo === comment.id}
-                replyText={replyText}
-                setReplyText={setReplyText}
-                onSubmitReply={handleComment}
-                submitting={submitting}
-                getTimeAgo={getTimeAgo}
-                userId={user?.uid || ''}
-              />
-            ))}
-            {rootComments.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first to reply!</p>
-            )}
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-headline font-bold flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-primary" />
+              Comments
+              <span className="text-sm font-normal text-muted-foreground">
+                ({comments.length})
+              </span>
+            </h2>
           </div>
 
-          <Card className="border-border">
-            <CardContent className="p-4">
-              <div className="flex gap-3">
-                <Avatar className="h-8 w-8 border border-muted shrink-0">
-                  <AvatarFallback className="bg-muted text-xs">{(user?.displayName || 'Y')[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-2">
-                  <Textarea
-                    placeholder={replyTo ? 'Write a reply...' : 'Write a comment...'}
-                    value={replyText}
-                    onChange={e => setReplyText(e.target.value)}
-                    rows={3}
-                    className="text-sm"
-                  />
-                  <div className="flex justify-between items-center">
-                    {replyTo && (
-                      <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => setReplyTo(null)}>
-                        Cancel reply
-                      </Button>
-                    )}
-                    <Button size="sm" className="gap-1.5 ml-auto" onClick={handleComment} disabled={submitting || !replyText.trim()}>
-                      {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                      {replyTo ? 'Reply' : 'Comment'}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {user && (
+            <CommentForm
+              onSubmit={handleComment}
+              placeholder="Share your thoughts..."
+            />
+          )}
+
+          {rootComments.length > 0 ? (
+            <div className="space-y-1">
+              {rootComments.map(comment => (
+                <CommentThread
+                  key={comment.id}
+                  comment={comment}
+                  allComments={comments}
+                  currentUserId={user?.uid}
+                  onReply={handleReply}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <MessageSquare className="w-8 h-8 mx-auto mb-3 opacity-50" />
+              <p className="text-sm font-medium">No comments yet</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Be the first to share your thoughts on this post.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </Shell>
-  );
-}
-
-function CommentThread({ comment, replies, onReply, isReplying, replyText, setReplyText, onSubmitReply, submitting, getTimeAgo, userId }: {
-  comment: PostComment; replies: PostComment[]; onReply: () => void; isReplying: boolean;
-  replyText: string; setReplyText: (v: string) => void; onSubmitReply: () => void; submitting: boolean;
-  getTimeAgo: (d: string) => string; userId: string;
-}) {
-  return (
-    <div className="space-y-3">
-      <Card className="bg-card/50 border-border">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <Avatar className="h-8 w-8 border border-muted shrink-0">
-              <AvatarImage src={comment.photoURL} />
-              <AvatarFallback className="bg-muted text-xs">{(comment.username || '?')[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{comment.username}</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {getTimeAgo(comment.createdAt)}
-                </span>
-              </div>
-              <p className="text-sm mt-1">{comment.content}</p>
-              <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground mt-1" onClick={onReply}>
-                <Reply className="w-3 h-3" /> Reply
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {replies.length > 0 && (
-        <div className="ml-8 space-y-3">
-          {replies.map(reply => (
-            <Card key={reply.id} className="bg-card/40 border-border/70">
-              <CardContent className="p-3">
-                <div className="flex items-start gap-2">
-                  <Avatar className="h-6 w-6 border border-muted shrink-0">
-                    <AvatarFallback className="bg-muted text-[10px]">{(reply.username || '?')[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-xs">{reply.username}</span>
-                      <span className="text-xs text-muted-foreground">{getTimeAgo(reply.createdAt)}</span>
-                    </div>
-                    <p className="text-sm mt-0.5">{reply.content}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {isReplying && (
-        <div className="ml-8 flex gap-2">
-          <Textarea
-            placeholder="Write a reply..."
-            value={replyText}
-            onChange={e => setReplyText(e.target.value)}
-            rows={2}
-            className="text-sm flex-1"
-          />
-          <Button size="sm" className="gap-1 self-end" onClick={onSubmitReply} disabled={submitting || !replyText.trim()}>
-            {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-          </Button>
-        </div>
-      )}
-    </div>
   );
 }

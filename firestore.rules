@@ -47,14 +47,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // ===== USERNAMES COLLECTION =====
+    // ===== USERNAMES COLLECTION (server-side writes only via Admin SDK) =====
     match /usernames/{normalized} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated()
-        && (request.resource.data.userId == request.auth.uid
-            || resource.data.userId == request.auth.uid);
-      allow delete: if isAuthenticated()
-        && resource.data.userId == request.auth.uid;
+      allow write: if false;
+      allow delete: if false;
     }
 
     // ===== PROBLEMS COLLECTION (metadata only, read for all, write for admin/moderator) =====
@@ -416,8 +413,8 @@ service cloud.firestore {
 
       function isPlayer(uid) {
         return resource.data.players != null
-          && resource.data.players[0].userId == uid
-          || resource.data.players[1].userId == uid;
+          && (resource.data.players[0].userId == uid
+              || resource.data.players[1].userId == uid);
       }
 
       function isValidPhaseTransition() {
@@ -429,15 +426,7 @@ service cloud.firestore {
         return ni >= 0 && ni >= ci;
       }
 
-      allow create: if isAuthenticated()
-        && request.resource.data.players is list
-        && request.resource.data.players.size() == 2
-        && request.resource.data.players[0].userId == request.auth.uid
-        && request.resource.data.players[0].userId is string
-        && request.resource.data.players[1].userId is string
-        && request.resource.data.players[0].userId != request.resource.data.players[1].userId
-        && request.resource.data.phase == 'countdown'
-        && request.resource.data.status == 'active';
+      allow create: if false;
 
       allow update: if isAuthenticated()
         && isPlayer(request.auth.uid)

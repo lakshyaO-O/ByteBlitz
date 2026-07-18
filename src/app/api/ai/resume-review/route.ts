@@ -1,9 +1,12 @@
 import { verifyAuth } from '@/lib/verify-auth';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(req: Request) {
   try {
     const auth = await verifyAuth(req);
     if (auth instanceof Response) return auth;
+    const rateCheck = checkRateLimit(auth.uid, req);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
     const { resumeText, jobDescription, targetRole, yearsOfExperience } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {

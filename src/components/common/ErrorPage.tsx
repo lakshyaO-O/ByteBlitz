@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, RefreshCw, Home, Zap } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface ErrorPageProps {
   error?: Error | null;
@@ -21,8 +21,8 @@ export function ErrorPage({
   const handleHome = () => window.location.href = '/';
 
   const container = fullScreen
-    ? 'fixed inset-0 z-[9999] bg-[#05070f] flex items-center justify-center'
-    : 'min-h-[60vh] bg-[#05070f] flex items-center justify-center';
+    ? 'fixed inset-0 z-[9999] bg-background flex items-center justify-center'
+    : 'min-h-[60vh] bg-background flex items-center justify-center';
 
   return (
     <div className={container}>
@@ -56,7 +56,7 @@ export function ErrorPage({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
             >
               <RefreshCw className="w-4 h-4" />
               Try Again
@@ -64,14 +64,14 @@ export function ErrorPage({
           )}
           <button
             onClick={handleRefresh}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-all active:scale-[0.97]"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh Page
           </button>
           <button
             onClick={handleHome}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-all active:scale-[0.97]"
           >
             <Home className="w-4 h-4" />
             Go Home

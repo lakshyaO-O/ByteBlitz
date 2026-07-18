@@ -3,11 +3,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const ReviewIssueSchema = z.object({
-  line: z.number().describe('The line number where the issue occurs.'),
-  severity: z.enum(['critical', 'warning', 'suggestion']).describe('The severity of the issue.'),
-  message: z.string().describe('A description of the issue.'),
-  suggestion: z.string().describe('A suggestion for fixing or improving the issue.'),
+const CategoryScoresSchema = z.object({
+  correctness: z.number().describe('Score out of 10.'),
+  readability: z.number().describe('Score out of 10.'),
+  performance: z.number().describe('Score out of 10.'),
+  security: z.number().describe('Score out of 10.'),
+  maintainability: z.number().describe('Score out of 10.'),
+  bestPractices: z.number().describe('Score out of 10.'),
 });
 
 const CodeReviewAssistantInputSchema = z.object({
@@ -17,11 +19,9 @@ const CodeReviewAssistantInputSchema = z.object({
 export type CodeReviewAssistantInput = z.infer<typeof CodeReviewAssistantInputSchema>;
 
 const CodeReviewAssistantOutputSchema = z.object({
-  summary: z.string().describe('A short executive summary of the code quality and review findings.'),
-  strengths: z.array(z.string()).describe('List of strengths or things done well in the code.'),
-  issues: z.array(ReviewIssueSchema).describe('List of issues found in the code, ordered by severity.'),
-  improvements: z.array(z.string()).describe('List of improvement suggestions including optimization, readability, best practices, and security.'),
+  review: z.string().describe('The full markdown-formatted code review. Concise and well-structured.'),
   score: z.number().describe('An overall code quality score from 0 to 100.'),
+  categoryScores: CategoryScoresSchema.describe('Per-category scores for the score visualization bars.'),
 });
 export type CodeReviewAssistantOutput = z.infer<typeof CodeReviewAssistantOutputSchema>;
 
@@ -35,29 +35,130 @@ const prompt = ai.definePrompt({
   name: 'codeReviewAssistantPrompt',
   input: {schema: CodeReviewAssistantInputSchema},
   output: {schema: CodeReviewAssistantOutputSchema},
-  prompt: `You are an expert code reviewer. Analyze the given code and provide structured feedback covering:
+  prompt: `You are an expert code reviewer. Be concise, direct, and helpful. Analyze the given code and produce a review.
 
-1. **Bug Detection** – Identify any logic errors, runtime issues, or potential crashes.
-2. **Code Quality** – Assess readability, naming conventions, structure, and adherence to language idioms.
-3. **Best Practices** – Check for modern patterns, error handling, and industry standards.
-4. **Time & Space Complexity** – Analyze algorithmic complexity and suggest improvements.
-5. **Optimization** – Spot performance bottlenecks and inefficient operations.
-6. **Readability** – Suggest ways to make the code clearer and more maintainable.
-7. **Security** – Flag any insecure patterns (e.g. injection risks, unsafe eval, hardcoded secrets).
+You MUST return valid JSON with exactly these fields:
+- "review": concise markdown string (see template below)
+- "score": overall quality 0-100
+- "categoryScores": { correctness, readability, performance, security, maintainability, bestPractices } each out of 10
 
-Return a structured review with:
-- A short executive summary.
-- A list of strengths (things done well).
-- A list of specific issues, each with line number, severity (critical/warning/suggestion), description, and a concrete suggestion.
-- A list of improvement opportunities (optimization, best practices, readability, security).
-- An overall score from 0-100.
+FORMATTING RULES:
+- Every code snippet MUST be inside fenced markdown code blocks with language
+  Correct: \`\`\`javascript\\ncode\\n\`\`\`
+  Wrong: No inline code or indented code for multi-line snippets
+- Never put "Copy" in the text — the UI adds copy buttons automatically
+- Bug explanations: max 2-3 short paragraphs per issue. Format: **Cause** / **Impact** / **Fix**
+- For code changes, use: ❌ Original → \`\`\` \\n ↓ \\n ✅ Recommended Fix → \`\`\` \\n ↓ \\n 💡 Why This Is Better
+- Refactored code section: show only changed functions/classes, not the whole file (unless >80% changed)
+- Next steps: use ☐ (☐ Fix bug, ☐ Add tests)
+- Confidence: use 🟢 High, 🟡 Medium, or 🔵 Low
+
+REVIEW STRUCTURE:
+
+# ⭐ Overall Score
+{score}/100
+
+Category scores:
+Correctness: {categoryScores.correctness}/10
+Readability: {categoryScores.readability}/10
+Performance: {categoryScores.performance}/10
+Security: {categoryScores.security}/10
+Maintainability: {categoryScores.maintainability}/10
+Best Practices: {categoryScores.bestPractices}/10
+
+---
+
+# 📝 Executive Summary
+
+1 short paragraph: what the code does, main strength, biggest issue.
+
+---
+
+# ✅ Strengths
+
+- Bullet list of things done well (max 5)
+
+---
+
+# ❌ Bugs
+
+## 🔴 Critical
+
+**Cause:** what, why
+**Impact:** real-world effect
+\`\`\`{{{language}}}
+fix
+\`\`\`
+
+## 🟠 High
+
+Same compact format.
+
+## 🟡 Medium
+
+Same compact format.
+
+## 🔵 Low
+
+Same compact format.
+
+---
+
+# ⚠ Edge Cases
+
+✓ Handled: case1, case2
+✗ Missed: case3 (add guard)
+
+---
+
+# ⚡ Complexity
+
+Time: O(?)
+Space: O(?)
+Reason: one-liner
+
+---
+
+# 🔒 Security Review
+
+One line. "No security vulnerabilities detected." or specific issue.
+
+---
+
+# 💡 Best Practices
+
+- Point with one-liner why
+
+---
+
+# 🔄 Refactored Code
+
+\`\`\`{{{language}}}
+// only changed parts
+\`\`\`
+
+---
+
+# 🎯 AI Confidence
+
+🟢 High / 🟡 Medium / 🔵 Low — one-line reason.
+
+---
+
+# 🚀 Next Steps
+
+☐ Action item 1
+☐ Action item 2
+
+---
 
 Language: {{{language}}}
 Code:
 \`\`\`{{{language}}}
 {{{code}}}
 \`\`\`
-`,
+
+Produce the complete JSON. Keep the review concise — no essays.`,
 });
 
 const codeReviewAssistantFlow = ai.defineFlow(

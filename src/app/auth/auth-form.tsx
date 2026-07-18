@@ -12,6 +12,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   onAuthStateChanged,
+  getAuth,
 } from 'firebase/auth';
 import { getDoc, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
@@ -19,6 +20,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, AlertCircle, Chrome, Loader2 } from 'lucide-react';
+
+async function setSessionCookie(token: string) {
+  await fetch('/api/auth/session', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
 
 const ALLOWED_REDIRECTS = new Set([
   '/dashboard',
@@ -123,7 +131,7 @@ function AuthForm() {
       if (firebaseUser) {
         try {
           const token = await firebaseUser.getIdToken();
-          document.cookie = `__session=${token};path=/;max-age=604800;samesite=lax;secure`;
+          await setSessionCookie(token);
         } catch (e: any) {
           console.error('[Auth] Failed to set session cookie:', e?.code || e?.message || e);
         }
@@ -141,7 +149,7 @@ function AuthForm() {
     const userRef = doc(db, 'users', userId);
     const existingProfile = await getDoc(userRef);
 
-    if (existingProfile.exists() && !isNewUser) {
+    if (existingProfile.exists()) {
       await updateDoc(userRef, {
         onlineStatus: 'online',
         lastActive: serverTimestamp(),
@@ -149,60 +157,19 @@ function AuthForm() {
       return;
     }
 
-    if (existingProfile.exists() && isNewUser) {
-      await updateDoc(userRef, {
-        email,
-        photoURL,
-        onlineStatus: 'online',
-        lastActive: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      return;
-    }
+    const idToken = await getAuth().currentUser?.getIdToken();
+    if (!idToken) return;
 
-    const publicId = 'u_' + Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join('');
-
-    await setDoc(userRef, {
-      uid: userId,
-      publicId,
-      username: displayName,
-      email,
-      photoURL,
-      coins: 0,
-      xp: 0,
-      level: 1,
-      rating: 1200,
-      highestRating: 1200,
-      highestScore: 0,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-      totalGamesPlayed: 0,
-      tier: 'Beginner',
-      rank: 0,
-      lastActive: serverTimestamp(),
-      onlineStatus: 'online',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+    const res = await fetch('/api/auth/create-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ username: displayName, email, photoURL }),
     });
 
-    await setDoc(doc(db, 'usernames', displayName.toLowerCase()), {
-      name: displayName.toLowerCase(),
-      userId,
-      claimedAt: serverTimestamp(),
-    }).catch((err) => console.warn('[Auth] Username claim may have failed (possible duplicate)', err));
-
-    await setDoc(doc(db, 'leaderboard', userId), {
-      userId,
-      username: displayName,
-      photoURL,
-      rating: 1200,
-      wins: 0,
-      tier: 'Beginner',
-      period: 'all-time',
-      periodStart: serverTimestamp(),
-      periodEnd: serverTimestamp(),
-    }, { merge: true }).catch((err) => console.warn('[Auth] Leaderboard entry creation failed', err));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to create profile');
+    }
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -242,7 +209,7 @@ function AuthForm() {
       await createUserProfile(user.uid, user.email || email, user.displayName || email.split('@')[0], photoURL, isSignUp);
 
       const idToken = await user.getIdToken();
-      document.cookie = `__session=${idToken};path=/;max-age=604800;samesite=lax;secure`;
+      await setSessionCookie(idToken);
     } catch (err: any) {
       console.error('[Auth] Sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
@@ -269,7 +236,7 @@ function AuthForm() {
       await createUserProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '', isNewGoogleUser);
 
       const idToken = await user.getIdToken();
-      document.cookie = `__session=${idToken};path=/;max-age=604800;samesite=lax;secure`;
+      await setSessionCookie(idToken);
     } catch (err: any) {
       console.error('[Auth] Google sign-in error:', err?.code || '(no code)', err?.message || '', err?.stack || '(no stack)');
       const msg = sanitizeFirebaseError(err);
@@ -310,44 +277,43 @@ function AuthForm() {
       <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
         <Card className="max-w-md w-full bg-background/95 border-border">
           <CardHeader className="text-center space-y-2">
-            <div className="flex justify-center mb-2 text-primary">
-              <Zap className="h-8 w-8 fill-primary" />
+                    <div className="flex justify-center mb-2">
+              <img src="/logo.svg" alt="DevRann" className="h-10 w-10" />
             </div>
-            <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">Reset Password</CardTitle>
-            <p className="text-xs text-muted-foreground">
+            <CardTitle className="text-2xl font-headline font-bold tracking-tight">Reset Password</CardTitle>
+            <p className="text-sm text-muted-foreground">
               Enter your email and we&apos;ll send you a reset link.
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleForgotPassword} className="space-y-4">
               {error && (
-                <div className="p-3 bg-destructive/10 border border-destructive/50 rounded-lg flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
                   <p className="text-xs text-destructive">{error}</p>
                 </div>
               )}
-              <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground">Email</label>
                 <Input
                   type="email"
                   placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  className="mt-1 bg-muted/50 border-border"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase"
+                className="w-full h-12 rounded-xl font-headline font-bold uppercase tracking-wider shadow-lg shadow-primary/20"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full text-xs"
+                className="w-full"
                 onClick={() => setShowForgotPassword(false)}
               >
                 Back to Sign In
@@ -360,33 +326,35 @@ function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center px-4 py-12">
-      <Card className="max-w-md w-full bg-background/95 border-border">
-        <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center mb-2">
-            <img src="/logo.svg" alt="DevRann" className="h-10 w-10" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <Card className="max-w-md w-full shadow-lg border-border/60">
+        <CardHeader className="text-center space-y-2 pt-8">
+          <div className="flex justify-center mb-3">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <img src="/logo.svg" alt="DevRann" className="h-8 w-8" />
+            </div>
           </div>
-          <CardTitle className="text-2xl font-headline font-bold uppercase tracking-tight">
+          <CardTitle className="text-2xl font-headline font-bold tracking-tight">
             {isSignUp ? 'Join DevRann' : 'Welcome Back'}
           </CardTitle>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground max-w-xs mx-auto">
             {isSignUp
               ? 'Create your account and enter the arena.'
               : 'Sign in to continue your journey.'}
           </p>
         </CardHeader>
-        <CardContent>
-          {/* Google Sign-In */}
+        <CardContent className="px-8 pb-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full h-12 mb-4 font-headline font-bold uppercase text-sm border-border hover:bg-muted"
+            className="w-full h-12 rounded-xl font-headline font-bold text-sm border-border/70 hover:bg-muted/60"
             onClick={handleGoogleSignIn}
             disabled={loading || isGoogleLoading}
           >
             {isGoogleLoading ? (
               <>
-                <Chrome className="w-5 h-5 mr-2" />
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Signing in...
               </>
             ) : (
@@ -399,91 +367,90 @@ function AuthForm() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full border-t border-border/60" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or</span>
+              <span className="bg-card px-3 text-muted-foreground/60 font-semibold">or</span>
             </div>
           </div>
 
           <form onSubmit={handleEmailAuth} className="space-y-4">
             {error && (
-              <div className="p-3 bg-destructive/10 border border-destructive/50 rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+              <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
                 <p className="text-xs text-destructive">{error}</p>
               </div>
             )}
 
             {isSignUp && (
-              <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Username</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground">Username</label>
                 <Input
                   type="text"
                   placeholder="CoderName"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={loading}
-                  className="mt-1 bg-muted/50 border-border"
                   maxLength={20}
                 />
-                <p className="text-[10px] text-muted-foreground mt-1">2-20 characters</p>
+                <p className="text-[10px] text-muted-foreground/60">2-20 characters</p>
               </div>
             )}
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">Email</label>
               <Input
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="mt-1 bg-muted/50 border-border"
               />
             </div>
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Password</label>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-muted-foreground">Password</label>
+                {!isSignUp && (
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-[11px] text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Forgot?
+                  </button>
+                )}
+              </div>
               <Input
                 type="password"
-                placeholder={isSignUp ? 'Min 6 characters' : ''}
+                placeholder={isSignUp ? 'Min 6 characters' : 'Enter your password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="mt-1 bg-muted/50 border-border"
               />
             </div>
 
             {isSignUp && (
-              <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Confirm Password</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground">Confirm Password</label>
                 <Input
                   type="password"
                   placeholder="Confirm password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
-                  className="mt-1 bg-muted/50 border-border"
                 />
               </div>
-            )}
-
-            {!isSignUp && (
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="text-xs text-primary hover:underline"
-              >
-                Forgot password?
-              </button>
             )}
 
             <Button
               type="submit"
               disabled={loading || isGoogleLoading}
-              className="w-full h-12 bg-primary text-background hover:bg-primary/90 font-headline font-bold uppercase"
+              className="w-full h-12 rounded-xl font-headline font-bold uppercase tracking-wider shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
             >
-              {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
+              {loading ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+              ) : isSignUp ? 'Create Account' : 'Sign In'}
             </Button>
           </form>
 
@@ -501,16 +468,33 @@ function AuthForm() {
                 setUsername('');
                 setConfirmPassword('');
               }}
-              className="text-primary font-bold hover:underline"
+              className="text-primary font-semibold hover:text-primary/80 transition-colors"
             >
               {isSignUp ? 'Sign In' : 'Create Account'}
             </button>
           </div>
 
-          <div className="mt-8 text-center text-xs text-muted-foreground space-y-2">
-            <p> Compete 1v1 in real-time coding battles</p>
-            <p> Climb the ELO ladder</p>
-            <p> Become a legendary architect</p>
+          <div className="mt-8 pt-6 border-t border-border/40 text-center">
+            <div className="grid grid-cols-3 gap-2 text-[10px] text-muted-foreground/60">
+              <div className="p-2 rounded-lg bg-muted/20">
+                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-1">
+                  <span className="text-primary text-[10px] font-bold">1v1</span>
+                </div>
+                Real-time battles
+              </div>
+              <div className="p-2 rounded-lg bg-muted/20">
+                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-1">
+                  <span className="text-primary text-[10px] font-bold">ELO</span>
+                </div>
+                Climb the ladder
+              </div>
+              <div className="p-2 rounded-lg bg-muted/20">
+                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-1">
+                  <span className="text-primary text-[10px] font-bold">AI</span>
+                </div>
+                Smart feedback
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -36,12 +36,13 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
 export function HowItWorksSection() {
   return (
-    <section className="relative py-32 border-t border-border/50">
+    <section className="relative py-32 border-t border-border/40 overflow-hidden">
+      <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
           className="text-center mb-20"
@@ -52,7 +53,7 @@ export function HowItWorksSection() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-bold tracking-tight text-foreground mb-4">
             How It{' '}
-            <span className="text-primary">Works</span>
+            <span className="text-gradient">Works</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base">
             Get started in minutes. Practice, battle, and improve.
@@ -73,15 +74,15 @@ export function HowItWorksSection() {
               className="relative text-center group"
             >
               <div className="relative mb-6">
-                <div className="w-16 h-16 mx-auto bg-card border border-border group-hover:border-primary/50 transition-colors duration-300 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-card border border-border/60 group-hover:border-primary/40 transition-all duration-300 flex items-center justify-center shadow-sm group-hover:shadow-md">
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[calc(50%+3rem)] w-[calc(100%-6rem)] h-px bg-primary/30" />
+                  <div className="hidden lg:block absolute top-8 left-[calc(50%+3rem)] w-[calc(100%-6rem)] h-px bg-gradient-to-r from-primary/30 to-transparent" />
                 )}
               </div>
 
-              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-headline font-bold mb-4">
+              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 text-primary text-xs font-headline font-bold mb-4 shadow-sm">
                 {index + 1}
               </div>
 

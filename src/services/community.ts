@@ -2,20 +2,28 @@
 
 import { initializeFirebase } from '@/firebase';
 import {
-  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
+  collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
   arrayUnion, arrayRemove,
 } from 'firebase/firestore';
 import type { CommunityPost, PostComment, PostType } from '@/types';
 
-export async function createPost(postData: Omit<CommunityPost, 'id' | 'createdAt' | 'updatedAt' | 'likes' | 'comments'>) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
+function getFirestore() {
+  const { firestore } = initializeFirebase();
+  if (!firestore) throw new Error('Firestore not initialized');
+  return firestore;
+}
+
+export async function createPost(
+  postData: Omit<CommunityPost, 'id' | 'createdAt' | 'updatedAt' | 'likes' | 'comments' | 'likedBy'>,
+): Promise<string> {
+  const db = getFirestore();
 
   const ref = await addDoc(collection(db, 'communityPosts'), {
     ...postData,
     likes: 0,
     comments: 0,
+    likedBy: [],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -27,8 +35,7 @@ export async function getPosts(
   limitCount = 20,
   lastDoc?: any,
 ): Promise<{ posts: CommunityPost[]; lastDoc: any }> {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return { posts: [], lastDoc: null };
+  const db = getFirestore();
 
   const constraints: any[] = [orderBy('createdAt', 'desc'), limit(limitCount)];
   if (filters?.type) constraints.unshift(where('type', '==', filters.type));
@@ -38,17 +45,23 @@ export async function getPosts(
   const q = query(collection(db, 'communityPosts'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const posts = docs.map(d => ({ id: d.id, ...d.data() } as CommunityPost));
+  const posts = docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      ...data,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
+    } as CommunityPost;
+  });
   return { posts, lastDoc: docs[docs.length - 1] || null };
 }
 
 export async function likePost(postId: string, userId: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-
+  const db = getFirestore();
   const ref = doc(db, 'communityPosts', postId);
   const snap = await getDoc(ref);
-  if (!snap.exists()) return;
+  if (!snap.exists()) return { liked: false };
 
   const data = snap.data();
   const likedBy = data.likedBy || [];
@@ -57,17 +70,21 @@ export async function likePost(postId: string, userId: string) {
       likes: increment(-1),
       likedBy: arrayRemove(userId),
     });
+    return { liked: false };
   } else {
     await updateDoc(ref, {
       likes: increment(1),
       likedBy: arrayUnion(userId),
     });
+    return { liked: true };
   }
 }
 
-export async function addComment(postId: string, commentData: Omit<PostComment, 'id' | 'createdAt' | 'likes' | 'postId'>) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
+export async function addComment(
+  postId: string,
+  commentData: Omit<PostComment, 'id' | 'createdAt' | 'likes' | 'postId'>,
+): Promise<string> {
+  const db = getFirestore();
 
   const ref = await addDoc(collection(db, 'communityPosts', postId, 'comments'), {
     ...commentData,
@@ -84,34 +101,38 @@ export async function addComment(postId: string, commentData: Omit<PostComment, 
 }
 
 export async function getComments(postId: string): Promise<PostComment[]> {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return [];
+  const db = getFirestore();
 
   const q = query(
     collection(db, 'communityPosts', postId, 'comments'),
     orderBy('createdAt', 'asc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as PostComment));
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      ...data,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
+    } as PostComment;
+  });
 }
 
-export async function deletePost(postId: string, userId: string) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-
+export async function deletePost(postId: string, userId: string): Promise<boolean> {
+  const db = getFirestore();
   const ref = doc(db, 'communityPosts', postId);
   const snap = await getDoc(ref);
-  if (!snap.exists()) return;
+  if (!snap.exists()) return false;
 
   const data = snap.data();
-  if (data.userId !== userId) return;
+  if (data.userId !== userId) return false;
 
   await deleteDoc(ref);
+  return true;
 }
 
 export async function getUserPosts(userId: string): Promise<CommunityPost[]> {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return [];
+  const db = getFirestore();
 
   const q = query(
     collection(db, 'communityPosts'),
@@ -119,5 +140,28 @@ export async function getUserPosts(userId: string): Promise<CommunityPost[]> {
     orderBy('createdAt', 'desc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as CommunityPost));
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      ...data,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
+    } as CommunityPost;
+  });
 }
+
+export async function getPostById(postId: string): Promise<CommunityPost | null> {
+  const db = getFirestore();
+  const snap = await getDoc(doc(db, 'communityPosts', postId));
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  return {
+    id: snap.id,
+    ...data,
+    createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
+    updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
+  } as CommunityPost;
+}
+
+

@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useArenaSettings } from '@/hooks/use-arena-settings';
 import {
   joinMatchmakingQueue, leaveMatchmakingQueue, subscribeMatchmaking,
-  findMatch, createBattle, fetchBattle,
+  findMatch, fetchBattle,
 } from '@/services/arena';
 import { fetchProblem } from '@/services/practice';
 import type { MatchmakingEntry, BattleDocument, Problem, Tier } from '@/types';
@@ -26,7 +26,7 @@ export function useArenaMatchmaking() {
   const { settings } = useArenaSettings();
   const [profile, setProfile] = useState<{ username: string; rating: number; tier: string } | null>(null);
   const [status, setStatus] = useState<MatchmakingStatus>('idle');
-  const [opponent, setOpponent] = useState<{ username: string; rating: number; tier: string } | null>(null);
+  const [opponent, setOpponent] = useState<{ uid: string; username: string; rating: number; tier: string } | null>(null);
   const [battle, setBattle] = useState<BattleDocument | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +109,7 @@ export function useArenaMatchmaking() {
           clearInterval(pollForMatch);
           cleanup();
           setStatus('found');
-          setOpponent({ username: found.username, rating: found.rating, tier: found.tier });
+          setOpponent({ uid: found.userId, username: found.username, rating: found.rating, tier: found.tier });
         }
       }, 3000);
     } catch (e: any) {
@@ -133,56 +133,38 @@ export function useArenaMatchmaking() {
     if (!user?.uid || !opponent || !profile) return;
     setStatus('creating_battle');
     try {
-      const sampleProblem: Problem = {
-        id: 'arena-sample',
-        title: 'Two Sum',
-        difficulty: 'Easy',
-        category: 'Arrays',
-        points: 100,
-        description: 'Given an array of integers nums and an integer target, return indices of the two numbers that add up to target.',
-        constraints: ['2 <= nums.length <= 10^4', '-10^9 <= nums[i] <= 10^9', '-10^9 <= target <= 10^9'],
-        examples: [
-          { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
-          { input: 'nums = [3,2,4], target = 6', output: '[1,2]' },
-        ],
-        starterCode: {
-          python: 'def two_sum(nums, target):\n    pass',
-          javascript: 'function twoSum(nums, target) {\n    \n}',
-          typescript: 'function twoSum(nums: number[], target: number): number[] {\n    \n}',
-          java: 'class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}',
-          cpp: 'class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};',
-          go: 'func twoSum(nums []int, target int) []int {\n    \n}',
-          rust: 'fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n    \n}',
-        },
-      };
+      const token = await user.getIdToken();
+      const res = await fetch('/api/battles/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          opponentId: opponent.uid || '',
+          rated: settings.rated,
+          timeControl: settings.timeControl,
+          language: settings.preferredLanguage,
+        }),
+      });
 
-      const battleId = await createBattle(
-        {
-          userId: user.uid,
-          username: profile.username,
-          rating: profile.rating,
-        tier: profile.tier as Tier,
-          language: settings.preferredLanguage,
-        },
-        {
-          userId: '',
-          username: opponent.username,
-          rating: opponent.rating,
-          tier: opponent.tier as Tier,
-          language: settings.preferredLanguage,
-        },
-        sampleProblem,
-        settings.rated ? 'ranked' : 'quick',
-        settings.timeControl,
-        settings.rated,
-      );
-      if (battleId) {
-        const battleDoc = await fetchBattle(battleId);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create battle');
+
+      if (data.battleId) {
+        const battleDoc = await fetchBattle(data.battleId);
         if (battleDoc) {
           setBattle(battleDoc);
-          setProblem(sampleProblem);
-          setStatus('ready');
         }
+        setProblem({
+          id: data.problem.id,
+          title: data.problem.title,
+          difficulty: data.problem.difficulty as any,
+          category: '',
+          points: 100,
+          description: data.problem.description,
+          constraints: [],
+          examples: data.problem.examples || [],
+          starterCode: data.problem.starterCode,
+        });
+        setStatus('ready');
       }
     } catch (e: any) {
       setError(e.message);

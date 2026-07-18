@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { encrypt } from '@/lib/encrypt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     await db.collection('users').doc(uid).collection('github').doc('integration').set({
       connected: true,
       githubUsername: userData.login,
-      accessToken,
+      encryptedAccessToken: encrypt(accessToken),
       repos,
       lastSynced: new Date().toISOString(),
     });

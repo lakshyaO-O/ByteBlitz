@@ -314,7 +314,11 @@ export async function getPracticeStats(userId: string) {
   const problemsMap: Record<string, any> = {};
   problemsSnap.docs.forEach(d => { problemsMap[d.id] = d.data(); });
 
-  const submissions = submissionsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as PracticeSubmission[];
+  const rawSubmissions: Record<string, any>[] = submissionsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const submissions = rawSubmissions.map(s => ({
+    ...s,
+    submittedAt: (s.submittedAt as any)?.toDate?.()?.toISOString() || new Date().toISOString(),
+  })) as PracticeSubmission[];
 
   const solved = Object.values(progressMap).filter((p: any) => p.solved).length;
   const total = Object.keys(progressMap).length;
@@ -353,8 +357,8 @@ export async function getPracticeStats(userId: string) {
     d.setDate(d.getDate() - i);
     const dayStr = d.toISOString().slice(0, 10);
     const daySubs = submissions.filter(s => {
-      const ts = s.submittedAt as any;
-      return ts?.toDate?.()?.toISOString()?.slice(0, 10) === dayStr;
+      const ts = (s as any).submittedAt;
+      return ts?.slice?.(0, 10) === dayStr;
     });
     const dayAcc = daySubs.length > 0
       ? Math.round((daySubs.filter(s => s.verdict === 'Accepted').length / daySubs.length) * 100)
@@ -366,7 +370,7 @@ export async function getPracticeStats(userId: string) {
   const submissionDates = new Set<string>();
   submissions.forEach(s => {
     const ts = (s as any).submittedAt;
-    const d = ts?.toDate?.()?.toISOString()?.slice(0, 10);
+    const d = ts?.slice?.(0, 10);
     if (d) submissionDates.add(d);
   });
   const sortedDates = [...submissionDates].sort().reverse();

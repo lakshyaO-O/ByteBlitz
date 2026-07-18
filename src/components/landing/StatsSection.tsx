@@ -12,12 +12,13 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
 export function StatsSection() {
   return (
-    <section className="relative py-32 border-t border-border/50">
+    <section className="relative py-32 border-t border-border/40 overflow-hidden">
+      <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
           className="text-center mb-16"
@@ -28,7 +29,7 @@ export function StatsSection() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-bold tracking-tight text-foreground mb-4">
             Built for{' '}
-            <span className="text-primary">Competitive Coding</span>
+            <span className="text-gradient">Competitive Coding</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base">
             Practice, compete, and improve with real-time feedback and AI-powered tools.
@@ -36,7 +37,7 @@ export function StatsSection() {
         </motion.div>
 
         <motion.div
-          className="text-center max-w-xl mx-auto p-8 rounded-lg border border-border bg-card/30"
+          className="text-center max-w-xl mx-auto p-10 rounded-xl border border-border/60 bg-card/30 shadow-sm hover-lift"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -49,7 +50,7 @@ export function StatsSection() {
             Early Access
           </motion.p>
           <motion.p
-            className="text-sm text-muted-foreground"
+            className="text-sm text-muted-foreground leading-relaxed"
             variants={itemVariants}
           >
             DevRann is in early access. We are actively building the platform

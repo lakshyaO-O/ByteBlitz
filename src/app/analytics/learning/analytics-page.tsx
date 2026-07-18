@@ -198,7 +198,7 @@ export function LearningAnalyticsPage() {
   const topicData = useMemo(() => {
     if (!problems || !progress || !stats) return [];
     const counts = problems.reduce((acc, p) => {
-      p.topics.forEach(t => {
+      (p.topics || []).forEach(t => {
         if (!acc[t]) acc[t] = { total: 0, solved: 0, attempted: 0 };
         acc[t].total++;
         if (progress[p.id]?.solved) acc[t].solved++;
@@ -225,7 +225,7 @@ export function LearningAnalyticsPage() {
     return Object.entries(PATTERNS)
       .filter(([, p]) => {
         const relatedProblems = problems.filter(pr =>
-          pr.topics.some(t => p.detectionRules.some(r => r.toLowerCase().includes(t.toLowerCase())))
+          (pr.topics || []).some(t => p.detectionRules.some(r => r.toLowerCase().includes(t.toLowerCase())))
         );
         return relatedProblems.some(pr => progress[pr.id]?.solved);
       })
@@ -239,7 +239,7 @@ export function LearningAnalyticsPage() {
     if (!problems || weakTopicNames.length === 0) return [];
     const unsolved = problems.filter(p =>
       !progress?.[p.id]?.solved &&
-      p.topics.some(t => weakTopicNames.includes(t))
+      (p.topics || []).some(t => weakTopicNames.includes(t))
     );
     return unsolved.slice(0, 5);
   }, [problems, weakTopicNames, progress]);
@@ -305,8 +305,10 @@ export function LearningAnalyticsPage() {
       : null;
 
     if (firstSolve && firstSolve.submittedAt) {
+      const d = new Date(firstSolve.submittedAt);
+      const dateStr = isNaN(d.getTime()) ? 'Recently' : d.toLocaleDateString();
       milestones.push({
-        date: new Date(firstSolve.submittedAt).toLocaleDateString(),
+        date: dateStr,
         title: 'Solved first problem',
         icon: CheckCircle2, color: 'text-emerald-400',
       });

@@ -8,8 +8,8 @@ import {
 } from 'firebase/firestore';
 import type {
   ArenaSettings, MatchmakingEntry, BattleDocument, PlayerBattleProgress,
-  BattlePhase, MatchType, TimeControlPreset, CodingLanguage, Difficulty,
-  Tier, MatchRecord, LeaderboardEntry, RoomInvite, Problem,
+  BattlePhase, CodingLanguage,
+  MatchRecord, LeaderboardEntry, RoomInvite,
 } from '@/types';
 
 const DEFAULT_SETTINGS: ArenaSettings = {
@@ -149,62 +149,6 @@ export async function findMatch(
   return null;
 }
 
-export async function createBattle(
-  player1: { userId: string; username: string; rating: number; tier: Tier; language: CodingLanguage },
-  player2: { userId: string; username: string; rating: number; tier: Tier; language: CodingLanguage },
-  problem: Problem,
-  matchType: MatchType,
-  timeControl: TimeControlPreset,
-  rated: boolean,
-): Promise<string | null> {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return null;
-  const totalTimeMs = parseTimeControl(timeControl);
-  const battle: Omit<BattleDocument, 'id'> = {
-    roomId: undefined,
-    players: [
-      {
-        userId: player1.userId, username: player1.username, rating: player1.rating,
-        tier: player1.tier,
-        code: '', language: player1.language,
-        passedTestCases: 0, totalTestCases: problem.examples?.length || 0,
-        submissionCount: 0, result: 'pending', eloChange: 0,
-      },
-      {
-        userId: player2.userId, username: player2.username, rating: player2.rating,
-        tier: player2.tier,
-        code: '', language: player2.language,
-        passedTestCases: 0, totalTestCases: problem.examples?.length || 0,
-        submissionCount: 0, result: 'pending', eloChange: 0,
-      },
-    ],
-    problemId: problem.id,
-    problem,
-    phase: 'countdown',
-    matchType,
-    timeControl,
-    totalTimeMs,
-    rated,
-    countdownStartedAt: new Date().toISOString(),
-    codingStartedAt: '',
-    winnerIds: [],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  const ref = await addDoc(collection(db, 'battles'), {
-    ...battle,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-
-  await updateDoc(doc(db, 'matchmaking', player1.userId), { status: 'matched', matchedWith: player2.userId });
-  await updateDoc(doc(db, 'matchmaking', player2.userId), { status: 'matched', matchedWith: player1.userId });
-
-  return ref.id;
-}
-
 export async function fetchBattle(battleId: string): Promise<BattleDocument | null> {
   const { firestore: db } = initializeFirebase();
   if (!db) return null;
@@ -277,54 +221,6 @@ export async function submitBattleCode(
     };
   } catch {
     return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
-  }
-}
-
-async function createMatchRecord(
-  battle: BattleDocument,
-  players: PlayerBattleProgress[],
-  winnerIds: string[],
-) {
-  const { firestore: db } = initializeFirebase();
-  if (!db) return;
-  const record = {
-    roomId: battle.roomId || '',
-    players: players.map(p => ({
-      uid: p.userId,
-      username: p.username,
-      score: p.passedTestCases,
-      timeUsed: 0,
-      result: winnerIds.length === 1
-        ? (winnerIds[0] === p.userId ? 'WIN' as const : 'LOSS' as const)
-        : 'DRAW' as const,
-      eloChange: p.eloChange,
-      newRating: p.rating + p.eloChange,
-    })),
-    winnerIds,
-    problem: { id: battle.problemId, title: battle.problem.title },
-    duration: 0,
-    gameMode: battle.rated ? 'rated' as const : 'practice' as const,
-    timestamp: new Date().toISOString(),
-  };
-
-  for (const p of players) {
-    await addDoc(collection(db, 'users', p.userId, 'matches'), {
-      ...record,
-      timestamp: serverTimestamp(),
-    });
-  }
-
-  const leaderboardRef = collection(db, 'leaderboard');
-  for (const p of players) {
-    const q = query(leaderboardRef, where('userId', '==', p.userId), where('period', '==', 'all-time'));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      await updateDoc(doc(db, 'leaderboard', snap.docs[0].id), {
-        rating: p.rating + p.eloChange,
-        wins: increment(winnerIds.includes(p.userId) && winnerIds.length === 1 ? 1 : 0),
-        lastActive: serverTimestamp(),
-      });
-    }
   }
 }
 
@@ -413,13 +309,6 @@ export async function fetchOnlinePlayerCount(): Promise<number> {
   );
   const snap = await getDocs(q);
   return snap.size;
-}
-
-function parseTimeControl(tc: TimeControlPreset): number {
-  const match = tc.match(/^(\d+)\+(\d+)$/);
-  if (!match) return 5 * 60 * 1000;
-  const minutes = parseInt(match[1], 10);
-  return minutes * 60 * 1000;
 }
 
 function calculateNewRating(rating: number, opponentRating: number, score: number): number {

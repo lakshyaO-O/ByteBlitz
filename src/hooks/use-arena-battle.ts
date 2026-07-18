@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import {
-  subscribeBattle, updateBattlePhase, submitBattleCode, updatePlayerProgress,
+  subscribeBattle, updateBattlePhase, submitBattleCode, updatePlayerProgress, fetchBattle,
 } from '@/services/arena';
 import type { BattleDocument, CodingLanguage } from '@/types';
 
@@ -64,13 +64,17 @@ export function useArenaBattle(battleId: string | null) {
     setSubmitting(true);
     setResult(null);
     try {
-      const battle = await subscribeBattle(battleId, () => {});
-      const testCases = (await import('@/services/arena')).fetchBattle;
+      const b = await fetchBattle(battleId);
+      const testCaseCount = b?.problem?.testCases?.length || 0;
       const res = await submitBattleCode(
         battleId, user.uid, code, language,
-        [{ input: 'test', expected: 'test' }],
+        [],
       );
-      setResult(res);
+      setResult({
+        passed: res.passed,
+        total: testCaseCount,
+        verdict: res.verdict,
+      });
     } catch (e: any) {
       setError(e.message);
     } finally {

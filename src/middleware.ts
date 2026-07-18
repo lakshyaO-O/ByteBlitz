@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifySessionCookie } from '@/lib/verify-session-edge';
 
 const protectedRoutes = [
   '/dashboard', '/practice', '/arena', '/profile', '/settings',
@@ -14,33 +15,59 @@ const authRoutes = ['/auth'];
 
 const adminRoutes = ['/admin', '/admin/'];
 
+function isMatching(pathname: string, routes: string[]): boolean {
+  return routes.some(route => pathname === route || pathname.startsWith(route + '/'));
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('__session')?.value;
 
-  const isAuthenticated = !!sessionCookie;
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname === route || pathname.startsWith(route + '/')
-  );
-  const isAuthRoute = authRoutes.some(route =>
-    pathname === route || pathname.startsWith(route + '/')
-  );
-  const isAdminRoute = adminRoutes.some(route =>
-    pathname === route || pathname.startsWith(route + '/')
-  );
+  const needsSession = isMatching(pathname, protectedRoutes);
+  const needsAdmin = isMatching(pathname, adminRoutes);
+  const onAuthPage = isMatching(pathname, authRoutes);
 
-  if (!isAuthenticated && isProtectedRoute) {
-    const url = new URL('/auth', request.url);
-    url.searchParams.set('mode', 'login');
-    url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
+  if (sessionCookie && (needsSession || needsAdmin || onAuthPage)) {
+    const session = await verifySessionCookie(sessionCookie);
+    if (!session) {
+      if (onAuthPage) {
+        return NextResponse.next();
+      }
+      const url = new URL('/auth', request.url);
+      url.searchParams.set('mode', 'login');
+      url.searchParams.set('redirect', pathname);
+      const res = NextResponse.redirect(url);
+      res.cookies.set('__session', '', { path: '/', maxAge: 0 });
+      return res;
+    }
   }
 
-  if (isAuthenticated && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (needsSession) {
+    if (!sessionCookie) {
+      const url = new URL('/auth', request.url);
+      url.searchParams.set('mode', 'login');
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
+    }
+    const session = await verifySessionCookie(sessionCookie);
+    if (!session) {
+      const url = new URL('/auth', request.url);
+      url.searchParams.set('mode', 'login');
+      url.searchParams.set('redirect', pathname);
+      const res = NextResponse.redirect(url);
+      res.cookies.set('__session', '', { path: '/', maxAge: 0 });
+      return res;
+    }
   }
 
-  if (!isAuthenticated && isAdminRoute) {
+  if (sessionCookie && onAuthPage) {
+    const session = await verifySessionCookie(sessionCookie);
+    if (session) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+  }
+
+  if (needsAdmin && !sessionCookie) {
     const url = new URL('/auth', request.url);
     url.searchParams.set('mode', 'login');
     url.searchParams.set('redirect', pathname);
@@ -49,13 +76,13 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  if (isAuthenticated) {
-    response.cookies.set('__session', sessionCookie!, {
+  if (sessionCookie) {
+    response.cookies.set('__session', sessionCookie, {
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      httpOnly: false,
+      httpOnly: true,
     });
   }
 

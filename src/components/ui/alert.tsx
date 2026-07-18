@@ -8,9 +8,13 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
+        default: "bg-background text-foreground border-border/60",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "border-destructive/30 text-destructive [&>svg]:text-destructive bg-destructive/5",
+        success:
+          "border-emerald-500/30 text-emerald-400 [&>svg]:text-emerald-400 bg-emerald-500/5",
+        warning:
+          "border-yellow-500/30 text-yellow-400 [&>svg]:text-yellow-400 bg-yellow-500/5",
       },
     },
     defaultVariants: {
@@ -50,7 +54,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-sm [&_p]:leading-relaxed text-muted-foreground/80", className)}
     {...props}
   />
 ))
