@@ -95,6 +95,7 @@ function AuthForm() {
         : err.code === 'auth/popup-blocked' ? 'Popup blocked, allow popups for this site'
         : err.code === 'auth/unauthorized-domain' ? 'Domain not authorized for sign-in'
         : err.code === 'auth/operation-not-allowed' ? 'Google sign-in not enabled in Firebase Console'
+        : err.code === 'auth/internal-error' ? 'Sign-in failed. Check Firebase Console configuration.'
         : err.message || 'Something went wrong';
       setError(msg);
     } finally {
@@ -107,6 +108,7 @@ function AuthForm() {
     try {
       if (!auth) throw new Error('Auth not initialized');
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       await createProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
@@ -114,10 +116,12 @@ function AuthForm() {
       const ok = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       if (ok.ok) router.push(redirectTo);
     } catch (err: any) {
+      console.error('[Google Sign-In]', err?.code, err?.message, err);
       if (err.code === 'auth/popup-closed-by-user') { setLoading(false); return; }
       const msg = err.code === 'auth/popup-blocked' ? 'Popup blocked, allow popups for this site'
-        : err.code === 'auth/unauthorized-domain' ? 'Domain not authorized. Add it in Firebase Console.'
-        : err.code === 'auth/operation-not-allowed' ? 'Enable Google sign-in in Firebase Console'
+        : err.code === 'auth/unauthorized-domain' ? 'Domain not authorized. Add it in Firebase Console (Authentication > Settings > Authorized domains).'
+        : err.code === 'auth/operation-not-allowed' ? 'Enable Google sign-in in Firebase Console (Authentication > Sign-in providers > Google).'
+        : err.code === 'auth/internal-error' ? 'Google sign-in failed. Make sure your Vercel domain is added to Firebase Console authorized domains and Google sign-in is enabled.'
         : err.message || 'Google sign-in failed';
       setError(msg);
     } finally {
