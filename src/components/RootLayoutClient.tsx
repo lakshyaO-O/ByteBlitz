@@ -36,7 +36,7 @@ export function RootLayoutClient({ children }: ProtectedLayoutProps) {
 
   // Landing and auth pages: no shell, no guard (they handle auth themselves)
   if (isPublicNoShell) {
-    return <ErrorBoundary>{children}</ErrorBoundary>;
+    return <>{children}</>;
   }
 
   // Protected routes (profile, settings, friends, etc.) require auth
