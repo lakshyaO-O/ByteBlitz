@@ -9,6 +9,8 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   sendPasswordResetEmail,
   onAuthStateChanged,
 } from 'firebase/auth';
@@ -32,6 +34,13 @@ function AuthForm() {
 
   const redirectTo = searchParams.get('redirect') || '/dashboard';
 
+  async function finishSignIn(user: any) {
+    await createProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
+    const token = await user.getIdToken();
+    const ok = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+    if (ok.ok) router.push(redirectTo);
+  }
+
   useEffect(() => {
     if (searchParams.get('mode') === 'login') setIsSignUp(false);
     if (searchParams.get('mode') === 'register') setIsSignUp(true);
@@ -39,15 +48,21 @@ function AuthForm() {
 
   useEffect(() => {
     if (!auth) return;
+    getRedirectResult(auth).then(async (result) => {
+      if (!result) return;
+      await finishSignIn(result.user);
+    }).catch((err) => {
+      if (err.code !== 'auth/credential-already-in-use') console.error('[Redirect Result]', err);
+    });
+  }, [auth]);
+
+  useEffect(() => {
+    if (!auth) return;
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
-      try {
-        const token = await user.getIdToken();
-        const res = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) router.push(redirectTo);
-      } catch (e) {
-        console.error(e);
-      }
+      const token = await user.getIdToken();
+      const res = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) router.push(redirectTo);
     });
     return () => unsub();
   }, [auth, router, redirectTo]);
@@ -82,20 +97,13 @@ function AuthForm() {
         : await signInWithEmailAndPassword(auth, email, password);
 
       if (isSignUp) await updateProfile(cred.user, { displayName: username });
-      await createProfile(cred.user.uid, email, username || email.split('@')[0], cred.user.photoURL || '');
-      const token = await cred.user.getIdToken();
-      const ok = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-      if (ok.ok) router.push(redirectTo);
+      await finishSignIn(cred.user);
     } catch (err: any) {
       const msg = err.code === 'auth/user-not-found' ? 'No account found'
         : err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential' ? 'Invalid email or password'
         : err.code === 'auth/email-already-in-use' ? 'Email already in use'
         : err.code === 'auth/weak-password' ? 'Password must be 6+ characters'
         : err.code === 'auth/too-many-requests' ? 'Too many attempts, try later'
-        : err.code === 'auth/popup-blocked' ? 'Popup blocked, allow popups for this site'
-        : err.code === 'auth/unauthorized-domain' ? 'Domain not authorized for sign-in'
-        : err.code === 'auth/operation-not-allowed' ? 'Google sign-in not enabled in Firebase Console'
-        : err.code === 'auth/internal-error' ? 'Sign-in failed. Check Firebase Console configuration.'
         : err.message || 'Something went wrong';
       setError(msg);
     } finally {
@@ -104,28 +112,17 @@ function AuthForm() {
   };
 
   const handleGoogleSignIn = async () => {
-    setError(null); setLoading(true);
+    if (!auth) { setError('Auth not initialized'); return; }
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-      if (!auth) throw new Error('Auth not initialized');
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      await createProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
-      const token = await user.getIdToken();
-      const ok = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-      if (ok.ok) router.push(redirectTo);
-    } catch (err: any) {
-      console.error('[Google Sign-In]', err?.code, err?.message, err);
-      if (err.code === 'auth/popup-closed-by-user') { setLoading(false); return; }
-      const msg = err.code === 'auth/popup-blocked' ? 'Popup blocked, allow popups for this site'
-        : err.code === 'auth/unauthorized-domain' ? 'Domain not authorized. Add it in Firebase Console (Authentication > Settings > Authorized domains).'
-        : err.code === 'auth/operation-not-allowed' ? 'Enable Google sign-in in Firebase Console (Authentication > Sign-in providers > Google).'
-        : err.code === 'auth/internal-error' ? 'Google sign-in failed. Make sure your Vercel domain is added to Firebase Console authorized domains and Google sign-in is enabled.'
-        : err.message || 'Google sign-in failed';
-      setError(msg);
-    } finally {
-      setLoading(false);
+      await signInWithPopup(auth, provider);
+    } catch (popupErr: any) {
+      if (popupErr.code === 'auth/popup-closed-by-user') return;
+      if (popupErr.code === 'auth/popup-blocked') { setError('Popup blocked. Please allow popups for this site or try again.'); return; }
+      console.warn('[Google] Popup failed, trying redirect:', popupErr.code);
+      setError('Popup sign-in failed. Redirecting to Google...');
+      signInWithRedirect(auth, provider);
     }
   };
 
