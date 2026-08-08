@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Home } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export default function NotFound() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-center mb-2">
-            <img src="/logo.svg" alt="DevRann" className="h-8 w-8" />
+            <Image src="/logo.svg" alt="DevRann" width={32} height={32} unoptimized className="h-8 w-8" />
           </div>
           <h2 className="text-xl font-headline font-bold">Page Not Found</h2>
           <p className="text-sm text-muted-foreground">

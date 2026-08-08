@@ -84,6 +84,8 @@
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
     "dotenv": "^16.5.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.9",
     "genkit-cli": "^1.28.0",
     "jsdom": "^29.1.1",
     "postcss": "^8",

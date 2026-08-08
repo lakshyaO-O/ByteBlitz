@@ -144,7 +144,7 @@ export function ErrorTranslator({ errorMessage, language = 'python' }: ErrorTran
         <div className="pl-8">
           <div className="flex items-center gap-2 mb-1">
             <Lightbulb className="w-4 h-4 text-yellow-400" />
-            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Don't panic!</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-foreground">Don&apos;t panic!</p>
           </div>
           <p className="text-sm">Errors are normal — every programmer gets them! The computer is trying to tell you something went wrong. Try these steps:</p>
           <ol className="text-xs text-muted-foreground mt-2 space-y-1 list-decimal list-inside">

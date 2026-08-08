@@ -191,7 +191,7 @@ export default function RootLayout({
                   ],
                 },
                 {
-                  '@type': 'WebApplication',
+                  '@type': 'WebApp',
                   name: 'DevRann',
                   url: SITE_URL,
                   applicationCategory: 'EducationalApplication',
@@ -201,12 +201,6 @@ export default function RootLayout({
                     '@type': 'Offer',
                     price: '0',
                     priceCurrency: 'USD',
-                  },
-                  aggregateRating: {
-                    '@type': 'AggregateRating',
-                    ratingValue: '4.5',
-                    ratingCount: '100',
-                    bestRating: '5',
                   },
                 },
                 {

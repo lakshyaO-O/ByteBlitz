@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, addDoc, updateDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { Hackathon, HackathonTeam } from '@/types';
 
 export async function getHackathons(
@@ -23,7 +24,7 @@ export async function getHackathons(
   const q = query(collection(db, 'hackathons'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const hackathons = docs.map(d => ({ id: d.id, ...d.data() } as Hackathon));
+  const hackathons = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as Hackathon));
   return { hackathons, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -61,5 +62,5 @@ export async function getUserHackathons(userId: string): Promise<HackathonTeam[]
     orderBy('createdAt', 'desc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as HackathonTeam));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as HackathonTeam));
 }

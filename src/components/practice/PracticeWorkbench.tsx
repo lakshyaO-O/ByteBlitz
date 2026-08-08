@@ -66,7 +66,7 @@ export function PracticeWorkbench({
         recordPracticeSolved();
       }
     }
-  }, [session.verdict, session.passedTestCases, session.totalTestCases]);
+  }, [session.verdict, session.passedTestCases, session.totalTestCases, recordSubmission, recordPracticeSolved]);
 
   const runTestsRef = useRef(session.runTests);
   const submitRef = useRef(session.submit);
@@ -394,7 +394,7 @@ function ConsolePanel({
         )}
         {activeTab === 'output' && judgeAvailable && (
           <div className="text-xs font-mono text-muted-foreground space-y-1">
-            <p className="text-muted-foreground/60">&gt; Click "Run" to test your code against sample cases, or "Submit" for full evaluation.</p>
+            <p className="text-muted-foreground/60">&gt; Click &quot;Run&quot; to test your code against sample cases, or &quot;Submit&quot; for full evaluation.</p>
             <p className="text-muted-foreground/60">&gt; Use <kbd className="px-1 py-0.5 rounded bg-muted border border-border text-[10px]">Ctrl+Enter</kbd> to run, <kbd className="px-1 py-0.5 rounded bg-muted border border-border text-[10px]">Ctrl+Shift+Enter</kbd> to submit.</p>
             <p className="text-muted-foreground/60">&gt; Code is auto-saved in your browser (IndexedDB).</p>
           </div>

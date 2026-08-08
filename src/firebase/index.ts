@@ -4,6 +4,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth, browserLocalPersistence } from 'firebase/auth';
 import { firebaseConfig, isFirebaseConfigured } from './config';
+import { authLog } from '@/lib/auth-debug';
 
 interface FirebaseServices {
   app: FirebaseApp | null;
@@ -41,6 +42,7 @@ export function initializeFirebase(): FirebaseServices {
 
   try {
     appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig as Record<string, string>);
+    authLog('Firebase', 'app initialized');
   } catch (err) {
     hasAttemptedInitialization = true;
     console.error('[Firebase] App initialization failed:', err);

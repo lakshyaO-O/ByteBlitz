@@ -52,7 +52,7 @@ export default function TermsPage() {
               <li>Cheat, automate, or exploit the battle/matchmaking system</li>
               <li>Submit malicious code through the judge engine</li>
               <li>Harass, abuse, or threaten other users</li>
-              <li>Attempt to access other users' accounts or data</li>
+              <li>Attempt to access other users&apos; accounts or data</li>
               <li>Use automated tools to scrape or overload the platform</li>
               <li>Reverse engineer or decompile the platform</li>
             </ul>
@@ -65,12 +65,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-headline font-semibold text-foreground mb-3">5. AI Features</h2>
-            <p>AI-powered features (code review, debugging, mentoring) are provided on an "as-is" basis. AI outputs may contain errors. Do not rely solely on AI-generated code or advice for production systems. AI features have usage limits which vary by subscription tier.</p>
+            <p>AI-powered features (code review, debugging, mentoring) are provided on an &quot;as-is&quot; basis. AI outputs may contain errors. Do not rely solely on AI-generated code or advice for production systems. AI features have usage limits which vary by subscription tier.</p>
           </section>
 
           <section>
             <h2 className="text-lg font-headline font-semibold text-foreground mb-3">6. Service Availability</h2>
-            <p>DevRann is provided "as is" without warranty of uninterrupted service. We may perform maintenance, updates, or suspend access temporarily. We are not liable for any damages arising from service unavailability.</p>
+            <p>DevRann is provided &quot;as is&quot; without warranty of uninterrupted service. We may perform maintenance, updates, or suspend access temporarily. We are not liable for any damages arising from service unavailability.</p>
           </section>
 
           <section>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, onSnapshot, orderBy, limit, updateDoc, doc } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { AppNotification } from '@/app/lib/types';
 
 interface MilestoneCelebrationProps {
@@ -48,10 +49,10 @@ export function MilestoneCelebration({ userId, onDismiss }: MilestoneCelebration
       limit(5)
     );
 
-    const unsub = onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
       const newMilestones = snapshot.docs
-        .map(d => ({ id: d.id, ...d.data() } as AppNotification))
-        .filter(n => !n.read);
+        .map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as AppNotification))
+        .filter((n: AppNotification) => !n.read);
       if (newMilestones.length > 0) {
         setMilestones(newMilestones);
       }

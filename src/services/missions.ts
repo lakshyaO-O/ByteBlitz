@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, addDoc,
   query, where, orderBy, limit, serverTimestamp, increment, Timestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { DailyMission } from '@/types';
 
 export async function getDailyMissions(userId: string): Promise<DailyMission[]> {
@@ -26,7 +27,7 @@ export async function getDailyMissions(userId: string): Promise<DailyMission[]> 
     return generateDailyMissions(userId);
   }
 
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as DailyMission));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DailyMission));
 }
 
 export async function updateMissionProgress(userId: string, missionId: string, progress: number) {

@@ -451,11 +451,11 @@ function renderTraffic(d: AnalyticsData) {
           <ResponsiveContainer {...CHART_PROPS}>
             <BarChart data={d.traffic.activeByHour}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="hour" tickFormatter={h => `${h}:00`} tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
+              <XAxis dataKey="hour" tickFormatter={(h: number) => `${h}:00`} tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
               <YAxis tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
               <Tooltip
                 contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 11 }}
-                labelFormatter={h => `${h}:00`}
+                labelFormatter={(h: string) => `${h}:00`}
               />
               <Bar dataKey="count" fill="#f97316" radius={[2, 2, 0, 0]} />
             </BarChart>

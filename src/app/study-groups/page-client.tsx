@@ -15,6 +15,7 @@ import { searchGroups, createGroup, joinGroup } from '@/services/study-groups';
 import { useUser } from '@/firebase/auth/use-user';
 import { useFirestore } from '@/firebase/provider';
 import { doc, getDoc, collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import {
@@ -56,7 +57,7 @@ export default function StudyGroupsPage() {
         if (db2) {
           const q = query(collection(db2, 'studyGroups'), where('memberIds', 'array-contains', user.uid), orderBy('updatedAt', 'desc'));
           const snap = await getDocs(q);
-          setMyGroups(snap.docs.map(d => ({ id: d.id, ...d.data() } as StudyGroup)));
+          setMyGroups(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as StudyGroup)));
         }
       }
     } catch { /* fallback empty */ }

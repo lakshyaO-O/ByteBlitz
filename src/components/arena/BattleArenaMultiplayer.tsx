@@ -408,7 +408,7 @@ export function BattleArenaMultiplayer({
                       Test Cases ({battle.problem.testCases.length})
                     </h4>
                     <p className="text-muted-foreground/70 text-xs">
-                      Use "Run Tests" to validate your solution locally before submitting.
+                      Use &quot;Run Tests&quot; to validate your solution locally before submitting.
                     </p>
                   </div>
                 )}

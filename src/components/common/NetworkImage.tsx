@@ -25,6 +25,8 @@ export function NetworkImage({ src, alt, className, fallback }: NetworkImageProp
       {error ? (
         fallback || <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xs">?</div>
       ) : (
+        // ponytail: arbitrary avatar/upload hosts; next/image needs remotePatterns allowlist or a proxy
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={alt}

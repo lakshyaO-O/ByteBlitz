@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, addDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { MentorProfile, MentorReview } from '@/types';
 
 export async function getMentors(
@@ -23,7 +24,7 @@ export async function getMentors(
   const q = query(collection(db, 'mentorProfiles'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const mentors = docs.map(d => ({ id: d.id, ...d.data() } as MentorProfile));
+  const mentors = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as MentorProfile));
   return { mentors, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -63,7 +64,7 @@ export async function addReview(mentorId: string, reviewData: Omit<MentorReview,
   });
 
   const reviewsSnap = await getDocs(collection(db, 'mentorProfiles', mentorId, 'reviews'));
-  const totalRating = reviewsSnap.docs.reduce((sum, d) => sum + d.data().rating, 0);
+  const totalRating = reviewsSnap.docs.reduce((sum: number, d: QueryDocumentSnapshot<DocumentData>) => sum + d.data().rating, 0);
   const avgRating = totalRating / reviewsSnap.docs.length;
 
   await updateDoc(doc(db, 'mentorProfiles', mentorId), {

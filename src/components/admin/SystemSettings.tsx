@@ -89,6 +89,12 @@ export function SystemSettings() {
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
+  const [selectedRole, setSelectedRole] = useState<string>(Object.keys(ROLE_LABELS)[0]);
+  const [userSearch, setUserSearch] = useState('');
+  const [userResults, setUserResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchAll = useCallback(async () => {
@@ -576,11 +582,6 @@ export function SystemSettings() {
   }
 
   function renderPermissions() {
-    const [selectedRole, setSelectedRole] = useState<string>(Object.keys(ROLE_LABELS)[0]);
-    const [userSearch, setUserSearch] = useState('');
-    const [userResults, setUserResults] = useState<any[]>([]);
-    const [searching, setSearching] = useState(false);
-
     const searchUsers = async () => {
       if (!userSearch.trim()) return;
       setSearching(true);
@@ -784,7 +785,6 @@ export function SystemSettings() {
 
   function renderApiKeys() {
     const keyEntries = Object.entries(apiKeys);
-    const [revealed, setRevealed] = useState<Record<string, boolean>>({});
 
     return (
       <Section title="API Keys" desc="Platform API keys and secrets. All values are masked. Changes are logged as critical.">

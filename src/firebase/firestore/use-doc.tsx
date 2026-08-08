@@ -7,6 +7,7 @@ import {
   DocumentData,
   DocumentSnapshot,
 } from 'firebase/firestore';
+import type { FirestoreError } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 import { useFirestore } from '../provider';
@@ -33,7 +34,7 @@ export function useDoc(path: string | null) {
         setData(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
         setLoading(false);
       },
-      async (err) => {
+      async (err: FirestoreError) => {
         if (!active) return;
         const permissionError = new FirestorePermissionError({
           path: docRef.path,

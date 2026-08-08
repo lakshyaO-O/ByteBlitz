@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   Gem, ShoppingBag, CheckCircle2, Award, Star, Clock,
-  Palette, User, Gamepad2, MessageSquare, Zap, Image,
+  Palette, User, Gamepad2, MessageSquare, Zap, Image as ImageIcon,
   Sparkles, Frame, Type, Sword, Loader2, Eye, Info,
 } from 'lucide-react';
 import type { ShopItem } from '@/types';
@@ -40,7 +40,7 @@ const TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
   loading_theme: { label: 'Loading Theme', icon: <Clock className="w-4 h-4" /> },
   chat_emoji: { label: 'Chat Emoji Pack', icon: <MessageSquare className="w-4 h-4" /> },
   arena_effect: { label: 'Arena Effect', icon: <Zap className="w-4 h-4" /> },
-  profile_background: { label: 'Profile Background', icon: <Image className="w-4 h-4" /> },
+  profile_background: { label: 'Profile Background', icon: <ImageIcon className="w-4 h-4" /> },
   seasonal_collectible: { label: 'Seasonal Collectible', icon: <Sparkles className="w-4 h-4" /> },
 };
 

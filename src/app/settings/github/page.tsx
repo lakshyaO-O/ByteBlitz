@@ -76,7 +76,7 @@ export default function GithubSettingsPage() {
               <div>
                 <h2 className="text-xl font-headline font-bold">Connect GitHub</h2>
                 <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-                  Link your GitHub account to automatically display your repositories on your profile. We'll only access public information.
+                  Link your GitHub account to automatically display your repositories on your profile. We&apos;ll only access public information.
                 </p>
               </div>
               <Button size="lg" className="gap-2">

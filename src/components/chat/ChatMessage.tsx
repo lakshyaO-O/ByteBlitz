@@ -86,6 +86,8 @@ export function ChatMessageBubble({
         >
           {isImage && message.fileUrl && (
             <div className="mb-2">
+              {/* ponytail: arbitrary chat-upload host; next/image needs remotePatterns/proxy */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={message.fileUrl} alt={message.fileName || 'Image'} className="max-w-full rounded-lg max-h-64 object-cover" />
             </div>
           )}

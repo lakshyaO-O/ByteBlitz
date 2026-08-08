@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
   arrayUnion, arrayRemove,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { StudyGroup, StudyGroupMessage } from '@/types';
 
 export async function createGroup(groupData: Omit<StudyGroup, 'id' | 'createdAt' | 'updatedAt' | 'memberCount'>) {
@@ -66,7 +67,7 @@ export async function getGroupMessages(
   const q = query(collection(db, 'studyGroups', groupId, 'messages'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const messages = docs.map(d => ({ id: d.id, ...d.data() } as StudyGroupMessage));
+  const messages = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as StudyGroupMessage));
   return { messages, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -101,12 +102,12 @@ export async function searchGroups(
   const q = query(collection(db, 'studyGroups'), ...constraints);
   const snap = await getDocs(q);
 
-  let groups = snap.docs.map(d => ({ id: d.id, ...d.data() } as StudyGroup));
+  let groups = snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as StudyGroup));
 
   if (queryStr) {
     const lower = queryStr.toLowerCase();
     groups = groups.filter(
-      g => g.name.toLowerCase().includes(lower) || g.description.toLowerCase().includes(lower) || g.tags.some(t => t.toLowerCase().includes(lower)),
+      (g: any) => g.name.toLowerCase().includes(lower) || g.description.toLowerCase().includes(lower) || g.tags.some((t: any) => t.toLowerCase().includes(lower)),
     );
   }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { WeeklyStats } from '@/components/analytics/WeeklyStats';
 import { EmptyState } from '@/components/premium/EmptyState';
@@ -8,6 +8,7 @@ import { BarChart3, Activity } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, getDocs, orderBy, limit, doc, getDoc } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { SkeletonPage } from '@/components/common/SkeletonPage';
 import { WeeklySummary } from '@/app/lib/types';
 
@@ -28,12 +29,7 @@ export default function AnalyticsPage() {
     winRate: 0,
   });
 
-  useEffect(() => {
-    if (!user) { setLoading(false); return; }
-    loadAnalytics();
-  }, [user]);
-
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     try {
       const { firestore: db } = initializeFirebase();
       if (!db) { setLoading(false); return; }
@@ -57,7 +53,7 @@ export default function AnalyticsPage() {
       const now = new Date();
       const weekAgo = new Date(now.getTime() - 7 * 86400000);
 
-      sessionsSnap.docs.forEach(d => {
+      sessionsSnap.docs.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
         const s = d.data();
         const dateKey = s.startTime ? new Date(s.startTime).toISOString().split('T')[0] : '';
         if (dateKey) heatmap[dateKey] = (heatmap[dateKey] || 0) + 1;
@@ -86,7 +82,12 @@ export default function AnalyticsPage() {
       }
       } catch (e) { console.warn('[Analytics] Failed to load summary:', e); }
     setLoading(false);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) { setLoading(false); return; }
+    loadAnalytics();
+  }, [user, loadAnalytics]);
 
   if (loading) return <SkeletonPage type="analytics" />;
 

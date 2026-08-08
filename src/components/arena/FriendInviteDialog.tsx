@@ -14,6 +14,7 @@ import { useFriends } from '@/hooks/use-friends';
 import { sendRoomInvite } from '@/services/arena';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 interface FriendInviteDialogProps {
   roomId: string;
@@ -64,7 +65,7 @@ export function FriendInviteDialog({ roomId, roomCode }: FriendInviteDialogProps
       if (!db) { setManualStatus({ type: 'error', message: 'Firebase unavailable' }); return; }
       const q = query(collection(db, 'users'), where('username', '==', manualUsername.trim()));
       const snap = await getDocs(q);
-      const targetUser = snap.docs.find((d) => d.id !== user.uid);
+      const targetUser = snap.docs.find((d: QueryDocumentSnapshot<DocumentData>) => d.id !== user.uid);
       if (!targetUser) {
         setManualStatus({ type: 'not_found', message: 'User not found' });
         return;

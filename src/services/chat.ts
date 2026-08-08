@@ -7,6 +7,7 @@ import {
   onSnapshot, Timestamp, increment, runTransaction, writeBatch,
   arrayUnion, arrayRemove,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import {
   getStorage, getDownloadURL, ref, uploadBytes,
 } from 'firebase/storage';
@@ -207,9 +208,9 @@ export function subscribeChatList(
     where('participants', 'array-contains', userId),
     orderBy('updatedAt', 'desc'),
   );
-  return onSnapshot(q, (snap) => {
+  return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
     const list: ChatDoc[] = [];
-    snap.forEach((d) => {
+    snap.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
       const data = d.data();
       list.push({ id: d.id, ...data } as ChatDoc);
     });
@@ -225,9 +226,9 @@ export function subscribeMessages(
   const ref = messagesColRef(chatId);
   if (!ref) return () => {};
   const q = query(ref, orderBy('createdAt', 'asc'), limit(MESSAGE_BATCH_SIZE));
-  return onSnapshot(q, (snap) => {
+  return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
     const list: ChatMessage[] = [];
-    snap.forEach((d) => {
+    snap.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
       list.push({ id: d.id, ...d.data() } as ChatMessage);
     });
     onData(list);
@@ -242,9 +243,9 @@ export function subscribeTyping(
   const { firestore: db } = initializeFirebase();
   if (!db) return () => {};
   const q = query(collection(db, 'chats', chatId, 'typing'), where('typing', '==', true));
-  return onSnapshot(q, (snap) => {
+  return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
     const users: string[] = [];
-    snap.forEach((d) => {
+    snap.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
       if (d.id !== myId) users.push(d.id);
     });
     onData(users);
@@ -291,7 +292,7 @@ export async function loadMoreMessages(
     q = query(ref, orderBy('createdAt', 'desc'), limit(MESSAGE_BATCH_SIZE));
   }
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ ...d.data(), id: d.id } as ChatMessage)).reverse();
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ ...d.data(), id: d.id } as ChatMessage)).reverse();
 }
 
 // ===== GET USER PROFILE (for chat header) =====

@@ -14,6 +14,7 @@ const PUBLIC_NO_SHELL_ROUTES = ['/', '/auth'];
 
 // Routes that require authentication (redirect to auth if not logged in)
 const PROTECTED_ROUTES = [
+  '/dashboard',
   '/profile',
   '/settings',
   '/friends',

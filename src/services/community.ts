@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
   arrayUnion, arrayRemove,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { CommunityPost, PostComment, PostType } from '@/types';
 
 function getFirestore() {
@@ -45,7 +46,7 @@ export async function getPosts(
   const q = query(collection(db, 'communityPosts'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const posts = docs.map(d => {
+  const posts = docs.map((d: QueryDocumentSnapshot<DocumentData>) => {
     const data = d.data();
     return {
       id: d.id,
@@ -108,7 +109,7 @@ export async function getComments(postId: string): Promise<PostComment[]> {
     orderBy('createdAt', 'asc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => {
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => {
     const data = d.data();
     return {
       id: d.id,
@@ -140,7 +141,7 @@ export async function getUserPosts(userId: string): Promise<CommunityPost[]> {
     orderBy('createdAt', 'desc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => {
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => {
     const data = d.data();
     return {
       id: d.id,

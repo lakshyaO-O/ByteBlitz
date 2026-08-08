@@ -61,3 +61,7 @@ public1/
 
 # catch any remaining .env files
 .env*
+
+# stray nested copy of the repo (see root devrann/)
+/devrann/
+-A

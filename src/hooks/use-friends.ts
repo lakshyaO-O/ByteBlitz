@@ -5,6 +5,7 @@ import { initializeFirebase } from '@/firebase';
 import {
   collection, doc, addDoc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, onSnapshot, limit, orderBy, serverTimestamp, runTransaction,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot, Transaction } from 'firebase/firestore';
 import { FriendDoc, BlockDoc } from '@/app/lib/types';
 
 export function useFriends(userId: string | null) {
@@ -19,8 +20,8 @@ export function useFriends(userId: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'friends'), orderBy('addedAt', 'desc'));
-    unsub = onSnapshot(q, (snap) => {
-      setFriends(snap.docs.map((d) => ({ id: d.id, ...d.data() } as unknown as FriendDoc)));
+    unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      setFriends(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as unknown as FriendDoc)));
       setLoading(false);
     }, () => { setError('Failed to load friends'); setLoading(false); });
     return () => { if (unsub) unsub(); };
@@ -40,8 +41,8 @@ export function useBlockedUsers(userId: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'blocked'), orderBy('blockedAt', 'desc'));
-    unsub = onSnapshot(q, (snap) => {
-      setBlocked(snap.docs.map((d) => ({ id: d.id, ...d.data() } as unknown as BlockDoc)));
+    unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      setBlocked(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as unknown as BlockDoc)));
       setLoading(false);
     }, () => { setLoading(false); });
     return () => { if (unsub) unsub(); };
@@ -172,7 +173,7 @@ export function useBlockUser() {
     try {
       const { firestore: db } = initializeFirebase();
       if (!db) return false;
-      await runTransaction(db, async (tx) => {
+      await runTransaction(db, async (tx: Transaction) => {
         tx.set(doc(collection(db, 'users', userId, 'blocked'), targetId), {
           blockedUserId: targetId, username, photoURL: photoURL || '',
           blockedAt: serverTimestamp(),
@@ -212,8 +213,8 @@ export function useFriendRequestsReceived(userId: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'friendRequests'), orderBy('createdAt', 'desc'));
-    unsub = onSnapshot(q, (snap) => {
-      setRequests(snap.docs.filter(d => d.data().status === 'pending').map(d => ({ id: d.id, ...d.data() })));
+    unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      setRequests(snap.docs.filter((d: QueryDocumentSnapshot<DocumentData>) => d.data().status === 'pending').map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() })));
       setLoading(false);
     }, () => { setLoading(false); });
     return () => { if (unsub) unsub(); };

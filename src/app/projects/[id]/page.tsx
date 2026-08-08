@@ -78,7 +78,11 @@ export default function ProjectDetailPage() {
               <Code2 className="w-20 h-20 text-muted-foreground/20" />
               {project.screenshots.length > 0 && (
                 <>
+                <div className="absolute inset-0 overflow-hidden">
+                  {/* ponytail: arbitrary screenshot host; next/image needs remotePatterns/proxy */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={project.screenshots[currentSlide]} alt={`Screenshot ${currentSlide + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                </div>
                   <div className="absolute inset-0 bg-black/20" />
                   {project.screenshots.length > 1 && (
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">

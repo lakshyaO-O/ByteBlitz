@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,11 +23,7 @@ export function MatchReplay({ matchId }: MatchReplayProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [currentEventIdx, setCurrentEventIdx] = useState(0);
 
-  useEffect(() => {
-    loadReplay();
-  }, [matchId]);
-
-  const loadReplay = async () => {
+  const loadReplay = useCallback(async () => {
     try {
       const { firestore: db } = initializeFirebase();
       if (!db) { setLoading(false); return; }
@@ -38,7 +34,11 @@ export function MatchReplay({ matchId }: MatchReplayProps) {
       }
       setLoading(false);
     } catch { setLoading(false); }
-  };
+  }, [matchId]);
+
+  useEffect(() => {
+    loadReplay();
+  }, [loadReplay]);
 
   const togglePlay = () => setPlaying(!playing);
 

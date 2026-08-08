@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, limit } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +41,7 @@ export default function StudyGroupDetailPage() {
     const { firestore: db } = initializeFirebase();
     if (!db) return;
 
-    getDoc(doc(db, 'studyGroups', id)).then(snap => {
+    getDoc(doc(db, 'studyGroups', id)).then((snap: DocumentSnapshot<DocumentData>) => {
       if (snap.exists()) {
         setGroup({ id: snap.id, ...snap.data() } as StudyGroup);
         const memberIds = snap.data().memberIds || [];
@@ -54,8 +55,8 @@ export default function StudyGroupDetailPage() {
     });
 
     const q = query(collection(db, 'studyGroups', id, 'messages'), orderBy('createdAt', 'asc'), limit(100));
-    const unsub = onSnapshot(q, snapshot => {
-      setMessages(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as StudyGroupMessage)));
+    const unsub = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
+      setMessages(snapshot.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as StudyGroupMessage)));
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     });
     return () => unsub();

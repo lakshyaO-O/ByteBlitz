@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useFirestore } from '../provider';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 export interface GlobalStats {
   totalPlayers: number;
@@ -39,7 +40,7 @@ export function useGlobalStats() {
         const battlesSnapshot = await getDocs(collection(db, 'battles'));
         totalBattles = battlesSnapshot.size;
 
-        battlesSnapshot.forEach(doc => {
+        battlesSnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
           const data = doc.data();
           if (data.executionTime) {
             totalExecutionTime += data.executionTime;

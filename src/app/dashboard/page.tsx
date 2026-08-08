@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -73,7 +72,7 @@ export default function BeginnerDashboard() {
     if (firebaseProgressLoaded && user) {
       incrementStreak();
     }
-  }, [firebaseProgressLoaded, user]);
+  }, [firebaseProgressLoaded, user, incrementStreak]);
 
   const handleCompleteOnboarding = () => {
     setShowOnboarding(false);
@@ -114,7 +113,6 @@ export default function BeginnerDashboard() {
 
   return (
     <ErrorBoundary>
-      <Shell>
         <div className="space-y-6 pb-12">
           {/* Welcome Header */}
           <div className="relative overflow-hidden rounded-2xl bg-primary/10 border border-primary/20 p-6 md:p-8">
@@ -140,7 +138,7 @@ export default function BeginnerDashboard() {
                 </div>
                 <div className="hidden sm:flex items-center gap-3">
                   <div className="text-right">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Today's XP</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Today&apos;s XP</p>
                     <p className="text-xl font-headline font-bold text-primary">{beginner.dailyXpEarned} <span className="text-xs text-muted-foreground">/ {beginner.dailyXpGoal}</span></p>
                   </div>
                   <div className="w-12 h-12 rounded-full border-2 border-primary/30 flex items-center justify-center">
@@ -432,8 +430,7 @@ export default function BeginnerDashboard() {
             </div>
           </div>
         </div>
-      </Shell>
-    </ErrorBoundary>
+      </ErrorBoundary>
   );
 }
 

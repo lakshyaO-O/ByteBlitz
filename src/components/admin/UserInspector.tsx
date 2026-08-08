@@ -234,6 +234,8 @@ export function UserInspector() {
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-full bg-foreground/5 border border-border flex items-center justify-center shrink-0 overflow-hidden">
                 {data.profile.photoURL ? (
+                  // ponytail: arbitrary avatar host (google/firebase); next/image needs remotePatterns/proxy
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={data.profile.photoURL} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-lg font-medium text-foreground/60">

@@ -92,7 +92,7 @@ export function RoboticMascot() {
       x.set(savedState.current.x);
       y.set(savedState.current.y);
     }
-  }, []);
+  }, [x, y]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

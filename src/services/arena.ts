@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, serverTimestamp, runTransaction, Timestamp,
   increment, onSnapshot, Unsubscribe,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot, DocumentSnapshot } from 'firebase/firestore';
 import type {
   ArenaSettings, MatchmakingEntry, BattleDocument, PlayerBattleProgress,
   BattlePhase, CodingLanguage,
@@ -106,7 +107,7 @@ export function subscribeMatchmaking(
   const { firestore: db } = initializeFirebase();
   if (!db) return null;
   const ref = doc(db, 'matchmaking', userId);
-  return onSnapshot(ref, (snap) => {
+  return onSnapshot(ref, (snap: DocumentSnapshot<DocumentData>) => {
     if (snap.exists()) {
       onMatch({ userId: snap.id, ...snap.data() } as MatchmakingEntry);
     } else {
@@ -140,8 +141,8 @@ export async function findMatch(
   );
   const snap = await getDocs(q);
   const candidates = snap.docs
-    .filter(d => d.id !== userId)
-    .map(d => ({ userId: d.id, ...d.data() } as MatchmakingEntry));
+    .filter((d: QueryDocumentSnapshot<DocumentData>) => d.id !== userId)
+    .map((d: QueryDocumentSnapshot<DocumentData>) => ({ userId: d.id, ...d.data() } as MatchmakingEntry));
 
   if (candidates.length > 0) {
     return candidates[0];
@@ -163,7 +164,7 @@ export function subscribeBattle(
   const { firestore: db } = initializeFirebase();
   if (!db) return null;
   const ref = doc(db, 'battles', battleId);
-  return onSnapshot(ref, (snap) => {
+  return onSnapshot(ref, (snap: DocumentSnapshot<DocumentData>) => {
     if (snap.exists()) {
       onUpdate({ id: snap.id, ...snap.data() } as BattleDocument);
     }
@@ -233,7 +234,7 @@ export async function fetchMatchHistory(userId: string): Promise<MatchRecord[]> 
     limit(20),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({
     id: d.id,
     ...d.data(),
     timestamp: d.data().timestamp?.toMillis?.()?.toString() || new Date().toISOString(),
@@ -250,7 +251,7 @@ export async function fetchLeaderboard(period: 'weekly' | 'monthly' | 'all-time'
     limit(100),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as LeaderboardEntry));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as LeaderboardEntry));
 }
 
 export async function sendRoomInvite(
@@ -282,8 +283,8 @@ export function subscribeInvites(
     where('toUserId', '==', userId),
     where('status', '==', 'pending'),
   );
-  return onSnapshot(q, (snap) => {
-    onInvite(snap.docs.map(d => ({ id: d.id, ...d.data() } as RoomInvite)));
+  return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+    onInvite(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as RoomInvite)));
   });
 }
 

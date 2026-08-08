@@ -6,6 +6,7 @@ import {
   collection, doc, addDoc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, deleteField,
   query, where, onSnapshot, limit, orderBy, runTransaction, serverTimestamp, arrayUnion, arrayRemove,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot, Transaction } from 'firebase/firestore';
 import { GameRoom } from '@/app/lib/types';
 
 function generateRoomCode() {
@@ -46,7 +47,7 @@ export function useActiveRoom(userId: string | null) {
     if (!db) return;
     if (unsubRef.current) unsubRef.current();
     const roomRef = doc(db, 'gameRooms', roomId);
-    unsubRef.current = onSnapshot(roomRef, (snap) => {
+    unsubRef.current = onSnapshot(roomRef, (snap: QuerySnapshot<DocumentData>) => {
       if (snap.exists()) {
         const data = { id: snap.id, ...snap.data() } as GameRoom;
         if (data.status === 'finished' || !data.players?.includes(userId || '')) {
@@ -60,7 +61,7 @@ export function useActiveRoom(userId: string | null) {
         saveActiveRoomId(null);
       }
       setLoading(false);
-    }, (err) => {
+    }, (err: Error) => {
       setError('Room connection lost');
       setLoading(false);
     });
@@ -93,8 +94,8 @@ export function useRooms() {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'gameRooms'), where('status', '==', 'waiting'), orderBy('createdAt', 'desc'), limit(20));
-    unsub = onSnapshot(q, (snap) => {
-      setRooms(snap.docs.map((d) => ({ id: d.id, ...d.data() } as GameRoom)));
+    unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      setRooms(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as GameRoom)));
       setLoading(false);
     }, () => { setError('Failed to load rooms'); setLoading(false); });
     return () => { if (unsub) unsub(); };
@@ -113,9 +114,9 @@ export function useRoomByCode(roomCode: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'gameRooms'), where('roomCode', '==', roomCode.toUpperCase()), limit(1));
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
       if (cancelled) return;
-      const found = snap.docs.map((d) => ({ id: d.id, ...d.data() } as GameRoom))[0] || null;
+      const found = snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as GameRoom))[0] || null;
       setRoom(found);
       setLoading(false);
     }, () => { if (!cancelled) setLoading(false); });
@@ -156,7 +157,7 @@ export function useJoinRoom() {
       const { firestore: db } = initializeFirebase();
       if (!db) { setLoading(false); return null; }
       const roomRef = doc(db, 'gameRooms', params.roomId);
-      await runTransaction(db, async (tx) => {
+      await runTransaction(db, async (tx: Transaction) => {
         const snap = await tx.get(roomRef);
         if (!snap.exists()) throw new Error('Room no longer exists');
         const room = snap.data() as GameRoom;
@@ -192,7 +193,7 @@ export function useLeaveRoom() {
       const { firestore: db } = initializeFirebase();
       if (!db) return;
       const roomRef = doc(db, 'gameRooms', roomId);
-      await runTransaction(db, async (tx) => {
+      await runTransaction(db, async (tx: Transaction) => {
         const snap = await tx.get(roomRef);
         if (!snap.exists()) return;
         const room = snap.data() as GameRoom;
@@ -245,7 +246,7 @@ export function useTransferHost() {
       const { firestore: db } = initializeFirebase();
       if (!db) return false;
       const roomRef = doc(db, 'gameRooms', roomId);
-      await runTransaction(db, async (tx) => {
+      await runTransaction(db, async (tx: Transaction) => {
         const snap = await tx.get(roomRef);
         if (!snap.exists()) return;
         const room = snap.data() as GameRoom;
@@ -315,22 +316,22 @@ export function usePresence(userId: string | null) {
     if (!db) return;
     const userRef = doc(db, 'users', userId);
     const setOnline = () => {
-      updateDoc(userRef, { onlineStatus: 'online', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set online status', err));
+      updateDoc(userRef, { onlineStatus: 'online', lastActive: serverTimestamp() }).catch((err: Error) => console.error('[Rooms] Failed to set online status', err));
     };
     setOnline();
     const interval = setInterval(setOnline, PRESENCE_INTERVAL);
     const onUnload = () => {
-      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on unload', err));
+      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err: Error) => console.error('[Rooms] Failed to set offline status on unload', err));
     };
     window.addEventListener('beforeunload', onUnload);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') setOnline();
-      else updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on visibility change', err));
+      else updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err: Error) => console.error('[Rooms] Failed to set offline status on visibility change', err));
     });
     return () => {
       clearInterval(interval);
       window.removeEventListener('beforeunload', onUnload);
-      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err) => console.error('[Rooms] Failed to set offline status on cleanup', err));
+      updateDoc(userRef, { onlineStatus: 'offline', lastActive: serverTimestamp() }).catch((err: Error) => console.error('[Rooms] Failed to set offline status on cleanup', err));
     };
   }, [userId]);
 }

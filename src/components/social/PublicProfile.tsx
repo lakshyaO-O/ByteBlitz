@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { UserProfile, FriendDoc, ActivityEvent, MatchRecord, PrivacySettings } from '@/app/lib/types';
 import { useUser } from '@/firebase/auth/use-user';
 import { useSendFriendRequest } from '@/hooks/use-friends';
@@ -45,11 +46,7 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
     showTopicMastery: true, showBadges: true,
   };
 
-  useEffect(() => {
-    loadProfile();
-  }, [profileId]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const { firestore: db } = initializeFirebase();
       if (!db) { setLoading(false); return; }
@@ -65,19 +62,23 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
         getDocs(query(collection(db, 'users', profileId, 'matchHistory'), orderBy('timestamp', 'desc'), limit(10))),
       ]);
 
-      setFriends(friendsSnap.docs.map(d => ({ id: d.id, ...d.data() } as unknown as FriendDoc)));
-      setActivities(activitySnap.docs.map(d => ({ id: d.id, ...d.data() } as unknown as ActivityEvent)));
-      setMatchHistory(matchSnap.docs.map(d => ({ id: d.id, ...d.data() } as unknown as MatchRecord)));
+      setFriends(friendsSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as unknown as FriendDoc)));
+      setActivities(activitySnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as unknown as ActivityEvent)));
+      setMatchHistory(matchSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as unknown as MatchRecord)));
 
       if (user && user.uid !== profileId) {
         const myFriendsSnap = await getDocs(collection(db, 'users', user.uid, 'friends'));
-        const isFriend = myFriendsSnap.docs.some(d => d.id === profileId);
+        const isFriend = myFriendsSnap.docs.some((d: QueryDocumentSnapshot<DocumentData>) => d.id === profileId);
         if (isFriend) setFriendStatus('friends');
       }
 
       setLoading(false);
     } catch { setLoading(false); }
-  };
+  }, [profileId, user]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [profileId, loadProfile]);
 
   const handleSendRequest = async () => {
     if (!user || !profile) return;
@@ -127,7 +128,7 @@ export function PublicProfile({ profileId }: PublicProfileProps) {
       <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-4">
         <EyeOff className="w-16 h-16" />
         <h2 className="text-xl font-headline font-bold">User Not Found</h2>
-        <p className="text-sm">This profile doesn't exist or has been removed.</p>
+        <p className="text-sm">This profile doesn&apos;t exist or has been removed.</p>
       </div>
     );
   }

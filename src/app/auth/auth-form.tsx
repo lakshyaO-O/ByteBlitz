@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth, useFirestore } from '@/firebase/provider';
 import {
   createUserWithEmailAndPassword,
@@ -16,6 +18,26 @@ import {
 } from 'firebase/auth';
 import { getDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { Chrome, Loader2, AlertCircle } from 'lucide-react';
+import { authLog } from '@/lib/auth-debug';
+
+const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
+  'auth/popup-blocked': 'Popup blocked by your browser. Allow popups for this site and try again, or use email sign-in.',
+  'auth/popup-closed-by-user': 'Sign-in cancelled.',
+  'auth/cancelled-popup-request': 'Sign-in cancelled.',
+  'auth/already-in-progress': 'Sign-in is already in progress. Please wait a moment.',
+  'auth/network-request-failed': 'Network error. Check your connection and try again.',
+  'auth/invalid-api-key': 'Authentication is misconfigured. Please contact support.',
+  'auth/unauthorized-domain': 'This domain is not authorized for Google sign-in yet. Contact support.',
+  'auth/operation-not-supported-in-this-environment': 'Popups are not supported here. Try a different browser.',
+  'auth/account-exists-with-different-credential': 'An account already exists with this email using a different sign-in method.',
+};
+
+// Popup failures that should fall back to the full-page redirect flow.
+const GOOGLE_REDIRECT_FALLBACK_CODES = new Set([
+  'auth/operation-not-supported-in-this-environment',
+  'auth/popup-blocked',
+  'auth/internal-error',
+]);
 
 function AuthForm() {
   const auth = useAuth();
@@ -32,14 +54,31 @@ function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const rawRedirect = searchParams.get('redirect');
+  const redirectTo = rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/dashboard';
 
-  async function finishSignIn(user: any) {
+  const createProfile = useCallback(async (userId: string, email: string, displayName: string, photoURL: string) => {
+    if (!db) return;
+    const ref = doc(db, 'users', userId);
+    const existing = await getDoc(ref);
+    if (existing.exists()) {
+      await updateDoc(ref, { onlineStatus: 'online', lastActive: serverTimestamp() });
+      return;
+    }
+    const idToken = await auth?.currentUser?.getIdToken();
+    await fetch('/api/auth/create-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ username: displayName, email, photoURL }),
+    });
+  }, [db, auth]);
+
+  const finishSignIn = useCallback(async (user: any) => {
     await createProfile(user.uid, user.email || '', user.displayName || 'Player', user.photoURL || '');
     const token = await user.getIdToken();
     const ok = await fetch('/api/auth/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
     if (ok.ok) router.push(redirectTo);
-  }
+  }, [router, redirectTo, createProfile]);
 
   useEffect(() => {
     if (searchParams.get('mode') === 'login') setIsSignUp(false);
@@ -54,7 +93,7 @@ function AuthForm() {
     }).catch((err) => {
       if (err.code !== 'auth/credential-already-in-use') console.error('[Redirect Result]', err);
     });
-  }, [auth]);
+  }, [auth, finishSignIn]);
 
   useEffect(() => {
     if (!auth) return;
@@ -66,22 +105,6 @@ function AuthForm() {
     });
     return () => unsub();
   }, [auth, router, redirectTo]);
-
-  const createProfile = async (userId: string, email: string, displayName: string, photoURL: string) => {
-    if (!db) return;
-    const ref = doc(db, 'users', userId);
-    const existing = await getDoc(ref);
-    if (existing.exists()) {
-      await updateDoc(ref, { onlineStatus: 'online', lastActive: serverTimestamp() });
-      return;
-    }
-    const idToken = await auth?.currentUser?.getIdToken();
-    await fetch('/api/auth/create-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-      body: JSON.stringify({ username: displayName, email, photoURL }),
-    });
-  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,14 +138,33 @@ function AuthForm() {
     if (!auth) { setError('Auth not initialized'); return; }
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
+    setError(null);
+    setLoading(true);
+    authLog('Google', 'starting popup sign-in');
     try {
       await signInWithPopup(auth, provider);
+      // Success — the onAuthStateChanged effect below writes the session
+      // cookie and navigates to the redirect target; nothing left to do.
+      authLog('Google', 'popup sign-in succeeded');
     } catch (popupErr: any) {
-      if (popupErr.code === 'auth/popup-closed-by-user') return;
-      if (popupErr.code === 'auth/popup-blocked') { setError('Popup blocked. Please allow popups for this site or try again.'); return; }
-      console.warn('[Google] Popup failed, trying redirect:', popupErr.code);
-      setError('Popup sign-in failed. Redirecting to Google...');
-      signInWithRedirect(auth, provider);
+      const code: string | undefined = popupErr?.code;
+      authLog('Google', 'popup sign-in failed:', code, popupErr?.message);
+
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        authLog('Google', 'cancelled by user — no-op');
+        setError(null);
+        return;
+      }
+      if (code && GOOGLE_REDIRECT_FALLBACK_CODES.has(code)) {
+        authLog('Google', 'falling back to redirect flow');
+        setError('Continuing with Google...');
+        signInWithRedirect(auth, provider);
+        return;
+      }
+      const friendly = code ? GOOGLE_ERROR_MESSAGES[code] : undefined;
+      setError(friendly || (code ? `${code}: ${popupErr?.message || 'Unable to sign in with Google.'}` : 'Something went wrong. Try again.'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,7 +188,7 @@ function AuthForm() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-border/60 bg-card shadow-lg">
           <div className="text-center space-y-2">
-            <img src="/logo.svg" alt="" className="h-10 w-10 mx-auto" />
+            <Image src="/logo.svg" alt="" width={40} height={40} unoptimized className="h-10 w-10 mx-auto" />
             <h1 className="text-2xl font-bold">Reset Password</h1>
             <p className="text-sm text-muted-foreground">Enter your email for a reset link.</p>
           </div>
@@ -170,7 +212,7 @@ function AuthForm() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6 p-8 rounded-2xl border border-border/60 bg-card shadow-lg">
         <div className="text-center space-y-2">
-          <a href="/"><img src="/logo.svg" alt="DevRann" className="h-12 w-12 mx-auto" /></a>
+          <Link href="/"><Image src="/logo.svg" alt="DevRann" width={48} height={48} unoptimized className="h-12 w-12 mx-auto" /></Link>
           <h1 className="text-2xl font-bold">{isSignUp ? 'Join DevRann' : 'Welcome Back'}</h1>
           <p className="text-sm text-muted-foreground">
             {isSignUp ? 'Create your account and enter the arena.' : 'Sign in to continue your journey.'}

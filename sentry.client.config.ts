@@ -10,7 +10,7 @@ if (SENTRY_DSN) {
     replaysOnErrorSampleRate: 1.0,
     environment: process.env.NODE_ENV || 'development',
     enabled: process.env.NODE_ENV === 'production',
-    beforeSend(event) {
+    beforeSend(event: any) {
       if (event.exception) {
         console.error('[Sentry] Captured exception:', event.exception.values?.[0]?.value);
       }

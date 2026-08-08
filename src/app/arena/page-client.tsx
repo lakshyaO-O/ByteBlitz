@@ -270,7 +270,7 @@ export default function ArenaPage() {
               <Sparkles className="w-6 h-6 text-yellow-400 shrink-0" />
               <div className="flex-1">
                 <p className="font-bold text-sm">Arena Unlocked! 🎉</p>
-                <p className="text-xs text-muted-foreground">You've completed enough lessons. Enter the Arena and test your skills!</p>
+                <p className="text-xs text-muted-foreground">You&apos;ve completed enough lessons. Enter the Arena and test your skills!</p>
               </div>
               <Button size="sm" className="gap-1" onClick={() => setView('matchmaking')}>
                 Enter <Swords className="w-3 h-3" />

@@ -33,7 +33,7 @@ export function FilterTabs({ value, onChange }: FilterTabsProps) {
                 ? 'text-foreground'
                 : 'text-muted-foreground hover:text-foreground/80',
             )}
-            aria-pressed={isActive}
+            aria-selected={isActive}
             role="tab"
           >
             {isActive && (

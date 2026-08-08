@@ -61,7 +61,7 @@ export function usePracticeSession(
       const starter = problem.starterCode[state.language] || problem.starterCode.javascript || '';
       setState(s => ({ ...s, code: starter, testResults: [], verdict: null, phase: 'idle' }));
     }
-  }, [problem?.id]);
+  }, [problem, state.language]);
 
   useEffect(() => {
     languageRef.current = state.language;

@@ -11,7 +11,7 @@ import {
   ShoppingBag, Coins, Sparkles, Palette, Award, User, Zap,
   Star, Shield, Sword, Heart, Eye, Filter, Loader2,
   CheckCircle2, Clock, Frame, Sun, Type, Gamepad2, MessageSquare,
-  SwordIcon, Image, Gem, Search, ArrowUpDown, X, Info,
+  SwordIcon, Image as ImageIcon, Gem, Search, ArrowUpDown, X, Info,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -30,7 +30,7 @@ const CATEGORIES: { id: ShopItemType | 'all'; label: string; icon: React.ReactNo
   { id: 'loading_theme', label: 'Loaders', icon: <Clock className="w-3 h-3" /> },
   { id: 'chat_emoji', label: 'Emojis', icon: <MessageSquare className="w-3 h-3" /> },
   { id: 'arena_effect', label: 'Effects', icon: <Zap className="w-3 h-3" /> },
-  { id: 'profile_background', label: 'Backgrounds', icon: <Image className="w-3 h-3" /> },
+  { id: 'profile_background', label: 'Backgrounds', icon: <ImageIcon className="w-3 h-3" /> },
   { id: 'seasonal_collectible', label: 'Seasonal', icon: <Sparkles className="w-3 h-3" /> },
 ];
 

@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, addDoc,
   query, where, orderBy, limit, serverTimestamp, Timestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { ContestCalendarEntry } from '@/types';
 
 export async function getUpcomingContests(): Promise<ContestCalendarEntry[]> {
@@ -19,7 +20,7 @@ export async function getUpcomingContests(): Promise<ContestCalendarEntry[]> {
     limit(50),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ContestCalendarEntry));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ContestCalendarEntry));
 }
 
 export async function getPastContests(): Promise<ContestCalendarEntry[]> {
@@ -34,7 +35,7 @@ export async function getPastContests(): Promise<ContestCalendarEntry[]> {
     limit(50),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ContestCalendarEntry));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ContestCalendarEntry));
 }
 
 export async function addContestReminder(userId: string, contestId: string) {

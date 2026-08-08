@@ -160,7 +160,7 @@ export default function AIInterviewerPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [answer, isLoading, questions, currentIndex]);
+  }, [answer, isLoading, questions, currentIndex, toast, topic]);
 
   const handleNextQuestion = () => {
     if (currentIndex + 1 < questions.length) {

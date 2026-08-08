@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import Image from 'next/image';
 
 interface ErrorPageProps {
   error?: Error | null;
@@ -39,7 +40,7 @@ export function ErrorPage({
 
         <div className="space-y-2">
           <div className="flex items-center justify-center mb-2">
-            <img src="/logo.svg" alt="DevRann" className="h-8 w-8" />
+            <Image src="/logo.svg" alt="DevRann" width={32} height={32} unoptimized className="h-8 w-8" />
           </div>
           <h2 className="text-xl font-headline font-bold">{title}</h2>
           <p className="text-sm text-muted-foreground">

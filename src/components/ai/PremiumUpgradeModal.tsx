@@ -38,7 +38,7 @@ export function PremiumUpgradeModal({ open, onClose, feature }: PremiumUpgradeMo
           <div className="space-y-2">
             <h3 className="text-xl font-headline font-bold">Daily Limit Reached</h3>
             <p className="text-sm text-muted-foreground">
-              You've used all your free <span className="font-bold text-foreground">{featureLabel}</span> queries for today.
+              You&apos;ve used all your free <span className="font-bold text-foreground">{featureLabel}</span> queries for today.
             </p>
           </div>
 

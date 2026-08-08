@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, addDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { CareerListing, CompanyPrep } from '@/types';
 
 export async function getJobListings(
@@ -27,7 +28,7 @@ export async function getJobListings(
   const q = query(collection(db, 'careerListings'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const listings = docs.map(d => ({ id: d.id, ...d.data() } as CareerListing));
+  const listings = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as CareerListing));
   return { listings, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -50,7 +51,7 @@ export async function getInternships(
   const q = query(collection(db, 'careerListings'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const listings = docs.map(d => ({ id: d.id, ...d.data() } as CareerListing));
+  const listings = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as CareerListing));
   return { listings, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -68,7 +69,7 @@ export async function getAllCompanies(): Promise<CompanyPrep[]> {
 
   const q = query(collection(db, 'companyPrep'), orderBy('company', 'asc'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as CompanyPrep));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as CompanyPrep));
 }
 
 export async function submitApplication(listingId: string, userId: string) {

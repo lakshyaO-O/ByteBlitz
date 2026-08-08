@@ -90,7 +90,7 @@ export function CodeEditor({
     } else {
       setCode(initialCode);
     }
-  }, [problemId, userId]);
+  }, [problemId, userId, initialCode, loadCode]);
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;

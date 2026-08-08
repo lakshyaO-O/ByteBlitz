@@ -141,6 +141,8 @@ export default function FeedPage() {
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         {entry.imageUrl && (
+                          // ponytail: arbitrary feed image host; next/image needs remotePatterns/proxy
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={entry.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0 hidden sm:block" />
                         )}
                         <div className="flex-1 min-w-0">

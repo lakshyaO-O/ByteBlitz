@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, serverTimestamp, increment, arrayUnion, arrayRemove,
   Timestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type {
   ShopItem, UserInventory, PurchaseRecord, DevCoinEarning, DevCoinSource, EarningLimit, ShopItemType,
 } from '@/types';
@@ -44,7 +45,7 @@ export async function getShopItems(category?: ShopItemType): Promise<ShopItem[]>
 
   const q = query(collection(db, SHOP_COLLECTION), ...constraints);
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ShopItem));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ShopItem));
 }
 
 export async function getShopItemById(itemId: string): Promise<ShopItem | null> {
@@ -65,7 +66,7 @@ export async function getFeaturedItems(): Promise<ShopItem[]> {
     limit(6),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ShopItem));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ShopItem));
 }
 
 // ---- DevCoin Balance ----
@@ -202,7 +203,7 @@ export async function getPurchaseHistory(userId: string, max: number = 50): Prom
     limit(max),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as PurchaseRecord));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as PurchaseRecord));
 }
 
 // ---- DevCoin Earning ----
@@ -257,9 +258,9 @@ export async function recordEarning(
   ]);
 
   let dailyTotal = 0;
-  dailyEarnings.forEach(d => { dailyTotal += (d.data() as DevCoinEarning).amount; });
+  dailyEarnings.forEach((d: QueryDocumentSnapshot<DocumentData>) => { dailyTotal += (d.data() as DevCoinEarning).amount; });
   let weeklyTotal = 0;
-  weeklyEarnings.forEach(d => { weeklyTotal += (d.data() as DevCoinEarning).amount; });
+  weeklyEarnings.forEach((d: QueryDocumentSnapshot<DocumentData>) => { weeklyTotal += (d.data() as DevCoinEarning).amount; });
 
   if (limitConfig.dailyMax > 0 && dailyTotal + amount > limitConfig.dailyMax) {
     return { success: false, amount: 0, error: `Daily limit reached for ${source}` };
@@ -294,7 +295,7 @@ export async function getRecentEarnings(userId: string, max: number = 20): Promi
     limit(max),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as DevCoinEarning));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DevCoinEarning));
 }
 
 export async function getTotalDevCoinsEarned(userId: string): Promise<number> {
@@ -302,6 +303,6 @@ export async function getTotalDevCoinsEarned(userId: string): Promise<number> {
   if (!db) return 0;
   const snap = await getDocs(collection(db, 'users', userId, 'earnings'));
   let total = 0;
-  snap.forEach(d => { total += (d.data() as DevCoinEarning).amount; });
+  snap.forEach((d: QueryDocumentSnapshot<DocumentData>) => { total += (d.data() as DevCoinEarning).amount; });
   return total;
 }

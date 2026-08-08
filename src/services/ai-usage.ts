@@ -2,6 +2,7 @@
 
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, Timestamp, runTransaction } from 'firebase/firestore';
+import type { Transaction } from 'firebase/firestore';
 import type {
   AiFeature, AiFeatureLimit, AiLimitsConfig, SubscriptionTier,
 } from '@/config/ai-limits';
@@ -137,7 +138,7 @@ export async function incrementAiUsage(
   const { firestore: db } = initializeFirebase();
   if (!db) return;
 
-  await runTransaction(db, async (tx) => {
+  await runTransaction(db, async (tx: Transaction) => {
     const snap = await tx.get(ref);
     const expectedPeriod = getCurrentPeriodKey(feature);
     let newCount = 1;

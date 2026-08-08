@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -16,6 +17,7 @@ import { useUser } from '@/firebase/auth/use-user';
 import { useAuth } from '@/firebase/provider';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import type { DocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -288,7 +290,7 @@ function SidebarContent({
       <div className="shrink-0 px-3 py-4 border-b border-border/40">
         <Link href="/" className="flex items-center justify-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <img src="/logo.svg" alt="DevRann" className="h-5 w-5" />
+            <Image src="/logo.svg" alt="DevRann" width={20} height={20} unoptimized className="h-5 w-5" />
           </div>
           {!collapsed && (
             <motion.span
@@ -493,7 +495,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     if (!firestore || !user) return;
     const ref = doc(firestore, 'users', user.uid);
     getDoc(ref)
-      .then((snap) => {
+      .then((snap: DocumentSnapshot<DocumentData>) => {
         if (snap.exists()) setProfile({ id: snap.id, ...snap.data() });
       })
       .catch(() => {});

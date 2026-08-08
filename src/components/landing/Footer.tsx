@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const productLinks = [
@@ -50,7 +51,7 @@ export function LandingFooter() {
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <img src="/logo.svg" alt="DevRann" className="h-5 w-5" />
+                <Image src="/logo.svg" alt="DevRann" width={20} height={20} unoptimized className="h-5 w-5" />
               </div>
               <span className="text-lg font-headline font-bold tracking-tight text-foreground">
                 Dev<span className="text-primary">Rann</span>

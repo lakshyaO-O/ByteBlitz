@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import type { DocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useArenaSettings } from '@/hooks/use-arena-settings';
 import {
   joinMatchmakingQueue, leaveMatchmakingQueue, subscribeMatchmaking,
@@ -39,7 +40,7 @@ export function useArenaMatchmaking() {
     let mounted = true;
     const { firestore: db } = initializeFirebase();
     if (!db) return;
-    getDoc(doc(db, 'users', user.uid)).then((snap) => {
+    getDoc(doc(db, 'users', user.uid)).then((snap: DocumentSnapshot<DocumentData>) => {
       if (snap.exists() && mounted) {
         const d = snap.data();
         setProfile({
@@ -170,7 +171,7 @@ export function useArenaMatchmaking() {
       setError(e.message);
       setStatus('error');
     }
-  }, [user?.uid, opponent, profile, settings]);
+  }, [user, opponent, profile, settings]);
 
   return {
     status, opponent, battle, problem, error, queueTime,

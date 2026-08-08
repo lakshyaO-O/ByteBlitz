@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import type { Transaction } from 'firebase/firestore';
 
 export function useUsernameAvailability() {
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -44,7 +45,7 @@ export function useClaimUsername() {
       const { firestore: db } = initializeFirebase();
       if (!db) { setLoading(false); return false; }
       const normalized = username.toLowerCase();
-      await runTransaction(db, async (transaction) => {
+      await runTransaction(db, async (transaction: Transaction) => {
         const usernameRef = doc(db, 'usernames', normalized);
         const usernameSnap = await transaction.get(usernameRef);
         if (usernameSnap.exists() && usernameSnap.data()?.userId !== userId) {

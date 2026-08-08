@@ -276,7 +276,7 @@ export default function PracticePage() {
     } else {
       handleRandomProblem();
     }
-  }, [daily, problems, handleStartProblem]);
+  }, [daily, problems, handleStartProblem, handleRandomProblem]);
 
   const handleStartWeekly = useCallback((problemId: string) => {
     const p = problems.find(pr => pr.id === problemId) || getStaticProblemById(problemId);

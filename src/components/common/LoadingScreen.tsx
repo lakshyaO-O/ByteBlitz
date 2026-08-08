@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { RotateCcw, RefreshCw } from 'lucide-react';
 
 interface LoadingScreenProps {
@@ -58,7 +59,7 @@ export function LoadingScreen({
             <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-30" />
             <div className="absolute inset-2 rounded-full border-2 border-primary/30 animate-spin" />
             <div className="absolute inset-3 rounded-full bg-primary/10 flex items-center justify-center p-3">
-              <img src="/logo.svg" alt="DevRann logo" className="h-20 w-20 object-contain" />
+              <Image src="/logo.svg" alt="DevRann logo" width={80} height={80} unoptimized className="h-20 w-20 object-contain" />
             </div>
           </div>
         </div>

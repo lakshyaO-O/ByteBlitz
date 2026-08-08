@@ -23,13 +23,13 @@ import Link from 'next/link';
 
 const languages = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Go', 'Rust', 'HTML', 'CSS', 'SQL'];
 
+const snippets: any[] = [];
+const loading = false;
+
 export default function CodeSharePage() {
   const [search, setSearch] = useState('');
   const [languageFilter, setLanguageFilter] = useState('All');
   const [tab, setTab] = useState('explore');
-
-  const snippets: any[] = [];
-  const loading = false;
 
   const filtered = useMemo(() => {
     let items = snippets;
@@ -37,7 +37,7 @@ export default function CodeSharePage() {
     if (search) items = items.filter((s: any) => s.title.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase()));
     if (languageFilter !== 'All') items = items.filter((s: any) => s.language === languageFilter);
     return items;
-  }, [snippets, search, languageFilter, tab]);
+  }, [search, languageFilter, tab]);
 
   return (
     <Shell>

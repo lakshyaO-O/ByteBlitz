@@ -105,6 +105,8 @@ export function ProblemEditor({ problemId, initialMeta, initialContent, onBack, 
   const [newTag, setNewTag] = useState('');
   const [newCompanyTag, setNewCompanyTag] = useState('');
   const [newPreReq, setNewPreReq] = useState('');
+  const [codeLang, setCodeLang] = useState<CodingLanguage>('javascript');
+  const [editorialLang, setEditorialLang] = useState<CodingLanguage>('javascript');
 
   const addToList = (list: string[], setList: (v: string[]) => void, value: string) => {
     if (value && !list.includes(value)) {
@@ -673,7 +675,8 @@ export function ProblemEditor({ problemId, initialMeta, initialContent, onBack, 
   }
 
   function renderCode() {
-    const [selectedLang, setSelectedLang] = useState<CodingLanguage>('javascript');
+    const selectedLang = codeLang;
+    const setSelectedLang = setCodeLang;
     return (
       <div className="space-y-3 max-w-3xl">
         <div className="flex items-center gap-2">
@@ -718,7 +721,8 @@ export function ProblemEditor({ problemId, initialMeta, initialContent, onBack, 
   }
 
   function renderEditorial() {
-    const [selectedLang, setSelectedLang] = useState<CodingLanguage>('javascript');
+    const selectedLang = editorialLang;
+    const setSelectedLang = setEditorialLang;
     return (
       <div className="space-y-4 max-w-3xl">
         <div>

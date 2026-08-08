@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, serverTimestamp, runTransaction, Timestamp,
   increment,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, Transaction } from 'firebase/firestore';
 import type {
   PracticeProblemDocument, PracticeSubmission, Verdict, SubmissionStatus,
   UserPracticeProgress, RecentlyViewedProblem, CodingLanguage,
@@ -20,7 +21,7 @@ export async function fetchProblems(): Promise<PracticeProblemDocument[]> {
   if (!db) return [];
   const q = query(collection(db, 'problems'), orderBy('title', 'asc'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeProblemDocument));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as PracticeProblemDocument));
 }
 
 export async function fetchProblem(problemId: string): Promise<PracticeProblemDocument | null> {
@@ -60,7 +61,7 @@ export async function getAllUserProgress(userId: string): Promise<UserPracticePr
   if (!db) return [];
   const q = query(collection(db, 'users', userId, 'practiceProgress'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ problemId: d.id, ...d.data() } as UserPracticeProgress));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ problemId: d.id, ...d.data() } as UserPracticeProgress));
 }
 
 export async function markSolved(userId: string, problemId: string, submissionId: string, rating: number) {
@@ -158,7 +159,7 @@ export async function submitSolution(
     }, { merge: true });
 
     const userRef = doc(db, 'users', userId);
-    await runTransaction(db, async (tx) => {
+    await runTransaction(db, async (tx: Transaction) => {
       const snap = await tx.get(userRef);
       if (snap.exists()) {
         const updates: Record<string, any> = {
@@ -193,7 +194,7 @@ export async function fetchSubmissions(userId: string, problemId?: string): Prom
   if (problemId) constraints.unshift(where('problemId', '==', problemId));
   const q = query(collection(db, 'users', userId, 'submissions'), ...constraints);
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data(), submittedAt: d.data().submittedAt?.toMillis?.()?.toString() || '' } as unknown as PracticeSubmission));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data(), submittedAt: d.data().submittedAt?.toMillis?.()?.toString() || '' } as unknown as PracticeSubmission));
 }
 
 export async function trackRecentlyViewed(userId: string, problem: { id: string; title: string; difficulty: string }) {
@@ -214,7 +215,7 @@ export async function fetchRecentlyViewed(userId: string, max = 5): Promise<Rece
     orderBy('viewedAt', 'desc'), limit(max),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => d.data() as RecentlyViewedProblem);
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => d.data() as RecentlyViewedProblem);
 }
 
 export async function fetchDiscussion(problemId: string): Promise<any[]> {
@@ -225,7 +226,7 @@ export async function fetchDiscussion(problemId: string): Promise<any[]> {
     orderBy('createdAt', 'desc'), limit(50),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }));
 }
 
 export async function postDiscussion(problemId: string, userId: string, username: string, message: string) {
@@ -309,12 +310,12 @@ export async function getPracticeStats(userId: string) {
   ]);
 
   const progressMap: Record<string, any> = {};
-  progressSnap.docs.forEach(d => { progressMap[d.id] = d.data(); });
+  progressSnap.docs.forEach((d: QueryDocumentSnapshot<DocumentData>) => { progressMap[d.id] = d.data(); });
 
   const problemsMap: Record<string, any> = {};
-  problemsSnap.docs.forEach(d => { problemsMap[d.id] = d.data(); });
+  problemsSnap.docs.forEach((d: QueryDocumentSnapshot<DocumentData>) => { problemsMap[d.id] = d.data(); });
 
-  const rawSubmissions: Record<string, any>[] = submissionsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const rawSubmissions: Record<string, any>[] = submissionsSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }));
   const submissions = rawSubmissions.map(s => ({
     ...s,
     submittedAt: (s.submittedAt as any)?.toDate?.()?.toISOString() || new Date().toISOString(),
@@ -435,7 +436,7 @@ export async function checkAndAwardAchievements(userId: string, stats: any) {
   const { firestore: db } = initializeFirebase();
   if (!db) return [];
   const earnedSnap = await getDocs(collection(db, 'users', userId, 'achievements'));
-  const earnedIds = new Set(earnedSnap.docs.map(d => d.id));
+  const earnedIds = new Set(earnedSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => d.id));
   const newAchievements: any[] = [];
 
   for (const def of ACHIEVEMENT_DEFS) {
@@ -472,7 +473,7 @@ export async function getAchievements(userId: string) {
   const { firestore: db } = initializeFirebase();
   if (!db) return [];
   const snap = await getDocs(collection(db, 'users', userId, 'achievements'));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }));
 }
 
 // ===== PROGRESSIVE UNLOCKING =====
@@ -499,7 +500,7 @@ export async function getUserProblemVerdicts(userId: string): Promise<Record<str
     orderBy('submittedAt', 'desc'),
   ));
   const latest: Record<string, Verdict> = {};
-  snap.docs.forEach(d => {
+  snap.docs.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
     const data = d.data();
     if (!latest[data.problemId]) latest[data.problemId] = data.verdict;
   });
@@ -601,7 +602,7 @@ export async function fetchProblemsFiltered(opts: {
 
   const q = query(collection(db, 'problems'), ...constraints);
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ProblemDocumentMeta));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ProblemDocumentMeta));
 }
 
 // ===== BATCH PROGRESS UPDATE =====

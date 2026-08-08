@@ -200,6 +200,8 @@ export default function CareerHubPage() {
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
                     {listing.companyLogo ? (
+                      // ponytail: arbitrary company-logo host; next/image needs remotePatterns/proxy
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={listing.companyLogo} alt="" className="w-12 h-12 rounded-lg object-contain bg-background border border-border shrink-0" />
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">

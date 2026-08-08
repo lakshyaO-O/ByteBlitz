@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, updateDoc, deleteDoc, addDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { ProjectShowcase } from '@/types';
 
 export async function createProject(projectData: Omit<ProjectShowcase, 'id' | 'createdAt' | 'updatedAt' | 'likes' | 'views'>) {
@@ -31,7 +32,7 @@ export async function getProjects(userId: string): Promise<ProjectShowcase[]> {
     orderBy('createdAt', 'desc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as ProjectShowcase));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ProjectShowcase));
 }
 
 export async function getAllProjects(
@@ -49,7 +50,7 @@ export async function getAllProjects(
   const q = query(collection(db, 'projects'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const projects = docs.map(d => ({ id: d.id, ...d.data() } as ProjectShowcase));
+  const projects = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ProjectShowcase));
   return { projects, lastDoc: docs[docs.length - 1] || null };
 }
 

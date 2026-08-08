@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
   query, where, orderBy, limit, serverTimestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import type { UserProfile } from '@/types';
 import type { AdminRole, AuditLog } from '@/types/admin';
@@ -192,7 +193,7 @@ export async function fetchShopItems() {
   if (!db) return [];
   const q = query(collection(db, 'shop'), orderBy('name', 'asc'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }));
 }
 
 export async function createShopItem(data: any) {

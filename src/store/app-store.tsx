@@ -207,7 +207,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!state.firebaseProgressLoaded) return;
     syncBeginnerToFirebase();
-  }, [state.beginner, state.firebaseProgressLoaded]);
+  }, [state.beginner, state.firebaseProgressLoaded, syncBeginnerToFirebase]);
 
   const loadBeginnerFromFirebase = useCallback(async (userId?: string) => {
     const { firestore: db, auth } = initializeFirebase();

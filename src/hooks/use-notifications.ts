@@ -5,6 +5,7 @@ import { initializeFirebase } from '@/firebase';
 import {
   collection, addDoc, doc, updateDoc, getDoc, query, where, onSnapshot, orderBy, limit, serverTimestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import { Notification, NotificationType } from '@/app/lib/types';
 
 export function useNotifications(userId: string | null) {
@@ -19,8 +20,8 @@ export function useNotifications(userId: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'notifications'), orderBy('createdAt', 'desc'), limit(50));
-    unsub = onSnapshot(q, (snap) => {
-      const notifs: Notification[] = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Notification));
+    unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      const notifs: Notification[] = snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as Notification));
       setNotifications(notifs);
       setUnreadCount(notifs.filter(n => !n.read).length);
       setLoading(false);
@@ -45,7 +46,7 @@ export function useNotifications(userId: string | null) {
       const { firestore: db } = initializeFirebase();
       if (!db) return;
       const unread = notifications.filter(n => !n.read);
-      await Promise.all(unread.map(n => updateDoc(doc(db, 'users', userId, 'notifications', n.id), { read: true }).catch((err) => console.error('[Notifications] Failed to mark as read', err))));
+      await Promise.all(unread.map(n => updateDoc(doc(db, 'users', userId, 'notifications', n.id), { read: true }).catch((err: Error) => console.error('[Notifications] Failed to mark as read', err))));
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch { /* ignore */ }

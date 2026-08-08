@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { getThread, replyToThread, searchThreads } from '@/services/forum';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { useUser } from '@/firebase/auth/use-user';
 import { useToast } from '@/hooks/use-toast';
@@ -46,7 +47,7 @@ export default function ForumThreadPage() {
         if (db) {
           const q = query(collection(db, 'forumThreads', id, 'replies'), orderBy('createdAt', 'asc'));
           const snap = await getDocs(q);
-          setReplies(snap.docs.map(d => ({ id: d.id, ...d.data() } as ForumReply)));
+          setReplies(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ForumReply)));
         }
       } catch { /* fallback */ }
       setLoading(false);
@@ -76,7 +77,7 @@ export default function ForumThreadPage() {
         if (db) {
           const q = query(collection(db, 'forumThreads', thread.id, 'replies'), orderBy('createdAt', 'asc'));
           const snap = await getDocs(q);
-          setReplies(snap.docs.map(d => ({ id: d.id, ...d.data() } as ForumReply)));
+          setReplies(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as ForumReply)));
         }
       }
     } catch { toast({ variant: 'destructive', title: 'Failed to post reply' }); }

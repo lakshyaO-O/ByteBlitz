@@ -5,6 +5,7 @@ import { initializeFirebase } from '@/firebase';
 import {
   collection, query, orderBy, onSnapshot,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase/firestore';
 import type { PracticeProblemDocument, UserPracticeProgress, Difficulty } from '@/types';
 import {
   fetchProblems, getAllUserProgress, toggleBookmark as fbToggleBookmark,
@@ -27,8 +28,8 @@ export function usePracticeProblems() {
       return;
     }
     const q = query(collection(db, 'problems'), orderBy('title', 'asc'));
-    const unsub = onSnapshot(q, (snap) => {
-      const fbData = snap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeProblemDocument));
+    const unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+      const fbData = snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as PracticeProblemDocument));
       if (fbData.length > 0) {
         setProblems(fbData);
         setUsingFallback(false);
@@ -57,9 +58,9 @@ export function useUserProgress(userId: string | null) {
     const { firestore: db } = initializeFirebase();
     if (!db) { setLoading(false); return; }
     const q = query(collection(db, 'users', userId, 'practiceProgress'));
-    const unsub = onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
       const map: Record<string, UserPracticeProgress> = {};
-      snap.docs.forEach(d => {
+      snap.docs.forEach((d: QueryDocumentSnapshot<DocumentData>) => {
         const data = d.data();
         if (data.lastSubmittedAt?.toDate) {
           data.lastSubmittedAt = data.lastSubmittedAt.toDate().toISOString();

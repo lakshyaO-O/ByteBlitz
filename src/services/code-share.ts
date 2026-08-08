@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs, updateDoc, deleteDoc, addDoc,
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { CodeShare } from '@/types';
 
 export async function shareCode(codeShareData: Omit<CodeShare, 'id' | 'createdAt' | 'updatedAt' | 'likes' | 'forks' | 'views'>) {
@@ -41,7 +42,7 @@ export async function getSharedCodes(
   const q = query(collection(db, 'codeShares'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const codes = docs.map(d => ({ id: d.id, ...d.data() } as CodeShare));
+  const codes = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as CodeShare));
   return { codes, lastDoc: docs[docs.length - 1] || null };
 }
 

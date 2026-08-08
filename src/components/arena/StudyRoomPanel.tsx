@@ -555,7 +555,7 @@ export function StudyRoomPanel({ onRoomReady }: StudyRoomPanelProps) {
               </div>
 
               <div className="rounded-lg bg-muted/10 border border-border/30 p-4 text-center">
-                <p className="text-xs text-muted-foreground/60 mb-2">Don't have a code?</p>
+                <p className="text-xs text-muted-foreground/60 mb-2">Don&apos;t have a code?</p>
                 <Button
                   variant="outline"
                   size="sm"

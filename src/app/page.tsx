@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { SITE_URL } from '@/lib/seo';
+import { SITE_URL, SITE_DESCRIPTION, SITE_NAME } from '@/lib/seo';
 import HomeClient from './home-client';
 
 export const metadata: Metadata = {
-  title: 'DevRann - Practice DSA, Compete in 1v1 Coding Battles',
-  description: 'Practice coding problems with real-time feedback. Battle opponents in 1v1 coding duels. Track ELO rating across Python, JavaScript, C++, Java, and TypeScript. AI-powered code reviews and hints.',
+  title: `${SITE_NAME} - Practice DSA, Compete in 1v1 Coding Battles`,
+  description: SITE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}`,
   },

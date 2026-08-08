@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import { initializeFirebase } from '@/firebase';
 import {
   collection, query, orderBy, limit, getDocs, doc, getDoc, updateDoc,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { sendEmailVerification } from 'firebase/auth';
 import { useUser } from '@/firebase/auth/use-user';
 import { useAuth } from '@/firebase/provider';
@@ -32,12 +33,7 @@ export function SecuritySettings() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
 
-  useEffect(() => {
-    if (!user) return;
-    loadData();
-  }, [user]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const { firestore: db } = initializeFirebase();
       if (!db || !user) { setLoadingHistory(false); return; }
@@ -48,16 +44,21 @@ export function SecuritySettings() {
       const historySnap = await getDocs(
         query(collection(db, 'users', user.uid, 'loginHistory'), orderBy('timestamp', 'desc'), limit(20))
       );
-      setLoginHistory(historySnap.docs.map(d => ({ id: d.id, ...d.data() }) as LoginHistoryEntry));
+      setLoginHistory(historySnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }) as LoginHistoryEntry));
 
       const sessionsSnap = await getDocs(
         query(collection(db, 'users', user.uid, 'sessions'), orderBy('lastActive', 'desc'), limit(10))
       );
-      setSessions(sessionsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setSessions(sessionsSnap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() })));
 
       setLoadingHistory(false);
     } catch { setLoadingHistory(false); }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    loadData();
+  }, [user, loadData]);
 
   const handleSendVerification = async () => {
     if (!auth?.currentUser || sendingVerification) return;

@@ -252,7 +252,7 @@ export function LearningAnalyticsPage() {
   const totalProblems = problems?.length || 0;
   const topicsCount = topicData.length;
   const improvementData = stats?.improvement?.map(d => d.accuracy) || [];
-  const recentSubmissions = stats?.recentSubmissions || [];
+  const recentSubmissions = useMemo(() => stats?.recentSubmissions ?? [], [stats?.recentSubmissions]);
 
   const hasData = totalSolved > 0 || totalAttemptedAll > 0;
 
@@ -868,7 +868,7 @@ export function LearningAnalyticsPage() {
                 <h3 className="text-xs font-semibold uppercase tracking-wider">Ready to Level Up</h3>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                You've mastered {strongTopics.length} topics. Try harder problems in these areas to push further.
+                You&apos;ve mastered {strongTopics.length} topics. Try harder problems in these areas to push further.
               </p>
               <Button asChild variant="outline" size="sm" className="mt-2 text-[10px] h-7 gap-1">
                 <Link href="/practice?difficulty=Hard">

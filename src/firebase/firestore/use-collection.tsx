@@ -7,6 +7,7 @@ import {
   DocumentData, 
   QuerySnapshot 
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, FirestoreError } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
@@ -25,14 +26,14 @@ export function useCollection(query: Query | null) {
     const unsubscribe = onSnapshot(
       query,
       (snapshot: QuerySnapshot<DocumentData>) => {
-        const items = snapshot.docs.map(doc => ({
+        const items = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setData(items);
         setLoading(false);
       },
-      async (err) => {
+      async (err: FirestoreError) => {
         const permissionError = new FirestorePermissionError({
           path: (query as any)._query?.path?.toString() || 'unknown',
           operation: 'list',

@@ -89,7 +89,7 @@ export default function PublicProfilePage() {
         <div className="text-center py-20 text-muted-foreground">
           <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="font-medium">User not found</p>
-          <p className="text-sm mt-1">The user "{username}" does not exist.</p>
+          <p className="text-sm mt-1">The user &quot;{username}&quot; does not exist.</p>
         </div>
       </Shell>
     );

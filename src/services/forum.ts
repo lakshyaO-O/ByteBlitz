@@ -6,6 +6,7 @@ import {
   query, where, orderBy, limit, startAfter, serverTimestamp, increment,
   arrayUnion,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { DiscussionForum, ForumReply } from '@/types';
 
 export async function createThread(threadData: Omit<DiscussionForum, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'replies' | 'lastActivity'>) {
@@ -37,7 +38,7 @@ export async function getThreads(
   const q = query(collection(db, 'forumThreads'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const threads = docs.map(d => ({ id: d.id, ...d.data() } as DiscussionForum));
+  const threads = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DiscussionForum));
   return { threads, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -97,12 +98,12 @@ export async function searchThreads(queryStr: string): Promise<DiscussionForum[]
   );
   const snap = await getDocs(q);
 
-  let threads = snap.docs.map(d => ({ id: d.id, ...d.data() } as DiscussionForum));
+  let threads = snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DiscussionForum));
 
   if (queryStr) {
     const lower = queryStr.toLowerCase();
     threads = threads.filter(
-      t => t.title.toLowerCase().includes(lower) || t.content.toLowerCase().includes(lower) || t.tags.some(tag => tag.toLowerCase().includes(lower)),
+      (t: any) => t.title.toLowerCase().includes(lower) || t.content.toLowerCase().includes(lower) || t.tags.some((tag: any) => tag.toLowerCase().includes(lower)),
     );
   }
 

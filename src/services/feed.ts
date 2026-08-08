@@ -5,6 +5,7 @@ import {
   collection, doc, getDoc, getDocs,
   query, where, orderBy, limit, startAfter, serverTimestamp, Timestamp,
 } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import type { DailyFeed } from '@/types';
 
 export async function getFeed(
@@ -20,7 +21,7 @@ export async function getFeed(
   const q = query(collection(db, 'feed'), ...constraints);
   const snap = await getDocs(q);
   const docs = snap.docs;
-  const feed = docs.map(d => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
+  const feed = docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
   return { feed, lastDoc: docs[docs.length - 1] || null };
 }
 
@@ -35,7 +36,7 @@ export async function getNews(): Promise<DailyFeed['entries']> {
     limit(10),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
 }
 
 export async function getCodingTips(): Promise<DailyFeed['entries']> {
@@ -49,5 +50,5 @@ export async function getCodingTips(): Promise<DailyFeed['entries']> {
     limit(10),
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as DailyFeed['entries'][0]));
 }
