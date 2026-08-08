@@ -455,7 +455,7 @@ function renderTraffic(d: AnalyticsData) {
               <YAxis tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" />
               <Tooltip
                 contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 11 }}
-                labelFormatter={(h: string) => `${h}:00`}
+                labelFormatter={(h: any) => `${h}:00`}
               />
               <Bar dataKey="count" fill="#f97316" radius={[2, 2, 0, 0]} />
             </BarChart>
