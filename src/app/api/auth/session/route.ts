@@ -16,11 +16,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const expiresIn = 60 * 60 * 24 * 7 * 1000;
-    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, { expiresIn });
+const expiresIn = 60 * 60 * 24 * 7 * 1000;
+    const session = await getAdminAuth().createSessionCookie(idToken, { expiresIn });
+
+    if (session.length > 4000) {
+      console.warn(`[Auth Session] session cookie is ${session.length} chars — some browsers drop cookies > 4KB`);
+    }
 
     const response = NextResponse.json({ uid: decoded.uid });
-    response.cookies.set('__session', sessionCookie, {
+    response.cookies.set('__session', session, {
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
       httpOnly: true,

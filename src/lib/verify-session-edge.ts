@@ -37,7 +37,9 @@ export async function verifySessionCookie(cookieValue: string): Promise<{ uid: s
 
     if (!payload.sub) return null;
     return { uid: payload.sub };
-  } catch {
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error('[verify-session] rejected cookie:', err?.name, err?.code, err?.message, 'len=', cookieValue.length);
     return null;
   }
 }
