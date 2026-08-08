@@ -149,6 +149,9 @@ function AuthForm() {
     } catch (popupErr: any) {
       const code: string | undefined = popupErr?.code;
       authLog('Google', 'popup sign-in failed:', code, popupErr?.message);
+      // Fire-and-forget server diagnostic: surfaces the popup error code in
+      // Vercel logs as a GET to /api/auth/popup-log?code=<code>.
+      fetch(`/api/auth/popup-log?code=${encodeURIComponent(code || popupErr?.message || 'unknown')}`).catch(() => {});
 
       if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
         authLog('Google', 'cancelled by user — no-op');
