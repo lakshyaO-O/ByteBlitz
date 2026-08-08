@@ -47,7 +47,7 @@ export function useActiveRoom(userId: string | null) {
     if (!db) return;
     if (unsubRef.current) unsubRef.current();
     const roomRef = doc(db, 'gameRooms', roomId);
-    unsubRef.current = onSnapshot(roomRef, (snap: QuerySnapshot<DocumentData>) => {
+    unsubRef.current = onSnapshot(roomRef, (snap: any) => {
       if (snap.exists()) {
         const data = { id: snap.id, ...snap.data() } as GameRoom;
         if (data.status === 'finished' || !data.players?.includes(userId || '')) {
