@@ -1,1 +1,33 @@
-aW1wb3J0IHsgdmVyaWZ5QXV0aCB9IGZyb20gJ0AvbGliL3ZlcmlmeS1hdXRoJzsKaW1wb3J0IHsgY2hlY2tSYXRlTGltaXQsIHJhdGVMaW1pdFJlc3BvbnNlIH0gZnJvbSAnQC9saWIvcmF0ZS1saW1pdCc7IGltcG9ydCB7IGVuZm9yY2VBaVF1b3RhLCBhaVF1b3RhUmVzcG9uc2UgfSBmcm9tICdAL2xpYi9haS1xdW90YS1zZXJ2ZXInOwoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIFBPU1QocmVxOiBSZXF1ZXN0KSB7CiAgdHJ5IHsKICAgIGNvbnN0IGF1dGggPSBhd2FpdCB2ZXJpZnlBdXRoKHJlcSk7CiAgICBpZiAoYXV0aCBpbnN0YW5jZW9mIFJlc3BvbnNlKSByZXR1cm4gYXV0aDsKICAgIGNvbnN0IHJhdGVDaGVjayA9IGNoZWNrUmF0ZUxpbWl0KGF1dGgudWlkLCByZXEpOwogICAgaWYgKCFyYXRlQ2hlY2suYWxsb3dlZCkgcmV0dXJuIHJhdGVMaW1pdFJlc3BvbnNlKHJhdGVDaGVjay5yZXRyeUFmdGVyTXMpOwogICAgY29uc3QgcXVvdGFDaGVjayA9IGF3YWl0IGVuZm9yY2VBaVF1b3RhKGF1dGgudWlkLCAnYWlJbnRlcnZpZXdlcicpOwogICAgaWYgKCFxdW90YUNoZWNrLmFsbG93ZWQpIHsKICAgICAgcmV0dXJuIFJlc3BvbnNlLmpzb24oYWlRdW90YVJlc3BvbnNlKHF1b3RhQ2hlY2ssICdhaUludGVydmlld2VyJyksIHsgc3RhdHVzOiA0MjkgfSk7CiAgICB9CiAgICBjb25zdCB7IHRvcGljLCBkaWZmaWN1bHR5LCBxdWVzdGlvbkNvdW50LCBwcmV2aW91c0Fuc3dlcnMgfSA9IGF3YWl0IHJlcS5qc29uKCk7CgogICAgaWYgKCFwcm9jZXNzLmVudi5HRU1JTklfQVBJX0tFWSkgewogICAgICByZXR1cm4gUmVzcG9uc2UuanNvbih7CiAgICAgICAgcXVlc3Rpb25zOiBbXSwKICAgICAgICBmZWVkYmFjazogIkkgbmVlZCBhIEdlbWluaSBBUEkga2V5IHRvIGdlbmVyYXRlIGludGVydmlldyBxdWVzdGlvbnMuIEFzayB0aGUgZGV2IHRvIGFkZCBgR0VNSU5JX0FQSV9LRVlgIHRvIGAuZW52LmxvY2FsYC4iLAogICAgICB9KTsKICAgIH0KCiAgICBjb25zdCB7IGFpSW50ZXJ2aWV3ZXIgfSA9IGF3YWl0IGltcG9ydCgnQC9haS9mbG93cy9haS1pbnRlcnZpZXdlci1mbG93Jyk7CiAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBhaUludGVydmlld2VyKHsgdG9waWMsIGRpZmZpY3VsdHksIHF1ZXN0aW9uQ291bnQsIHByZXZpb3VzQW5zd2VycyB9KTsKICAgIHJldHVybiBSZXNwb25zZS5qc29uKHJlc3VsdCk7CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGNvbnNvbGUuZXJyb3IoJ0FJIGludGVydmlld2VyIGVycm9yOicsIGVycm9yKTsKICAgIHJldHVybiBSZXNwb25zZS5qc29uKHsKICAgICAgcXVlc3Rpb25zOiBbXSwKICAgICAgZmVlZGJhY2s6ICJJbnRlcnZpZXdlciBpcyB1bmF2YWlsYWJsZS4gTWFrZSBzdXJlIGBHRU1JTklfQVBJX0tFWWAgaXMgc2V0IGluIGAuZW52LmxvY2FsYC4iLAogICAgfSk7CiAgfQp9Cg==
+import { verifyAuth } from '@/lib/verify-auth';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit'; import { enforceAiQuota, aiQuotaResponse } from '@/lib/ai-quota-server';
+
+export async function POST(req: Request) {
+  try {
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
+    const rateCheck = checkRateLimit(auth.uid, req);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
+    const quotaCheck = await enforceAiQuota(auth.uid, 'aiInterviewer');
+    if (!quotaCheck.allowed) {
+      return Response.json(aiQuotaResponse(quotaCheck, 'aiInterviewer'), { status: 429 });
+    }
+    const { topic, difficulty, questionCount, previousAnswers } = await req.json();
+
+    if (!process.env.GEMINI_API_KEY) {
+      return Response.json({
+        questions: [],
+        feedback: "I need a Gemini API key to generate interview questions. Ask the dev to add `GEMINI_API_KEY` to `.env.local`.",
+      });
+    }
+
+    const { aiInterviewer } = await import('@/ai/flows/ai-interviewer-flow');
+    const result = await aiInterviewer({ topic, difficulty, questionCount, previousAnswers });
+    return Response.json(result);
+  } catch (error) {
+    console.error('AI interviewer error:', error);
+    return Response.json({
+      questions: [],
+      feedback: "Interviewer is unavailable. Make sure `GEMINI_API_KEY` is set in `.env.local`.",
+    });
+  }
+}
