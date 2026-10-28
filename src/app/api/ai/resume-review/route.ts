@@ -1,1 +1,45 @@
-aW1wb3J0IHsgdmVyaWZ5QXV0aCB9IGZyb20gJ0AvbGliL3ZlcmlmeS1hdXRoJzsKaW1wb3J0IHsgY2hlY2tSYXRlTGltaXQsIHJhdGVMaW1pdFJlc3BvbnNlIH0gZnJvbSAnQC9saWIvcmF0ZS1saW1pdCc7IGltcG9ydCB7IGVuZm9yY2VBaVF1b3RhLCBhaVF1b3RhUmVzcG9uc2UgfSBmcm9tICdAL2xpYi9haS1xdW90YS1zZXJ2ZXInOwoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIFBPU1QocmVxOiBSZXF1ZXN0KSB7CiAgdHJ5IHsKICAgIGNvbnN0IGF1dGggPSBhd2FpdCB2ZXJpZnlBdXRoKHJlcSk7CiAgICBpZiAoYXV0aCBpbnN0YW5jZW9mIFJlc3BvbnNlKSByZXR1cm4gYXV0aDsKICAgIGNvbnN0IHJhdGVDaGVjayA9IGNoZWNrUmF0ZUxpbWl0KGF1dGgudWlkLCByZXEpOwogICAgaWYgKCFyYXRlQ2hlY2suYWxsb3dlZCkgcmV0dXJuIHJhdGVMaW1pdFJlc3BvbnNlKHJhdGVDaGVjay5yZXRyeUFmdGVyTXMpOwogICAgY29uc3QgcXVvdGFDaGVjayA9IGF3YWl0IGVuZm9yY2VBaVF1b3RhKGF1dGgudWlkLCAncmVzdW1lUmV2aWV3Jyk7CiAgICBpZiAoIXF1b3RhQ2hlY2suYWxsb3dlZCkgewogICAgICByZXR1cm4gUmVzcG9uc2UuanNvbihhaVF1b3RhUmVzcG9uc2UocXVvdGFDaGVjaywgJ3Jlc3VtZVJldmlldycpLCB7IHN0YXR1czogNDI5IH0pOwogICAgfQogICAgY29uc3QgeyByZXN1bWVUZXh0LCBqb2JEZXNjcmlwdGlvbiwgdGFyZ2V0Um9sZSwgeWVhcnNPZkV4cGVyaWVuY2UgfSA9IGF3YWl0IHJlcS5qc29uKCk7CgogICAgaWYgKCFwcm9jZXNzLmVudi5HRU1JTklfQVBJX0tFWSkgewogICAgICByZXR1cm4gUmVzcG9uc2UuanNvbih7CiAgICAgICAgb3ZlcmFsbFNjb3JlOiAwLAogICAgICAgIHN1bW1hcnk6ICdJIG5lZWQgYSBHZW1pbmkgQVBJIGtleSB0byByZXZpZXcgeW91ciByZXN1bWUuIEFzayB0aGUgZGV2IHRvIGFkZCBgR0VNSU5JX0FQSV9LRVlgIHRvIGAuZW52LmxvY2FsYC4nLAogICAgICAgIHN0cmVuZ3RoczogW10sCiAgICAgICAgd2Vha25lc3NlczogW10sCiAgICAgICAgc3VnZ2VzdGlvbnM6IFtdLAogICAgICAgIGtleXdvcmRzOiBbXSwKICAgICAgICBmb3JtYXR0aW5nSXNzdWVzOiBbXSwKICAgICAgICBhY3Rpb25JdGVtczogW10sCiAgICAgIH0pOwogICAgfQoKICAgIGNvbnN0IHsgYWlSZXN1bWVSZXZpZXdlciB9ID0gYXdhaXQgaW1wb3J0KCdAL2FpL2Zsb3dzL2FpLXJlc3VtZS1yZXZpZXdlci1mbG93Jyk7CiAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBhaVJlc3VtZVJldmlld2VyKHsgcmVzdW1lVGV4dCwgam9iRGVzY3JpcHRpb24sIHRhcmdldFJvbGUsIHllYXJzT2ZFeHBlcmllbmNlIH0pOwogICAgcmV0dXJuIFJlc3BvbnNlLmpzb24ocmVzdWx0KTsKICB9IGNhdGNoIChlcnJvcikgewogICAgY29uc29sZS5lcnJvcignQUkgcmVzdW1lIHJldmlldyBlcnJvcjonLCBlcnJvcik7CiAgICByZXR1cm4gUmVzcG9uc2UuanNvbih7CiAgICAgIG92ZXJhbGxTY29yZTogMCwKICAgICAgc3VtbWFyeTogJ1Jlc3VtZSByZXZpZXcgZmFpbGVkLiBNYWtlIHN1cmUgYEdFTUlOSV9BUElfS0VZYCBpcyBzZXQgaW4gYC5lbnYubG9jYWxgLicsCiAgICAgIHN0cmVuZ3RoczogW10sCiAgICAgIHdlYWtuZXNzZXM6IFtdLAogICAgICBzdWdnZXN0aW9uczogW10sCiAgICAgIGtleXdvcmRzOiBbXSwKICAgICAgZm9ybWF0dGluZ0lzc3VlczogW10sCiAgICAgIGFjdGlvbkl0ZW1zOiBbXSwKICAgIH0pOwogIH0KfQo=
+import { verifyAuth } from '@/lib/verify-auth';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit'; import { enforceAiQuota, aiQuotaResponse } from '@/lib/ai-quota-server';
+
+export async function POST(req: Request) {
+  try {
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
+    const rateCheck = checkRateLimit(auth.uid, req);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
+    const quotaCheck = await enforceAiQuota(auth.uid, 'resumeReview');
+    if (!quotaCheck.allowed) {
+      return Response.json(aiQuotaResponse(quotaCheck, 'resumeReview'), { status: 429 });
+    }
+    const { resumeText, jobDescription, targetRole, yearsOfExperience } = await req.json();
+
+    if (!process.env.GEMINI_API_KEY) {
+      return Response.json({
+        overallScore: 0,
+        summary: 'I need a Gemini API key to review your resume. Ask the dev to add `GEMINI_API_KEY` to `.env.local`.',
+        strengths: [],
+        weaknesses: [],
+        suggestions: [],
+        keywords: [],
+        formattingIssues: [],
+        actionItems: [],
+      });
+    }
+
+    const { aiResumeReviewer } = await import('@/ai/flows/ai-resume-reviewer-flow');
+    const result = await aiResumeReviewer({ resumeText, jobDescription, targetRole, yearsOfExperience });
+    return Response.json(result);
+  } catch (error) {
+    console.error('AI resume review error:', error);
+    return Response.json({
+      overallScore: 0,
+      summary: 'Resume review failed. Make sure `GEMINI_API_KEY` is set in `.env.local`.',
+      strengths: [],
+      weaknesses: [],
+      suggestions: [],
+      keywords: [],
+      formattingIssues: [],
+      actionItems: [],
+    });
+  }
+}
