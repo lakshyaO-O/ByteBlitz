@@ -1,1 +1,48 @@
-aW1wb3J0IHsgand0VmVyaWZ5LCBjcmVhdGVMb2NhbEpXS1NldCwgaW1wb3J0WDUwOSwgZXhwb3J0SldLIH0gZnJvbSAnam9zZSc7CgpsZXQgY2FjaGVkS2V5U2V0OiBSZXR1cm5UeXBlPHR5cGVvZiBjcmVhdGVMb2NhbEpXS1NldD4gfCBudWxsID0gbnVsbDsKCmFzeW5jIGZ1bmN0aW9uIGdldEZpcmViYXNlUHVibGljS2V5U2V0KCkgewogIGlmIChjYWNoZWRLZXlTZXQpIHJldHVybiBjYWNoZWRLZXlTZXQ7CgogIGNvbnN0IHByb2plY3RJZCA9IHByb2Nlc3MuZW52Lk5FWFRfUFVCTElDX0ZJUkVCQVNFX1BST0pFQ1RfSUQ7CiAgaWYgKCFwcm9qZWN0SWQpIHsKICAgIHRocm93IG5ldyBFcnJvcignTkVYVF9QVUJMSUNfRklSRUJBU0VfUFJPSkVDVF9JRCBpcyBub3Qgc2V0Jyk7CiAgfQoKICBjb25zdCB1cmwgPSBgaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS9zZWN1cmV0b2tlbkBzeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbWA7CiAgY29uc3QgcmVzcG9uc2UgPSBhd2FpdCBmZXRjaCh1cmwpOwogIGlmICghcmVzcG9uc2Uub2spIHsKICAgIHRocm93IG5ldyBFcnJvcihgRmFpbGVkIHRvIGZldGNoIEZpcmViYXNlIHB1YmxpYyBrZXlzOiBIVFRQICR7cmVzcG9uc2Uuc3RhdHVzfWApOwogIH0KICBjb25zdCBkYXRhOiBSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+ID0gYXdhaXQgcmVzcG9uc2UuanNvbigpOwoKICBjb25zdCBrZXlzOiBhbnlbXSA9IFtdOwogIGZvciAoY29uc3Qga2lkIG9mIE9iamVjdC5rZXlzKGRhdGEpKSB7CiAgICBjb25zdCBjZXJ0ID0gZGF0YVtraWRdOwogICAgY29uc3Qga2V5ID0gYXdhaXQgaW1wb3J0WDUwOShjZXJ0LCAnUlMyNTYnKTsKICAgIGtleXMucHVzaChhd2FpdCBleHBvcnRKV0soa2V5KSk7CiAgfQogIGNhY2hlZEtleVNldCA9IGNyZWF0ZUxvY2FsSldLU2V0KHsga2V5cyB9KTsKICByZXR1cm4gY2FjaGVkS2V5U2V0Owp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gdmVyaWZ5U2Vzc2lvbkNvb2tpZShjb29raWVWYWx1ZTogc3RyaW5nKTogUHJvbWlzZTx7IHVpZDogc3RyaW5nIH0gfCBudWxsPiB7CiAgdHJ5IHsKICAgIGNvbnN0IHByb2plY3RJZCA9IHByb2Nlc3MuZW52Lk5FWFRfUFVCTElDX0ZJUkVCQVNFX1BST0pFQ1RfSUQ7CiAgICBpZiAoIXByb2plY3RJZCkgcmV0dXJuIG51bGw7CgogICAgY29uc3QgSldLUyA9IGF3YWl0IGdldEZpcmViYXNlUHVibGljS2V5U2V0KCk7CiAgICBjb25zdCB7IHBheWxvYWQgfSA9IGF3YWl0IGp3dFZlcmlmeShjb29raWVWYWx1ZSwgSldLUywgewogICAgICBpc3N1ZXI6IGBodHRwczovL3Nlc3Npb24uZmlyZWJhc2UuZ29vZ2xlLmNvbS8ke3Byb2plY3RJZH1gLAogICAgICBhdWRpZW5jZTogcHJvamVjdElkLAogICAgfSk7CgogICAgaWYgKCFwYXlsb2FkLnN1YikgcmV0dXJuIG51bGw7CiAgICByZXR1cm4geyB1aWQ6IHBheWxvYWQuc3ViIH07CiAgfSBjYXRjaCAoZXJyOiBhbnkpIHsKICAgIC8vIGVzbGludC1kaXNhYmxlLW5leHQtbGluZSBuby1jb25zb2xlCiAgICBjb25zb2xlLmVycm9yKCdbdmVyaWZ5LXNlc3Npb25dIHJlamVjdGVkIGNvb2tpZTonLCBlcnI/Lm5hbWUsIGVycj8uY29kZSwgZXJyPy5tZXNzYWdlLCAnbGVuPScsIGNvb2tpZVZhbHVlLmxlbmd0aCk7CiAgICByZXR1cm4gbnVsbDsKICB9Cn0K
+import { jwtVerify, createLocalJWKSet, importX509, exportJWK } from 'jose';
+
+let cachedKeySet: ReturnType<typeof createLocalJWKSet> | null = null;
+
+async function getFirebasePublicKeySet() {
+  if (cachedKeySet) return cachedKeySet;
+
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  if (!projectId) {
+    throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set');
+  }
+
+  const url = `https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch Firebase public keys: HTTP ${response.status}`);
+  }
+  const data: Record<string, string> = await response.json();
+
+  const keys: any[] = [];
+  for (const kid of Object.keys(data)) {
+    const cert = data[kid];
+    const key = await importX509(cert, 'RS256');
+    keys.push(await exportJWK(key));
+  }
+  cachedKeySet = createLocalJWKSet({ keys });
+  return cachedKeySet;
+}
+
+export async function verifySessionCookie(cookieValue: string): Promise<{ uid: string } | null> {
+  try {
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    if (!projectId) return null;
+
+    const JWKS = await getFirebasePublicKeySet();
+    const { payload } = await jwtVerify(cookieValue, JWKS, {
+      issuer: `https://session.firebase.google.com/${projectId}`,
+      audience: projectId,
+    });
+
+    if (!payload.sub) return null;
+    return { uid: payload.sub };
+  } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error('[verify-session] rejected cookie:', err?.name, err?.code, err?.message, 'len=', cookieValue.length);
+    return null;
+  }
+}
