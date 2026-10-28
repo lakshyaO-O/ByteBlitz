@@ -1,1 +1,125 @@
-ZXhwb3J0IHR5cGUgQWlGZWF0dXJlID0KICB8ICdhaU1lbnRvcicKICB8ICdhaURlYnVnZ2VyJwogIHwgJ2FpQ29kZVJldmlldycKICB8ICdhaUhpbnRzJwogIHwgJ2FpRWRpdG9yaWFsJwogIHwgJ2FpSW50ZXJ2aWV3ZXInCiAgfCAncmVzdW1lUmV2aWV3JwogIHwgJ3JvYWRtYXBHZW5lcmF0b3InCiAgfCAnYWlDb21wbGV4aXR5JwogIHwgJ2FpTWlzdGFrZVByZWRpY3RvcicKICB8ICdhaUZlZWQnOwoKZXhwb3J0IGludGVyZmFjZSBBaUZlYXR1cmVMaW1pdCB7CiAgZGFpbHk6IG51bWJlciB8IG51bGw7CiAgbW9udGhseTogbnVtYmVyIHwgbnVsbDsKfQoKZXhwb3J0IHR5cGUgQWlMaW1pdHNDb25maWcgPSBSZWNvcmQ8QWlGZWF0dXJlLCBBaUZlYXR1cmVMaW1pdD47CgpleHBvcnQgdHlwZSBTdWJzY3JpcHRpb25UaWVyID0gJ2ZyZWUnIHwgJ3BybycgfCAnZWxpdGUnOwoKZXhwb3J0IGNvbnN0IEFJX0ZFQVRVUkVTOiBBaUZlYXR1cmVbXSA9IFsKICAnYWlNZW50b3InLAogICdhaURlYnVnZ2VyJywKICAnYWlDb2RlUmV2aWV3JywKICAnYWlIaW50cycsCiAgJ2FpRWRpdG9yaWFsJywKICAnYWlJbnRlcnZpZXdlcicsCiAgJ3Jlc3VtZVJldmlldycsCiAgJ3JvYWRtYXBHZW5lcmF0b3InLAogICdhaUNvbXBsZXhpdHknLAogICdhaU1pc3Rha2VQcmVkaWN0b3InLAogICdhaUZlZWQnLApdOwoKZXhwb3J0IGNvbnN0IEFJX0ZFQVRVUkVfTEFCRUxTOiBSZWNvcmQ8QWlGZWF0dXJlLCBzdHJpbmc+ID0gewogIGFpTWVudG9yOiAnQUkgTWVudG9yJywKICBhaURlYnVnZ2VyOiAnQUkgRGVidWdnZXInLAogIGFpQ29kZVJldmlldzogJ0NvZGUgUmV2aWV3JywKICBhaUhpbnRzOiAnQUkgSGludHMnLAogIGFpRWRpdG9yaWFsOiAnQUkgRWRpdG9yaWFsJywKICBhaUludGVydmlld2VyOiAnQUkgSW50ZXJ2aWV3ZXInLAogIHJlc3VtZVJldmlldzogJ1Jlc3VtZSBSZXZpZXcnLAogIHJvYWRtYXBHZW5lcmF0b3I6ICdSb2FkbWFwIEdlbmVyYXRvcicsCiAgYWlDb21wbGV4aXR5OiAnQ29tcGxleGl0eSBBbmFseXplcicsCiAgYWlNaXN0YWtlUHJlZGljdG9yOiAnTWlzdGFrZSBQcmVkaWN0b3InLAogIGFpRmVlZDogJ0FJIEZlZWQnLAp9OwoKZXhwb3J0IGNvbnN0IERFRkFVTFRfQUlfTElNSVRTOiBBaUxpbWl0c0NvbmZpZyA9IHsKICBhaU1lbnRvcjogeyBkYWlseTogMjAsIG1vbnRobHk6IG51bGwgfSwKICBhaURlYnVnZ2VyOiB7IGRhaWx5OiAxMCwgbW9udGhseTogbnVsbCB9LAogIGFpQ29kZVJldmlldzogeyBkYWlseTogNSwgbW9udGhseTogbnVsbCB9LAogIGFpSGludHM6IHsgZGFpbHk6IDE1LCBtb250aGx5OiBudWxsIH0sCiAgYWlFZGl0b3JpYWw6IHsgZGFpbHk6IDEwLCBtb250aGx5OiBudWxsIH0sCiAgYWlJbnRlcnZpZXdlcjogeyBkYWlseTogMSwgbW9udGhseTogbnVsbCB9LAogIHJlc3VtZVJldmlldzogeyBkYWlseTogbnVsbCwgbW9udGhseTogMSB9LAogIHJvYWRtYXBHZW5lcmF0b3I6IHsgZGFpbHk6IG51bGwsIG1vbnRobHk6IDMgfSwKICBhaUNvbXBsZXhpdHk6IHsgZGFpbHk6IDEwLCBtb250aGx5OiBudWxsIH0sCiAgYWlNaXN0YWtlUHJlZGljdG9yOiB7IGRhaWx5OiAxMCwgbW9udGhseTogbnVsbCB9LAogIGFpRmVlZDogeyBkYWlseTogNSwgbW9udGhseTogbnVsbCB9LAp9OwoKZXhwb3J0IGNvbnN0IFBSRU1JVU1fVU5MSU1JVEVEX0ZFQVRVUkVTOiBBaUZlYXR1cmVbXSA9IFsKICAnYWlNZW50b3InLAogICdhaURlYnVnZ2VyJywKICAnYWlDb2RlUmV2aWV3JywKICAnYWlIaW50cycsCiAgJ2FpRWRpdG9yaWFsJywKICAnYWlJbnRlcnZpZXdlcicsCiAgJ3Jlc3VtZVJldmlldycsCiAgJ3JvYWRtYXBHZW5lcmF0b3InLAogICdhaUNvbXBsZXhpdHknLAogICdhaU1pc3Rha2VQcmVkaWN0b3InLAogICdhaUZlZWQnLApdOwoKZXhwb3J0IGZ1bmN0aW9uIGlzUHJlbWl1bVRpZXIodGllcjogU3Vic2NyaXB0aW9uVGllcik6IGJvb2xlYW4gewogIHJldHVybiB0aWVyID09PSAncHJvJyB8fCB0aWVyID09PSAnZWxpdGUnOwp9CgpleHBvcnQgZnVuY3Rpb24gZ2V0TGltaXRGb3JUaWVyKAogIGZlYXR1cmU6IEFpRmVhdHVyZSwKICB0aWVyOiBTdWJzY3JpcHRpb25UaWVyLAogIGNvbmZpZ092ZXJyaWRlPzogUGFydGlhbDxBaUxpbWl0c0NvbmZpZz4sCik6IEFpRmVhdHVyZUxpbWl0IHwgbnVsbCB7CiAgaWYgKGlzUHJlbWl1bVRpZXIodGllcikpIHJldHVybiBudWxsOwogIGNvbnN0IGNvbmZpZyA9IGNvbmZpZ092ZXJyaWRlPy5bZmVhdHVyZV0gfHwgREVGQVVMVF9BSV9MSU1JVFNbZmVhdHVyZV07CiAgcmV0dXJuIGNvbmZpZyB8fCBudWxsOwp9CgpleHBvcnQgZnVuY3Rpb24gZ2V0UGVyaW9kS2V5KGZlYXR1cmU6IEFpRmVhdHVyZSk6ICdkYWlseScgfCAnbW9udGhseScgewogIGNvbnN0IGxpbWl0ID0gREVGQVVMVF9BSV9MSU1JVFNbZmVhdHVyZV07CiAgaWYgKGxpbWl0Py5tb250aGx5ICE9PSBudWxsICYmIGxpbWl0Py5kYWlseSA9PT0gbnVsbCkgcmV0dXJuICdtb250aGx5JzsKICByZXR1cm4gJ2RhaWx5JzsKfQoKZXhwb3J0IGZ1bmN0aW9uIGdldEN1cnJlbnRQZXJpb2RLZXkoZmVhdHVyZTogQWlGZWF0dXJlKTogc3RyaW5nIHsKICBjb25zdCBwZXJpb2QgPSBnZXRQZXJpb2RLZXkoZmVhdHVyZSk7CiAgY29uc3Qgbm93ID0gbmV3IERhdGUoKTsKICBpZiAocGVyaW9kID09PSAnbW9udGhseScpIHsKICAgIHJldHVybiBgJHtub3cuZ2V0RnVsbFllYXIoKX0tJHtTdHJpbmcobm93LmdldE1vbnRoKCkgKyAxKS5wYWRTdGFydCgyLCAnMCcpfWA7CiAgfQogIHJldHVybiBub3cudG9JU09TdHJpbmcoKS5zbGljZSgwLCAxMCk7Cn0KCmV4cG9ydCBmdW5jdGlvbiBnZXROZXh0UmVzZXRUaW1lKGZlYXR1cmU6IEFpRmVhdHVyZSk6IERhdGUgewogIGNvbnN0IG5vdyA9IG5ldyBEYXRlKCk7CiAgY29uc3QgcGVyaW9kID0gZ2V0UGVyaW9kS2V5KGZlYXR1cmUpOwogIGlmIChwZXJpb2QgPT09ICdtb250aGx5JykgewogICAgY29uc3QgbmV4dCA9IG5ldyBEYXRlKG5vdy5nZXRGdWxsWWVhcigpLCBub3cuZ2V0TW9udGgoKSArIDEsIDEpOwogICAgcmV0dXJuIG5leHQ7CiAgfQogIGNvbnN0IG5leHQgPSBuZXcgRGF0ZShub3cpOwogIG5leHQuc2V0RGF0ZShuZXh0LmdldERhdGUoKSArIDEpOwogIG5leHQuc2V0SG91cnMoMCwgMCwgMCwgMCk7CiAgcmV0dXJuIG5leHQ7Cn0KCi8qKgogKiBGaXJlc3RvcmUgcGF0aCBmb3IgcGVyLWZlYXR1cmUgdXNhZ2UgZG9jczogY29uZmlnL2FpUXVvdGFzCiAqIE92ZXJyaWRlcyBERUZBVUxUX0FJX0xJTUlUUyBhdCBydW50aW1lLgogKi8KZXhwb3J0IGNvbnN0IEFJX1FVT1RBU19DT05GSUdfRE9DID0gJ2NvbmZpZy9haVF1b3Rhcyc7Cg==
+export type AiFeature =
+  | 'aiMentor'
+  | 'aiDebugger'
+  | 'aiCodeReview'
+  | 'aiHints'
+  | 'aiEditorial'
+  | 'aiInterviewer'
+  | 'resumeReview'
+  | 'roadmapGenerator'
+  | 'aiComplexity'
+  | 'aiMistakePredictor'
+  | 'aiFeed';
+
+export interface AiFeatureLimit {
+  daily: number | null;
+  monthly: number | null;
+}
+
+export type AiLimitsConfig = Record<AiFeature, AiFeatureLimit>;
+
+export type SubscriptionTier = 'free' | 'pro' | 'elite';
+
+export const AI_FEATURES: AiFeature[] = [
+  'aiMentor',
+  'aiDebugger',
+  'aiCodeReview',
+  'aiHints',
+  'aiEditorial',
+  'aiInterviewer',
+  'resumeReview',
+  'roadmapGenerator',
+  'aiComplexity',
+  'aiMistakePredictor',
+  'aiFeed',
+];
+
+export const AI_FEATURE_LABELS: Record<AiFeature, string> = {
+  aiMentor: 'AI Mentor',
+  aiDebugger: 'AI Debugger',
+  aiCodeReview: 'Code Review',
+  aiHints: 'AI Hints',
+  aiEditorial: 'AI Editorial',
+  aiInterviewer: 'AI Interviewer',
+  resumeReview: 'Resume Review',
+  roadmapGenerator: 'Roadmap Generator',
+  aiComplexity: 'Complexity Analyzer',
+  aiMistakePredictor: 'Mistake Predictor',
+  aiFeed: 'AI Feed',
+};
+
+export const DEFAULT_AI_LIMITS: AiLimitsConfig = {
+  aiMentor: { daily: 20, monthly: null },
+  aiDebugger: { daily: 10, monthly: null },
+  aiCodeReview: { daily: 5, monthly: null },
+  aiHints: { daily: 15, monthly: null },
+  aiEditorial: { daily: 10, monthly: null },
+  aiInterviewer: { daily: 1, monthly: null },
+  resumeReview: { daily: null, monthly: 1 },
+  roadmapGenerator: { daily: null, monthly: 3 },
+  aiComplexity: { daily: 10, monthly: null },
+  aiMistakePredictor: { daily: 10, monthly: null },
+  aiFeed: { daily: 5, monthly: null },
+};
+
+export const PREMIUM_UNLIMITED_FEATURES: AiFeature[] = [
+  'aiMentor',
+  'aiDebugger',
+  'aiCodeReview',
+  'aiHints',
+  'aiEditorial',
+  'aiInterviewer',
+  'resumeReview',
+  'roadmapGenerator',
+  'aiComplexity',
+  'aiMistakePredictor',
+  'aiFeed',
+];
+
+export function isPremiumTier(tier: SubscriptionTier): boolean {
+  return tier === 'pro' || tier === 'elite';
+}
+
+export function getLimitForTier(
+  feature: AiFeature,
+  tier: SubscriptionTier,
+  configOverride?: Partial<AiLimitsConfig>,
+): AiFeatureLimit | null {
+  if (isPremiumTier(tier)) return null;
+  const config = configOverride?.[feature] || DEFAULT_AI_LIMITS[feature];
+  return config || null;
+}
+
+export function getPeriodKey(feature: AiFeature): 'daily' | 'monthly' {
+  const limit = DEFAULT_AI_LIMITS[feature];
+  if (limit?.monthly !== null && limit?.daily === null) return 'monthly';
+  return 'daily';
+}
+
+export function getCurrentPeriodKey(feature: AiFeature): string {
+  const period = getPeriodKey(feature);
+  const now = new Date();
+  if (period === 'monthly') {
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+  return now.toISOString().slice(0, 10);
+}
+
+export function getNextResetTime(feature: AiFeature): Date {
+  const now = new Date();
+  const period = getPeriodKey(feature);
+  if (period === 'monthly') {
+    const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return next;
+  }
+  const next = new Date(now);
+  next.setDate(next.getDate() + 1);
+  next.setHours(0, 0, 0, 0);
+  return next;
+}
+
+/**
+ * Firestore path for per-feature usage docs: config/aiQuotas
+ * Overrides DEFAULT_AI_LIMITS at runtime.
+ */
+export const AI_QUOTAS_CONFIG_DOC = 'config/aiQuotas';
