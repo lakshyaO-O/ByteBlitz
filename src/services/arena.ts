@@ -1,1 +1,341 @@
-J3VzZSBjbGllbnQnOwoKaW1wb3J0IHsgaW5pdGlhbGl6ZUZpcmViYXNlIH0gZnJvbSAnQC9maXJlYmFzZSc7CmltcG9ydCB7CiAgY29sbGVjdGlvbiwgZG9jLCBnZXREb2MsIGdldERvY3MsIHNldERvYywgdXBkYXRlRG9jLCBkZWxldGVEb2MsIGFkZERvYywKICBxdWVyeSwgd2hlcmUsIG9yZGVyQnksIGxpbWl0LCBzZXJ2ZXJUaW1lc3RhbXAsIHJ1blRyYW5zYWN0aW9uLCBUaW1lc3RhbXAsCiAgaW5jcmVtZW50LCBvblNuYXBzaG90LCBVbnN1YnNjcmliZSwKfSBmcm9tICdmaXJlYmFzZS9maXJlc3RvcmUnOwppbXBvcnQgdHlwZSB7IFF1ZXJ5RG9jdW1lbnRTbmFwc2hvdCwgRG9jdW1lbnREYXRhLCBRdWVyeVNuYXBzaG90LCBEb2N1bWVudFNuYXBzaG90IH0gZnJvbSAnZmlyZWJhc2UvZmlyZXN0b3JlJzsKaW1wb3J0IHR5cGUgewogIEFyZW5hU2V0dGluZ3MsIE1hdGNobWFraW5nRW50cnksIEJhdHRsZURvY3VtZW50LCBQbGF5ZXJCYXR0bGVQcm9ncmVzcywKICBCYXR0bGVQaGFzZSwgQ29kaW5nTGFuZ3VhZ2UsCiAgTWF0Y2hSZWNvcmQsIExlYWRlcmJvYXJkRW50cnksIFJvb21JbnZpdGUsCn0gZnJvbSAnQC90eXBlcyc7Cgpjb25zdCBERUZBVUxUX1NFVFRJTkdTOiBBcmVuYVNldHRpbmdzID0gewogIHByZWZlcnJlZExhbmd1YWdlOiAncHl0aG9uJywKICByYXRlZDogdHJ1ZSwKICBkaWZmaWN1bHR5OiAnTWVkaXVtJywKICBjYXRlZ29yeTogJ2FsbCcsCiAgdGltZUNvbnRyb2w6ICc1KzAnLAogIHJlZ2lvbjogJ2F1dG8nLAogIGVsb1JhbmdlOiAyMDAsCiAgZWRpdG9yVGhlbWU6ICd2cy1kYXJrJywKICBlZGl0b3JGb250U2l6ZTogMTQsCiAgZWRpdG9yTWluaW1hcDogdHJ1ZSwKICBlZGl0b3JXb3JkV3JhcDogdHJ1ZSwKICBlZGl0b3JUYWJTaXplOiA0LAogIHNvdW5kRW5hYmxlZDogdHJ1ZSwKICBtdXNpY0VuYWJsZWQ6IGZhbHNlLAogIHNob3dPcHBvbmVudFByb2dyZXNzOiB0cnVlLAogIGF1dG9BY2NlcHRSZW1hdGNoOiBmYWxzZSwKICBjb25maXJtQmVmb3JlU3VibWl0OiB0cnVlLAogIHByaXZhY3lTaG93QWN0aXZpdHk6IHRydWUsCiAgcHJpdmFjeVNob3dSYXRpbmc6IHRydWUsCiAgcHJpdmFjeVNob3dTdGF0czogdHJ1ZSwKICBub3RpZmljYXRpb25zTWF0Y2hGb3VuZDogdHJ1ZSwKICBub3RpZmljYXRpb25zQmF0dGxlU3RhcnQ6IHRydWUsCiAgbm90aWZpY2F0aW9uc1JvdW5kRW5kOiB0cnVlLAogIG5vdGlmaWNhdGlvbnNGcmllbmRJbnZpdGU6IHRydWUsCn07CgpleHBvcnQgZnVuY3Rpb24gYXJlbmFTZXR0aW5nc0RvY1JlZih1c2VySWQ6IHN0cmluZykgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuIG51bGw7CiAgcmV0dXJuIGRvYyhkYiwgJ3VzZXJzJywgdXNlcklkLCAnYXJlbmFTZXR0aW5ncycsICdkZWZhdWx0Jyk7Cn0KCmV4cG9ydCBmdW5jdGlvbiBtYXRjaG1ha2luZ0RvY1JlZih1c2VySWQ6IHN0cmluZykgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuIG51bGw7CiAgcmV0dXJuIGRvYyhkYiwgJ21hdGNobWFraW5nJywgdXNlcklkKTsKfQoKZXhwb3J0IGZ1bmN0aW9uIGJhdHRsZURvY1JlZihiYXR0bGVJZDogc3RyaW5nKSB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gbnVsbDsKICByZXR1cm4gZG9jKGRiLCAnYmF0dGxlcycsIGJhdHRsZUlkKTsKfQoKZXhwb3J0IGZ1bmN0aW9uIGludml0ZURvY1JlZihpbnZpdGVJZDogc3RyaW5nKSB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gbnVsbDsKICByZXR1cm4gZG9jKGRiLCAnaW52aXRlcycsIGludml0ZUlkKTsKfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGZldGNoQXJlbmFTZXR0aW5ncyh1c2VySWQ6IHN0cmluZyk6IFByb21pc2U8QXJlbmFTZXR0aW5ncz4gewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuIERFRkFVTFRfU0VUVElOR1M7CiAgY29uc3QgcmVmID0gZG9jKGRiLCAndXNlcnMnLCB1c2VySWQsICdhcmVuYVNldHRpbmdzJywgJ2RlZmF1bHQnKTsKICBjb25zdCBzbmFwID0gYXdhaXQgZ2V0RG9jKHJlZik7CiAgaWYgKHNuYXAuZXhpc3RzKCkpIHsKICAgIHJldHVybiB7IC4uLkRFRkFVTFRfU0VUVElOR1MsIC4uLnNuYXAuZGF0YSgpIH0gYXMgQXJlbmFTZXR0aW5nczsKICB9CiAgcmV0dXJuIERFRkFVTFRfU0VUVElOR1M7Cn0KCmV4cG9ydCBhc3luYyBmdW5jdGlvbiBzYXZlQXJlbmFTZXR0aW5ncyh1c2VySWQ6IHN0cmluZywgc2V0dGluZ3M6IFBhcnRpYWw8QXJlbmFTZXR0aW5ncz4pIHsKICBjb25zdCB7IGZpcmVzdG9yZTogZGIgfSA9IGluaXRpYWxpemVGaXJlYmFzZSgpOwogIGlmICghZGIpIHJldHVybjsKICBjb25zdCByZWYgPSBkb2MoZGIsICd1c2VycycsIHVzZXJJZCwgJ2FyZW5hU2V0dGluZ3MnLCAnZGVmYXVsdCcpOwogIGF3YWl0IHNldERvYyhyZWYsIHNldHRpbmdzLCB7IG1lcmdlOiB0cnVlIH0pOwp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gam9pbk1hdGNobWFraW5nUXVldWUoCiAgdXNlcklkOiBzdHJpbmcsIGVudHJ5OiBPbWl0PE1hdGNobWFraW5nRW50cnksICdqb2luZWRBdCcgfCAnc3RhdHVzJz4sCikgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGF3YWl0IHNldERvYyhkb2MoZGIsICdtYXRjaG1ha2luZycsIHVzZXJJZCksIHsKICAgIC4uLmVudHJ5LAogICAgam9pbmVkQXQ6IHNlcnZlclRpbWVzdGFtcCgpLAogICAgc3RhdHVzOiAnc2VhcmNoaW5nJywKICB9KTsKfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGxlYXZlTWF0Y2htYWtpbmdRdWV1ZSh1c2VySWQ6IHN0cmluZykgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGF3YWl0IGRlbGV0ZURvYyhkb2MoZGIsICdtYXRjaG1ha2luZycsIHVzZXJJZCkpOwp9CgpleHBvcnQgZnVuY3Rpb24gc3Vic2NyaWJlTWF0Y2htYWtpbmcoCiAgdXNlcklkOiBzdHJpbmcsCiAgb25NYXRjaDogKGVudHJ5OiBNYXRjaG1ha2luZ0VudHJ5IHwgbnVsbCkgPT4gdm9pZCwKKTogVW5zdWJzY3JpYmUgfCBudWxsIHsKICBjb25zdCB7IGZpcmVzdG9yZTogZGIgfSA9IGluaXRpYWxpemVGaXJlYmFzZSgpOwogIGlmICghZGIpIHJldHVybiBudWxsOwogIGNvbnN0IHJlZiA9IGRvYyhkYiwgJ21hdGNobWFraW5nJywgdXNlcklkKTsKICByZXR1cm4gb25TbmFwc2hvdChyZWYsIChzbmFwOiBEb2N1bWVudFNuYXBzaG90PERvY3VtZW50RGF0YT4pID0+IHsKICAgIGlmIChzbmFwLmV4aXN0cygpKSB7CiAgICAgIG9uTWF0Y2goeyB1c2VySWQ6IHNuYXAuaWQsIC4uLnNuYXAuZGF0YSgpIH0gYXMgTWF0Y2htYWtpbmdFbnRyeSk7CiAgICB9IGVsc2UgewogICAgICBvbk1hdGNoKG51bGwpOwogICAgfQogIH0pOwp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gZmluZE1hdGNoKAogIHVzZXJJZDogc3RyaW5nLCBzZXR0aW5nczogQXJlbmFTZXR0aW5ncywKKTogUHJvbWlzZTxNYXRjaG1ha2luZ0VudHJ5IHwgbnVsbD4gewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuIG51bGw7CiAgY29uc3QgdXNlclNuYXAgPSBhd2FpdCBnZXREb2MoZG9jKGRiLCAndXNlcnMnLCB1c2VySWQpKTsKICBpZiAoIXVzZXJTbmFwLmV4aXN0cygpKSByZXR1cm4gbnVsbDsKICBjb25zdCB1c2VyRGF0YSA9IHVzZXJTbmFwLmRhdGEoKTsKICBjb25zdCB1c2VyUmF0aW5nID0gdXNlckRhdGEucmF0aW5nIHx8IDgwMDsKCiAgY29uc3QgbWluUmF0aW5nID0gTWF0aC5tYXgoMCwgdXNlclJhdGluZyAtIHNldHRpbmdzLmVsb1JhbmdlKTsKICBjb25zdCBtYXhSYXRpbmcgPSB1c2VyUmF0aW5nICsgc2V0dGluZ3MuZWxvUmFuZ2U7CiAgY29uc3QgcSA9IHF1ZXJ5KAogICAgY29sbGVjdGlvbihkYiwgJ21hdGNobWFraW5nJyksCiAgICB3aGVyZSgnc3RhdHVzJywgJz09JywgJ3NlYXJjaGluZycpLAogICAgd2hlcmUoJ3JhdGVkJywgJz09Jywgc2V0dGluZ3MucmF0ZWQpLAogICAgd2hlcmUoJ2RpZmZpY3VsdHknLCAnPT0nLCBzZXR0aW5ncy5kaWZmaWN1bHR5KSwKICAgIHdoZXJlKCd0aW1lQ29udHJvbCcsICc9PScsIHNldHRpbmdzLnRpbWVDb250cm9sKSwKICAgIHdoZXJlKCdwcmVmZXJyZWRMYW5ndWFnZScsICc9PScsIHNldHRpbmdzLnByZWZlcnJlZExhbmd1YWdlKSwKICAgIHdoZXJlKCdyYXRpbmcnLCAnPj0nLCBtaW5SYXRpbmcpLAogICAgd2hlcmUoJ3JhdGluZycsICc8PScsIG1heFJhdGluZyksCiAgICBsaW1pdCgxKSwKICApOwogIGNvbnN0IHNuYXAgPSBhd2FpdCBnZXREb2NzKHEpOwogIGNvbnN0IGNhbmRpZGF0ZXMgPSBzbmFwLmRvY3MKICAgIC5maWx0ZXIoKGQ6IFF1ZXJ5RG9jdW1lbnRTbmFwc2hvdDxEb2N1bWVudERhdGE+KSA9PiBkLmlkICE9PSB1c2VySWQpCiAgICAubWFwKChkOiBRdWVyeURvY3VtZW50U25hcHNob3Q8RG9jdW1lbnREYXRhPikgPT4gKHsgdXNlcklkOiBkLmlkLCAuLi5kLmRhdGEoKSB9IGFzIE1hdGNobWFraW5nRW50cnkpKTsKCiAgaWYgKGNhbmRpZGF0ZXMubGVuZ3RoID4gMCkgewogICAgcmV0dXJuIGNhbmRpZGF0ZXNbMF07CiAgfQogIHJldHVybiBudWxsOwp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gZmV0Y2hCYXR0bGUoYmF0dGxlSWQ6IHN0cmluZyk6IFByb21pc2U8QmF0dGxlRG9jdW1lbnQgfCBudWxsPiB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gbnVsbDsKICBjb25zdCBzbmFwID0gYXdhaXQgZ2V0RG9jKGRvYyhkYiwgJ2JhdHRsZXMnLCBiYXR0bGVJZCkpOwogIHJldHVybiBzbmFwLmV4aXN0cygpID8gKHsgaWQ6IHNuYXAuaWQsIC4uLnNuYXAuZGF0YSgpIH0gYXMgQmF0dGxlRG9jdW1lbnQpIDogbnVsbDsKfQoKZXhwb3J0IGZ1bmN0aW9uIHN1YnNjcmliZUJhdHRsZSgKICBiYXR0bGVJZDogc3RyaW5nLAogIG9uVXBkYXRlOiAoYmF0dGxlOiBCYXR0bGVEb2N1bWVudCkgPT4gdm9pZCwKKTogVW5zdWJzY3JpYmUgfCBudWxsIHsKICBjb25zdCB7IGZpcmVzdG9yZTogZGIgfSA9IGluaXRpYWxpemVGaXJlYmFzZSgpOwogIGlmICghZGIpIHJldHVybiBudWxsOwogIGNvbnN0IHJlZiA9IGRvYyhkYiwgJ2JhdHRsZXMnLCBiYXR0bGVJZCk7CiAgcmV0dXJuIG9uU25hcHNob3QocmVmLCAoc25hcDogRG9jdW1lbnRTbmFwc2hvdDxEb2N1bWVudERhdGE+KSA9PiB7CiAgICBpZiAoc25hcC5leGlzdHMoKSkgewogICAgICBvblVwZGF0ZSh7IGlkOiBzbmFwLmlkLCAuLi5zbmFwLmRhdGEoKSB9IGFzIEJhdHRsZURvY3VtZW50KTsKICAgIH0KICB9KTsKfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHVwZGF0ZUJhdHRsZVBoYXNlKGJhdHRsZUlkOiBzdHJpbmcsIHBoYXNlOiBCYXR0bGVQaGFzZSkgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGF3YWl0IHVwZGF0ZURvYyhkb2MoZGIsICdiYXR0bGVzJywgYmF0dGxlSWQpLCB7CiAgICBwaGFzZSwKICAgIC4uLihwaGFzZSA9PT0gJ2NvZGluZycKICAgICAgPyB7IHN0YXR1czogJ2FjdGl2ZScsIGNvZGluZ1N0YXJ0ZWRBdDogc2VydmVyVGltZXN0YW1wKCkgfQogICAgICA6IHt9KSwKICAgIHVwZGF0ZWRBdDogc2VydmVyVGltZXN0YW1wKCksCiAgfSk7Cn0KCmV4cG9ydCBhc3luYyBmdW5jdGlvbiB1cGRhdGVQbGF5ZXJQcm9ncmVzcygKICBiYXR0bGVJZDogc3RyaW5nLCB1c2VySWQ6IHN0cmluZywgdXBkYXRlczogUGFydGlhbDxQbGF5ZXJCYXR0bGVQcm9ncmVzcz4sCikgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGNvbnN0IGJhdHRsZVNuYXAgPSBhd2FpdCBnZXREb2MoZG9jKGRiLCAnYmF0dGxlcycsIGJhdHRsZUlkKSk7CiAgaWYgKCFiYXR0bGVTbmFwLmV4aXN0cygpKSByZXR1cm47CiAgY29uc3QgYmF0dGxlID0gYmF0dGxlU25hcC5kYXRhKCkgYXMgQmF0dGxlRG9jdW1lbnQ7CiAgY29uc3QgcGxheWVyS2V5OiAncGxheWVyMScgfCAncGxheWVyMicgfCBudWxsID0gYmF0dGxlLnBsYXllcjE/LnVzZXJJZCA9PT0gdXNlcklkCiAgICA/ICdwbGF5ZXIxJwogICAgOiBiYXR0bGUucGxheWVyMj8udXNlcklkID09PSB1c2VySWQKICAgICAgPyAncGxheWVyMicKICAgICAgOiBudWxsOwogIGlmICghcGxheWVyS2V5KSByZXR1cm47CiAgY29uc3QgZmllbGRVcGRhdGVzOiBSZWNvcmQ8c3RyaW5nLCBhbnk+ID0geyB1cGRhdGVkQXQ6IHNlcnZlclRpbWVzdGFtcCgpIH07CiAgZm9yIChjb25zdCBba2V5LCB2YWx1ZV0gb2YgT2JqZWN0LmVudHJpZXModXBkYXRlcykpIHsKICAgIGZpZWxkVXBkYXRlc1tgJHtwbGF5ZXJLZXl9LiR7a2V5fWBdID0gdmFsdWU7CiAgfQogIGF3YWl0IHVwZGF0ZURvYyhkb2MoZGIsICdiYXR0bGVzJywgYmF0dGxlSWQpLCBmaWVsZFVwZGF0ZXMpOwp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gc3VibWl0QmF0dGxlQ29kZSgKICBiYXR0bGVJZDogc3RyaW5nLCB1c2VySWQ6IHN0cmluZywgY29kZTogc3RyaW5nLCBsYW5ndWFnZTogQ29kaW5nTGFuZ3VhZ2UsCiAgdGVzdENhc2VzOiBBcnJheTx7IGlucHV0OiBzdHJpbmc7IGV4cGVjdGVkOiBzdHJpbmcgfT4sCikgewogIHRyeSB7CiAgICBjb25zdCB1c2VyID0gKGF3YWl0IGltcG9ydCgnZmlyZWJhc2UvYXV0aCcpKS5nZXRBdXRoKCkuY3VycmVudFVzZXI7CiAgICBpZiAoIXVzZXIpIHJldHVybiB7IHBhc3NlZDogMCwgdG90YWw6IDAsIHZlcmRpY3Q6ICdSdW50aW1lIEVycm9yJyBhcyBjb25zdCB9OwogICAgY29uc3QgaWRUb2tlbiA9IGF3YWl0IHVzZXIuZ2V0SWRUb2tlbigpOwoKICAgIGNvbnN0IHJlcyA9IGF3YWl0IGZldGNoKCcvYXBpL2JhdHRsZXMvc3VibWl0JywgewogICAgICBtZXRob2Q6ICdQT1NUJywKICAgICAgaGVhZGVyczogewogICAgICAgICdDb250ZW50LVR5cGUnOiAnYXBwbGljYXRpb24vanNvbicsCiAgICAgICAgJ0F1dGhvcml6YXRpb24nOiBgQmVhcmVyICR7aWRUb2tlbn1gLAogICAgICB9LAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IGJhdHRsZUlkLCBjb2RlLCBsYW5ndWFnZSB9KSwKICAgIH0pOwoKICAgIGNvbnN0IGRhdGEgPSBhd2FpdCByZXMuanNvbigpOwogICAgaWYgKCFyZXMub2spIHsKICAgICAgaWYgKChkYXRhPy5lcnJvciB8fCAnJykudG9Mb3dlckNhc2UoKS5pbmNsdWRlcygnYWxyZWFkeSBzdWJtaXR0ZWQnKSkgewogICAgICAgIHJldHVybiB7IHBhc3NlZDogMCwgdG90YWw6IDAsIHZlcmRpY3Q6ICdBbHJlYWR5IFN1Ym1pdHRlZCcgYXMgY29uc3QgfTsKICAgICAgfQogICAgICBpZiAoKGRhdGE/LmVycm9yIHx8ICcnKS50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKCdhbHJlYWR5IGVuZGVkJykpIHsKICAgICAgICByZXR1cm4geyBwYXNzZWQ6IDAsIHRvdGFsOiAwLCB2ZXJkaWN0OiAnQmF0dGxlIEVuZGVkJyBhcyBjb25zdCB9OwogICAgICB9CiAgICAgIHJldHVybiB7IHBhc3NlZDogMCwgdG90YWw6IDAsIHZlcmRpY3Q6ICdSdW50aW1lIEVycm9yJyBhcyBjb25zdCB9OwogICAgfQogICAgcmV0dXJuIHsKICAgICAgcGFzc2VkOiBkYXRhLnBhc3NlZCB8fCAwLAogICAgICB0b3RhbDogZGF0YS50b3RhbCB8fCB0ZXN0Q2FzZXMubGVuZ3RoLAogICAgICB2ZXJkaWN0OiAoZGF0YS5yZXN1bHQgPT09ICdXSU4nCiAgICAgICAgPyAnQWNjZXB0ZWQnCiAgICAgICAgOiBkYXRhLnJlc3VsdCA9PT0gJ0xPU1MnCiAgICAgICAgICA/ICdXcm9uZyBBbnN3ZXInCiAgICAgICAgICA6ICdTdWJtaXR0ZWQg4oCUIHdhaXRpbmcgZm9yIG9wcG9uZW50JykgYXMgJ0FjY2VwdGVkJyB8ICdXcm9uZyBBbnN3ZXInIHwgJ1J1bnRpbWUgRXJyb3InLAogICAgfTsKICB9IGNhdGNoIHsKICAgIHJldHVybiB7IHBhc3NlZDogMCwgdG90YWw6IDAsIHZlcmRpY3Q6ICdSdW50aW1lIEVycm9yJyBhcyBjb25zdCB9OwogIH0KfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGZldGNoTWF0Y2hIaXN0b3J5KHVzZXJJZDogc3RyaW5nKTogUHJvbWlzZTxNYXRjaFJlY29yZFtdPiB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gW107CiAgY29uc3QgcSA9IHF1ZXJ5KAogICAgY29sbGVjdGlvbihkYiwgJ3VzZXJzJywgdXNlcklkLCAnbWF0Y2hlcycpLAogICAgb3JkZXJCeSgndGltZXN0YW1wJywgJ2Rlc2MnKSwKICAgIGxpbWl0KDIwKSwKICApOwogIGNvbnN0IHNuYXAgPSBhd2FpdCBnZXREb2NzKHEpOwogIHJldHVybiBzbmFwLmRvY3MubWFwKChkOiBRdWVyeURvY3VtZW50U25hcHNob3Q8RG9jdW1lbnREYXRhPikgPT4gKHsKICAgIGlkOiBkLmlkLAogICAgLi4uZC5kYXRhKCksCiAgICB0aW1lc3RhbXA6IGQuZGF0YSgpLnRpbWVzdGFtcD8udG9NaWxsaXM/LigpPy50b1N0cmluZygpIHx8IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKSwKICB9IGFzIHVua25vd24gYXMgTWF0Y2hSZWNvcmQpKTsKfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGZldGNoTGVhZGVyYm9hcmQocGVyaW9kOiAnd2Vla2x5JyB8ICdtb250aGx5JyB8ICdhbGwtdGltZScgPSAnYWxsLXRpbWUnKTogUHJvbWlzZTxMZWFkZXJib2FyZEVudHJ5W10+IHsKICBjb25zdCB7IGZpcmVzdG9yZTogZGIgfSA9IGluaXRpYWxpemVGaXJlYmFzZSgpOwogIGlmICghZGIpIHJldHVybiBbXTsKICBjb25zdCBxID0gcXVlcnkoCiAgICBjb2xsZWN0aW9uKGRiLCAnbGVhZGVyYm9hcmQnKSwKICAgIHdoZXJlKCdwZXJpb2QnLCAnPT0nLCBwZXJpb2QpLAogICAgb3JkZXJCeSgncmF0aW5nJywgJ2Rlc2MnKSwKICAgIGxpbWl0KDEwMCksCiAgKTsKICBjb25zdCBzbmFwID0gYXdhaXQgZ2V0RG9jcyhxKTsKICByZXR1cm4gc25hcC5kb2NzLm1hcCgoZDogUXVlcnlEb2N1bWVudFNuYXBzaG90PERvY3VtZW50RGF0YT4pID0+ICh7IGlkOiBkLmlkLCAuLi5kLmRhdGEoKSB9IGFzIExlYWRlcmJvYXJkRW50cnkpKTsKfQoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHNlbmRSb29tSW52aXRlKAogIGZyb21Vc2VySWQ6IHN0cmluZywgZnJvbVVzZXJuYW1lOiBzdHJpbmcsIHRvVXNlcklkOiBzdHJpbmcsCiAgcm9vbUlkOiBzdHJpbmcsIHJvb21Db2RlOiBzdHJpbmcsCikgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGF3YWl0IGFkZERvYyhjb2xsZWN0aW9uKGRiLCAnaW52aXRlcycpLCB7CiAgICByb29tSWQsIHJvb21Db2RlLCBmcm9tVXNlcklkLCBmcm9tVXNlcm5hbWUsIHRvVXNlcklkLAogICAgc3RhdHVzOiAncGVuZGluZycsIGNyZWF0ZWRBdDogc2VydmVyVGltZXN0YW1wKCksCiAgfSk7Cn0KCmV4cG9ydCBhc3luYyBmdW5jdGlvbiByZXNwb25kVG9JbnZpdGUoaW52aXRlSWQ6IHN0cmluZywgc3RhdHVzOiAnYWNjZXB0ZWQnIHwgJ2RlY2xpbmVkJykgewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuOwogIGF3YWl0IHVwZGF0ZURvYyhkb2MoZGIsICdpbnZpdGVzJywgaW52aXRlSWQpLCB7IHN0YXR1cywgdXBkYXRlZEF0OiBzZXJ2ZXJUaW1lc3RhbXAoKSB9KTsKfQoKZXhwb3J0IGZ1bmN0aW9uIHN1YnNjcmliZUludml0ZXMoCiAgdXNlcklkOiBzdHJpbmcsCiAgb25JbnZpdGU6IChpbnZpdGVzOiBSb29tSW52aXRlW10pID0+IHZvaWQsCik6IFVuc3Vic2NyaWJlIHwgbnVsbCB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gbnVsbDsKICBjb25zdCBxID0gcXVlcnkoCiAgICBjb2xsZWN0aW9uKGRiLCAnaW52aXRlcycpLAogICAgd2hlcmUoJ3RvVXNlcklkJywgJz09JywgdXNlcklkKSwKICAgIHdoZXJlKCdzdGF0dXMnLCAnPT0nLCAncGVuZGluZycpLAogICk7CiAgcmV0dXJuIG9uU25hcHNob3QocSwgKHNuYXA6IFF1ZXJ5U25hcHNob3Q8RG9jdW1lbnREYXRhPikgPT4gewogICAgb25JbnZpdGUoc25hcC5kb2NzLm1hcCgoZDogUXVlcnlEb2N1bWVudFNuYXBzaG90PERvY3VtZW50RGF0YT4pID0+ICh7IGlkOiBkLmlkLCAuLi5kLmRhdGEoKSB9IGFzIFJvb21JbnZpdGUpKSk7CiAgfSk7Cn0KCmV4cG9ydCBhc3luYyBmdW5jdGlvbiBmZXRjaEFjdGl2ZUJhdHRsZUNvdW50KHVzZXJJZD86IHN0cmluZyk6IFByb21pc2U8bnVtYmVyPiB7CiAgY29uc3QgeyBmaXJlc3RvcmU6IGRiIH0gPSBpbml0aWFsaXplRmlyZWJhc2UoKTsKICBpZiAoIWRiKSByZXR1cm4gMDsKICBjb25zdCBxID0gcXVlcnkoCiAgICBjb2xsZWN0aW9uKGRiLCAnYmF0dGxlcycpLAogICAgLi4uKHVzZXJJZCA/IFt3aGVyZSgncGFydGljaXBhbnRzJywgJ2FycmF5LWNvbnRhaW5zJywgdXNlcklkKV0gOiBbXSksCiAgICB3aGVyZSgnc3RhdHVzJywgJz09JywgJ2FjdGl2ZScpLAogICAgbGltaXQoMTAwMCksCiAgKTsKICBjb25zdCBzbmFwID0gYXdhaXQgZ2V0RG9jcyhxKTsKICByZXR1cm4gc25hcC5zaXplOwp9CgpleHBvcnQgYXN5bmMgZnVuY3Rpb24gZmV0Y2hPbmxpbmVQbGF5ZXJDb3VudCgpOiBQcm9taXNlPG51bWJlcj4gewogIGNvbnN0IHsgZmlyZXN0b3JlOiBkYiB9ID0gaW5pdGlhbGl6ZUZpcmViYXNlKCk7CiAgaWYgKCFkYikgcmV0dXJuIDA7CiAgY29uc3QgcSA9IHF1ZXJ5KAogICAgY29sbGVjdGlvbihkYiwgJ3VzZXJzJyksCiAgICB3aGVyZSgnb25saW5lU3RhdHVzJywgJz09JywgJ29ubGluZScpLAogICAgbGltaXQoMTAwMCksCiAgKTsKICBjb25zdCBzbmFwID0gYXdhaXQgZ2V0RG9jcyhxKTsKICByZXR1cm4gc25hcC5zaXplOwp9CgpmdW5jdGlvbiBjYWxjdWxhdGVOZXdSYXRpbmcocmF0aW5nOiBudW1iZXIsIG9wcG9uZW50UmF0aW5nOiBudW1iZXIsIHNjb3JlOiBudW1iZXIpOiBudW1iZXIgewogIGNvbnN0IEsgPSAzMjsKICBjb25zdCBleHBlY3RlZCA9IDEgLyAoMSArIE1hdGgucG93KDEwLCAob3Bwb25lbnRSYXRpbmcgLSByYXRpbmcpIC8gNDAwKSk7CiAgcmV0dXJuIE1hdGgucm91bmQocmF0aW5nICsgSyAqIChzY29yZSAtIGV4cGVjdGVkKSk7Cn0K
+'use client';
+
+import { initializeFirebase } from '@/firebase';
+import {
+  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc,
+  query, where, orderBy, limit, serverTimestamp, runTransaction, Timestamp,
+  increment, onSnapshot, Unsubscribe,
+} from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot, DocumentSnapshot } from 'firebase/firestore';
+import type {
+  ArenaSettings, MatchmakingEntry, BattleDocument, PlayerBattleProgress,
+  BattlePhase, CodingLanguage,
+  MatchRecord, LeaderboardEntry, RoomInvite,
+} from '@/types';
+
+const DEFAULT_SETTINGS: ArenaSettings = {
+  preferredLanguage: 'python',
+  rated: true,
+  difficulty: 'Medium',
+  category: 'all',
+  timeControl: '5+0',
+  region: 'auto',
+  eloRange: 200,
+  editorTheme: 'vs-dark',
+  editorFontSize: 14,
+  editorMinimap: true,
+  editorWordWrap: true,
+  editorTabSize: 4,
+  soundEnabled: true,
+  musicEnabled: false,
+  showOpponentProgress: true,
+  autoAcceptRematch: false,
+  confirmBeforeSubmit: true,
+  privacyShowActivity: true,
+  privacyShowRating: true,
+  privacyShowStats: true,
+  notificationsMatchFound: true,
+  notificationsBattleStart: true,
+  notificationsRoundEnd: true,
+  notificationsFriendInvite: true,
+};
+
+export function arenaSettingsDocRef(userId: string) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  return doc(db, 'users', userId, 'arenaSettings', 'default');
+}
+
+export function matchmakingDocRef(userId: string) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  return doc(db, 'matchmaking', userId);
+}
+
+export function battleDocRef(battleId: string) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  return doc(db, 'battles', battleId);
+}
+
+export function inviteDocRef(inviteId: string) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  return doc(db, 'invites', inviteId);
+}
+
+export async function fetchArenaSettings(userId: string): Promise<ArenaSettings> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return DEFAULT_SETTINGS;
+  const ref = doc(db, 'users', userId, 'arenaSettings', 'default');
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    return { ...DEFAULT_SETTINGS, ...snap.data() } as ArenaSettings;
+  }
+  return DEFAULT_SETTINGS;
+}
+
+export async function saveArenaSettings(userId: string, settings: Partial<ArenaSettings>) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  const ref = doc(db, 'users', userId, 'arenaSettings', 'default');
+  await setDoc(ref, settings, { merge: true });
+}
+
+export async function joinMatchmakingQueue(
+  userId: string, entry: Omit<MatchmakingEntry, 'joinedAt' | 'status'>,
+) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await setDoc(doc(db, 'matchmaking', userId), {
+    ...entry,
+    joinedAt: serverTimestamp(),
+    status: 'searching',
+  });
+}
+
+export async function leaveMatchmakingQueue(userId: string) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await deleteDoc(doc(db, 'matchmaking', userId));
+}
+
+export function subscribeMatchmaking(
+  userId: string,
+  onMatch: (entry: MatchmakingEntry | null) => void,
+): Unsubscribe | null {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const ref = doc(db, 'matchmaking', userId);
+  return onSnapshot(ref, (snap: DocumentSnapshot<DocumentData>) => {
+    if (snap.exists()) {
+      onMatch({ userId: snap.id, ...snap.data() } as MatchmakingEntry);
+    } else {
+      onMatch(null);
+    }
+  });
+}
+
+export async function findMatch(
+  userId: string, settings: ArenaSettings,
+): Promise<MatchmakingEntry | null> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const userSnap = await getDoc(doc(db, 'users', userId));
+  if (!userSnap.exists()) return null;
+  const userData = userSnap.data();
+  const userRating = userData.rating || 800;
+
+  const minRating = Math.max(0, userRating - settings.eloRange);
+  const maxRating = userRating + settings.eloRange;
+  const q = query(
+    collection(db, 'matchmaking'),
+    where('status', '==', 'searching'),
+    where('rated', '==', settings.rated),
+    where('difficulty', '==', settings.difficulty),
+    where('timeControl', '==', settings.timeControl),
+    where('preferredLanguage', '==', settings.preferredLanguage),
+    where('rating', '>=', minRating),
+    where('rating', '<=', maxRating),
+    limit(1),
+  );
+  const snap = await getDocs(q);
+  const candidates = snap.docs
+    .filter((d: QueryDocumentSnapshot<DocumentData>) => d.id !== userId)
+    .map((d: QueryDocumentSnapshot<DocumentData>) => ({ userId: d.id, ...d.data() } as MatchmakingEntry));
+
+  if (candidates.length > 0) {
+    return candidates[0];
+  }
+  return null;
+}
+
+export async function fetchBattle(battleId: string): Promise<BattleDocument | null> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const snap = await getDoc(doc(db, 'battles', battleId));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as BattleDocument) : null;
+}
+
+export function subscribeBattle(
+  battleId: string,
+  onUpdate: (battle: BattleDocument) => void,
+): Unsubscribe | null {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const ref = doc(db, 'battles', battleId);
+  return onSnapshot(ref, (snap: DocumentSnapshot<DocumentData>) => {
+    if (snap.exists()) {
+      onUpdate({ id: snap.id, ...snap.data() } as BattleDocument);
+    }
+  });
+}
+
+export async function updateBattlePhase(battleId: string, phase: BattlePhase) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await updateDoc(doc(db, 'battles', battleId), {
+    phase,
+    ...(phase === 'coding'
+      ? { status: 'active', codingStartedAt: serverTimestamp() }
+      : {}),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updatePlayerProgress(
+  battleId: string, userId: string, updates: Partial<PlayerBattleProgress>,
+) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  const battleSnap = await getDoc(doc(db, 'battles', battleId));
+  if (!battleSnap.exists()) return;
+  const battle = battleSnap.data() as BattleDocument;
+  const playerKey: 'player1' | 'player2' | null = battle.player1?.userId === userId
+    ? 'player1'
+    : battle.player2?.userId === userId
+      ? 'player2'
+      : null;
+  if (!playerKey) return;
+  const fieldUpdates: Record<string, any> = { updatedAt: serverTimestamp() };
+  for (const [key, value] of Object.entries(updates)) {
+    fieldUpdates[`${playerKey}.${key}`] = value;
+  }
+  await updateDoc(doc(db, 'battles', battleId), fieldUpdates);
+}
+
+export async function submitBattleCode(
+  battleId: string, userId: string, code: string, language: CodingLanguage,
+  testCases: Array<{ input: string; expected: string }>,
+) {
+  try {
+    const user = (await import('firebase/auth')).getAuth().currentUser;
+    if (!user) return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
+    const idToken = await user.getIdToken();
+
+    const res = await fetch('/api/battles/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ battleId, code, language }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      if ((data?.error || '').toLowerCase().includes('already submitted')) {
+        return { passed: 0, total: 0, verdict: 'Already Submitted' as const };
+      }
+      if ((data?.error || '').toLowerCase().includes('already ended')) {
+        return { passed: 0, total: 0, verdict: 'Battle Ended' as const };
+      }
+      return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
+    }
+    return {
+      passed: data.passed || 0,
+      total: data.total || testCases.length,
+      verdict: (data.result === 'WIN'
+        ? 'Accepted'
+        : data.result === 'LOSS'
+          ? 'Wrong Answer'
+          : 'Submitted — waiting for opponent') as 'Accepted' | 'Wrong Answer' | 'Runtime Error',
+    };
+  } catch {
+    return { passed: 0, total: 0, verdict: 'Runtime Error' as const };
+  }
+}
+
+export async function fetchMatchHistory(userId: string): Promise<MatchRecord[]> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return [];
+  const q = query(
+    collection(db, 'users', userId, 'matches'),
+    orderBy('timestamp', 'desc'),
+    limit(20),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({
+    id: d.id,
+    ...d.data(),
+    timestamp: d.data().timestamp?.toMillis?.()?.toString() || new Date().toISOString(),
+  } as unknown as MatchRecord));
+}
+
+export async function fetchLeaderboard(period: 'weekly' | 'monthly' | 'all-time' = 'all-time'): Promise<LeaderboardEntry[]> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return [];
+  const q = query(
+    collection(db, 'leaderboard'),
+    where('period', '==', period),
+    orderBy('rating', 'desc'),
+    limit(100),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as LeaderboardEntry));
+}
+
+export async function sendRoomInvite(
+  fromUserId: string, fromUsername: string, toUserId: string,
+  roomId: string, roomCode: string,
+) {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await addDoc(collection(db, 'invites'), {
+    roomId, roomCode, fromUserId, fromUsername, toUserId,
+    status: 'pending', createdAt: serverTimestamp(),
+  });
+}
+
+export async function respondToInvite(inviteId: string, status: 'accepted' | 'declined') {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return;
+  await updateDoc(doc(db, 'invites', inviteId), { status, updatedAt: serverTimestamp() });
+}
+
+export function subscribeInvites(
+  userId: string,
+  onInvite: (invites: RoomInvite[]) => void,
+): Unsubscribe | null {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return null;
+  const q = query(
+    collection(db, 'invites'),
+    where('toUserId', '==', userId),
+    where('status', '==', 'pending'),
+  );
+  return onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+    onInvite(snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() } as RoomInvite)));
+  });
+}
+
+export async function fetchActiveBattleCount(userId?: string): Promise<number> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return 0;
+  const q = query(
+    collection(db, 'battles'),
+    ...(userId ? [where('participants', 'array-contains', userId)] : []),
+    where('status', '==', 'active'),
+    limit(1000),
+  );
+  const snap = await getDocs(q);
+  return snap.size;
+}
+
+export async function fetchOnlinePlayerCount(): Promise<number> {
+  const { firestore: db } = initializeFirebase();
+  if (!db) return 0;
+  const q = query(
+    collection(db, 'users'),
+    where('onlineStatus', '==', 'online'),
+    limit(1000),
+  );
+  const snap = await getDocs(q);
+  return snap.size;
+}
+
+function calculateNewRating(rating: number, opponentRating: number, score: number): number {
+  const K = 32;
+  const expected = 1 / (1 + Math.pow(10, (opponentRating - rating) / 400));
+  return Math.round(rating + K * (score - expected));
+}
