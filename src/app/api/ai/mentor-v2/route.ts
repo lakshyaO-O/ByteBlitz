@@ -1,1 +1,45 @@
-aW1wb3J0IHsgdmVyaWZ5QXV0aCB9IGZyb20gJ0AvbGliL3ZlcmlmeS1hdXRoJzsKaW1wb3J0IHsgY2hlY2tSYXRlTGltaXQsIHJhdGVMaW1pdFJlc3BvbnNlIH0gZnJvbSAnQC9saWIvcmF0ZS1saW1pdCc7IGltcG9ydCB7IGVuZm9yY2VBaVF1b3RhLCBhaVF1b3RhUmVzcG9uc2UgfSBmcm9tICdAL2xpYi9haS1xdW90YS1zZXJ2ZXInOwoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIFBPU1QocmVxOiBSZXF1ZXN0KSB7CiAgdHJ5IHsKICAgIGNvbnN0IGF1dGggPSBhd2FpdCB2ZXJpZnlBdXRoKHJlcSk7CiAgICBpZiAoYXV0aCBpbnN0YW5jZW9mIFJlc3BvbnNlKSByZXR1cm4gYXV0aDsKICAgIGNvbnN0IHJhdGVDaGVjayA9IGNoZWNrUmF0ZUxpbWl0KGF1dGgudWlkLCByZXEpOwogICAgaWYgKCFyYXRlQ2hlY2suYWxsb3dlZCkgcmV0dXJuIHJhdGVMaW1pdFJlc3BvbnNlKHJhdGVDaGVjay5yZXRyeUFmdGVyTXMpOwogICAgY29uc3QgcXVvdGFDaGVjayA9IGF3YWl0IGVuZm9yY2VBaVF1b3RhKGF1dGgudWlkLCAnYWlNZW50b3InKTsKICAgIGlmICghcXVvdGFDaGVjay5hbGxvd2VkKSB7CiAgICAgIHJldHVybiBSZXNwb25zZS5qc29uKGFpUXVvdGFSZXNwb25zZShxdW90YUNoZWNrLCAnYWlNZW50b3InKSwgeyBzdGF0dXM6IDQyOSB9KTsKICAgIH0KCiAgICBjb25zdCBib2R5ID0gYXdhaXQgcmVxLmpzb24oKTsKICAgIGlmICghcHJvY2Vzcy5lbnYuR0VNSU5JX0FQSV9LRVkpIHsKICAgICAgcmV0dXJuIFJlc3BvbnNlLmpzb24oewogICAgICAgIGludHVpdGlvbjogJ0FJIE1lbnRvciBuZWVkcyBhIGNvbmZpZ3VyZWQgR2VtaW5pIEFQSSBrZXkuJywKICAgICAgICB3aHlJdFdvcmtzOiAnJywKICAgICAgICBhcHByb2FjaDogJ0FzayB0aGUgZGV2ZWxvcGVyIHRvIHNldCBHRU1JTklfQVBJX0tFWSBpbiAuZW52LmxvY2FsJywKICAgICAgICBhbHRlcm5hdGl2ZXM6IFtdLAogICAgICAgIGNvbXBsZXhpdHk6IHsgdGltZTogJ04vQScsIHNwYWNlOiAnTi9BJywgZXhwbGFuYXRpb246ICdBSSB1bmF2YWlsYWJsZScgfSwKICAgICAgICBlZGdlQ2FzZXM6IFtdLAogICAgICAgIGNvbW1vbk1pc3Rha2VzOiBbXSwKICAgICAgICBvcHRpbWl6YXRpb25PcHBvcnR1bml0aWVzOiBbXSwKICAgICAgfSk7CiAgICB9CgogICAgY29uc3QgeyBhaU1lbnRvclYyIH0gPSBhd2FpdCBpbXBvcnQoJ0AvYWkvZmxvd3MvYWktbWVudG9yLXYyLWZsb3cnKTsKICAgIGNvbnN0IHJlc3VsdCA9IGF3YWl0IGFpTWVudG9yVjIoYm9keSk7CiAgICByZXR1cm4gUmVzcG9uc2UuanNvbihyZXN1bHQpOwogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCdBSSBtZW50b3IgdjIgZXJyb3I6JywgZXJyb3IpOwogICAgcmV0dXJuIFJlc3BvbnNlLmpzb24oewogICAgICBpbnR1aXRpb246ICdVbmFibGUgdG8gZ2VuZXJhdGUgZXhwbGFuYXRpb24gYXQgdGhpcyB0aW1lLicsCiAgICAgIHdoeUl0V29ya3M6ICcnLAogICAgICBhcHByb2FjaDogJ1BsZWFzZSB0cnkgYWdhaW4gbGF0ZXIuJywKICAgICAgYWx0ZXJuYXRpdmVzOiBbXSwKICAgICAgY29tcGxleGl0eTogeyB0aW1lOiAnTi9BJywgc3BhY2U6ICdOL0EnLCBleHBsYW5hdGlvbjogJycgfSwKICAgICAgZWRnZUNhc2VzOiBbXSwKICAgICAgY29tbW9uTWlzdGFrZXM6IFtdLAogICAgICBvcHRpbWl6YXRpb25PcHBvcnR1bml0aWVzOiBbXSwKICAgIH0pOwogIH0KfQo=
+import { verifyAuth } from '@/lib/verify-auth';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit'; import { enforceAiQuota, aiQuotaResponse } from '@/lib/ai-quota-server';
+
+export async function POST(req: Request) {
+  try {
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
+    const rateCheck = checkRateLimit(auth.uid, req);
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
+    const quotaCheck = await enforceAiQuota(auth.uid, 'aiMentor');
+    if (!quotaCheck.allowed) {
+      return Response.json(aiQuotaResponse(quotaCheck, 'aiMentor'), { status: 429 });
+    }
+
+    const body = await req.json();
+    if (!process.env.GEMINI_API_KEY) {
+      return Response.json({
+        intuition: 'AI Mentor needs a configured Gemini API key.',
+        whyItWorks: '',
+        approach: 'Ask the developer to set GEMINI_API_KEY in .env.local',
+        alternatives: [],
+        complexity: { time: 'N/A', space: 'N/A', explanation: 'AI unavailable' },
+        edgeCases: [],
+        commonMistakes: [],
+        optimizationOpportunities: [],
+      });
+    }
+
+    const { aiMentorV2 } = await import('@/ai/flows/ai-mentor-v2-flow');
+    const result = await aiMentorV2(body);
+    return Response.json(result);
+  } catch (error) {
+    console.error('AI mentor v2 error:', error);
+    return Response.json({
+      intuition: 'Unable to generate explanation at this time.',
+      whyItWorks: '',
+      approach: 'Please try again later.',
+      alternatives: [],
+      complexity: { time: 'N/A', space: 'N/A', explanation: '' },
+      edgeCases: [],
+      commonMistakes: [],
+      optimizationOpportunities: [],
+    });
+  }
+}
