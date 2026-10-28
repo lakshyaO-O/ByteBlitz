@@ -4,11 +4,11 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.vercel-analytics.com https://vercel.live https://*.ingest.sentry.io https://apis.google.com",
+  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.vercel-analytics.com https://vercel.live https://*.ingest.sentry.io https://apis.google.com https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "img-src 'self' data: blob: https://*.vercel.app https://*.firebasestorage.app https://*.googleapis.com https://placehold.co https://images.unsplash.com https://picsum.photos",
+  "img-src 'self' data: blob: https://*.vercel.app https://*.firebasestorage.app https://*.googleapis.com https://*.googleusercontent.com https://placehold.co https://images.unsplash.com https://picsum.photos",
   "font-src 'self' https://fonts.gstatic.com",
-  "connect-src 'self' https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.googleapis.com https://*.ingest.sentry.io https://o0.ingest.sentry.io" + (isDev ? " ws://localhost:*" : ""),
+  "connect-src 'self' https://apis.google.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.googleapis.com https://*.ingest.sentry.io https://o0.ingest.sentry.io" + (isDev ? " ws://localhost:*" : ""),
   "frame-src 'self' https://*.firebaseapp.com https://apis.google.com",
   "object-src 'none'",
   "base-uri 'self'",
@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'placehold.co', pathname: '/**' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
       { protocol: 'https', hostname: 'picsum.photos', pathname: '/**' },
+      { protocol: 'https', hostname: '*.googleusercontent.com', pathname: '/**' },
     ],
   },
   experimental: {
