@@ -1,1 +1,163 @@
-aW1wb3J0IHsgTmV4dFJlcXVlc3QsIE5leHRSZXNwb25zZSB9IGZyb20gJ25leHQvc2VydmVyJzsKaW1wb3J0IHsgZ2V0QWRtaW5BdXRoLCBnZXRBZG1pbkZpcmVzdG9yZSB9IGZyb20gJ0AvZmlyZWJhc2UvYWRtaW4nOwppbXBvcnQgeyBGaWVsZFZhbHVlIH0gZnJvbSAnZmlyZWJhc2UtYWRtaW4vZmlyZXN0b3JlJzsKaW1wb3J0IHsgZXhlY3V0ZVRlc3RDYXNlcywgaXNMYW5ndWFnZVN1cHBvcnRlZCB9IGZyb20gJ0Avc2VydmljZXMvanVkZ2UtZW5naW5lJzsKaW1wb3J0IHsgY2hlY2tSYXRlTGltaXQsIHJhdGVMaW1pdFJlc3BvbnNlIH0gZnJvbSAnQC9saWIvcmF0ZS1saW1pdCc7CmltcG9ydCB0eXBlIHsgQ29kaW5nTGFuZ3VhZ2UsIFZlcmRpY3QgfSBmcm9tICdAL3R5cGVzJzsKCmNvbnN0IEFMTE9XRURfTEFOR1VBR0VTOiBDb2RpbmdMYW5ndWFnZVtdID0gWydqYXZhc2NyaXB0JywgJ3R5cGVzY3JpcHQnLCAncHl0aG9uJywgJ2phdmEnLCAnY3BwJywgJ2dvJywgJ3J1c3QnXTsKY29uc3QgTUFYX0NPREVfTEVOR1RIID0gMTAwMDAwOwoKZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIFBPU1QocmVxdWVzdDogTmV4dFJlcXVlc3QpIHsKICB0cnkgewogICAgY29uc3QgYXV0aEhlYWRlciA9IHJlcXVlc3QuaGVhZGVycy5nZXQoJ0F1dGhvcml6YXRpb24nKTsKICAgIGlmICghYXV0aEhlYWRlciB8fCAhYXV0aEhlYWRlci5zdGFydHNXaXRoKCdCZWFyZXIgJykpIHsKICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgZXJyb3I6ICdVbmF1dGhvcml6ZWQnIH0sIHsgc3RhdHVzOiA0MDEgfSk7CiAgICB9CgogICAgY29uc3QgaWRUb2tlbiA9IGF1dGhIZWFkZXIuc2xpY2UoNyk7CiAgICBsZXQgZGVjb2RlZFRva2VuOwogICAgdHJ5IHsKICAgICAgZGVjb2RlZFRva2VuID0gYXdhaXQgZ2V0QWRtaW5BdXRoKCkudmVyaWZ5SWRUb2tlbihpZFRva2VuKTsKICAgIH0gY2F0Y2ggewogICAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oeyBlcnJvcjogJ0ludmFsaWQgdG9rZW4nIH0sIHsgc3RhdHVzOiA0MDEgfSk7CiAgICB9CgogICAgY29uc3QgdWlkID0gZGVjb2RlZFRva2VuLnVpZDsKICAgIGNvbnN0IHJhdGVDaGVjayA9IGNoZWNrUmF0ZUxpbWl0KHVpZCwgcmVxdWVzdCwgeyB3aW5kb3dNczogNjBfMDAwLCBtYXhSZXF1ZXN0czogMTIgfSk7CiAgICBpZiAoIXJhdGVDaGVjay5hbGxvd2VkKSByZXR1cm4gcmF0ZUxpbWl0UmVzcG9uc2UocmF0ZUNoZWNrLnJldHJ5QWZ0ZXJNcyk7CgogICAgY29uc3QgYm9keSA9IGF3YWl0IHJlcXVlc3QuanNvbigpOwogICAgY29uc3QgcHJvYmxlbUlkID0gYm9keT8ucHJvYmxlbUlkOwogICAgY29uc3QgbGFuZ3VhZ2U6IENvZGluZ0xhbmd1YWdlID0gQUxMT1dFRF9MQU5HVUFHRVMuaW5jbHVkZXMoYm9keT8ubGFuZ3VhZ2UpID8gYm9keS5sYW5ndWFnZSA6ICdweXRob24nOwogICAgY29uc3QgY29kZSA9IGJvZHk/LmNvZGU7CgogICAgaWYgKCFwcm9ibGVtSWQgfHwgdHlwZW9mIHByb2JsZW1JZCAhPT0gJ3N0cmluZycpIHsKICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgZXJyb3I6ICdNaXNzaW5nIHByb2JsZW1JZCcgfSwgeyBzdGF0dXM6IDQwMCB9KTsKICAgIH0KICAgIGlmICh0eXBlb2YgY29kZSAhPT0gJ3N0cmluZycgfHwgY29kZS5sZW5ndGggPT09IDApIHsKICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgZXJyb3I6ICdNaXNzaW5nIGNvZGUnIH0sIHsgc3RhdHVzOiA0MDAgfSk7CiAgICB9CiAgICBpZiAoY29kZS5sZW5ndGggPiBNQVhfQ09ERV9MRU5HVEgpIHsKICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgZXJyb3I6ICdDb2RlIHRvbyBsb25nJyB9LCB7IHN0YXR1czogNDAwIH0pOwogICAgfQogICAgaWYgKCFpc0xhbmd1YWdlU3VwcG9ydGVkKGxhbmd1YWdlKSkgewogICAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oeyBlcnJvcjogYFVuc3VwcG9ydGVkIGxhbmd1YWdlOiAke2xhbmd1YWdlfWAgfSwgeyBzdGF0dXM6IDQwMCB9KTsKICAgIH0KCiAgICBjb25zdCBkYiA9IGdldEFkbWluRmlyZXN0b3JlKCk7CgogICAgLy8gQXV0aG9yaXRhdGl2ZSB0ZXN0IGNhc2VzIGxpdmUgc2VydmVyLXNpZGU7IHRoZSBjbGllbnQgbmV2ZXIgc3VwcGxpZXMgdGhlbS4KICAgIGNvbnN0IFttZXRhU25hcCwgdXNlclNuYXAsIHNlY3JldHNTbmFwLCBjb250ZW50U25hcF0gPSBhd2FpdCBQcm9taXNlLmFsbChbCiAgICAgIGRiLmNvbGxlY3Rpb24oJ3Byb2JsZW1zJykuZG9jKHByb2JsZW1JZCkuZ2V0KCksCiAgICAgIGRiLmNvbGxlY3Rpb24oJ3VzZXJzJykuZG9jKHVpZCkuZ2V0KCksCiAgICAgIGRiLmNvbGxlY3Rpb24oJ3Byb2JsZW1TZWNyZXRzJykuZG9jKHByb2JsZW1JZCkuZ2V0KCkuY2F0Y2goKCkgPT4gbnVsbCksCiAgICAgIGRiLmNvbGxlY3Rpb24oJ3Byb2JsZW1Db250ZW50JykuZG9jKHByb2JsZW1JZCkuZ2V0KCksCiAgICBdKTsKCiAgICBjb25zdCBzb3VyY2UgPSAoc2VjcmV0c1NuYXA/LmV4aXN0cyAmJiAoc2VjcmV0c1NuYXAuZGF0YSgpPy50ZXN0Q2FzZXMgYXMgYW55KT8ubGVuZ3RoID4gMCkKICAgICAgPyBzZWNyZXRzU25hcC5kYXRhKCkhCiAgICAgIDogY29udGVudFNuYXAuZXhpc3RzID8gY29udGVudFNuYXAuZGF0YSgpISA6IG51bGw7CiAgICBpZiAodXNlclNuYXAuZXhpc3RzICYmIHVzZXJTbmFwLmRhdGEoKT8uYmFubmVkID09PSB0cnVlKSB7CiAgICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAnQWNjb3VudCBiYW5uZWQnIH0sIHsgc3RhdHVzOiA0MDMgfSk7CiAgICB9CiAgICBjb25zdCByYXdUZXN0Q2FzZXM6IEFycmF5PHsgaW5wdXQ/OiBzdHJpbmc7IGV4cGVjdGVkPzogc3RyaW5nOyBpc0hpZGRlbj86IGJvb2xlYW4gfT4gPQogICAgICAoc291cmNlPy50ZXN0Q2FzZXMgYXMgYW55KSB8fCBbXTsKICAgIGlmIChyYXdUZXN0Q2FzZXMubGVuZ3RoID09PSAwKSB7CiAgICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAnUHJvYmxlbSBoYXMgbm8gdGVzdCBjYXNlcycgfSwgeyBzdGF0dXM6IDQwMCB9KTsKICAgIH0KCiAgICBjb25zdCBtZXRhID0gbWV0YVNuYXAuZGF0YSgpIHx8IHt9OwoKICAgIGNvbnN0IGp1ZGdlUmVzdWx0ID0gYXdhaXQgZXhlY3V0ZVRlc3RDYXNlcygKICAgICAgY29kZSwKICAgICAgbGFuZ3VhZ2UsCiAgICAgIHJhd1Rlc3RDYXNlcy5tYXAodGMgPT4gKHsKICAgICAgICBpbnB1dDogU3RyaW5nKHRjLmlucHV0ID8/ICcnKSwKICAgICAgICBleHBlY3RlZDogU3RyaW5nKHRjLmV4cGVjdGVkID8/ICcnKSwKICAgICAgICBpc0hpZGRlbjogISF0Yy5pc0hpZGRlbiwKICAgICAgfSkpLAogICAgICBNYXRoLm1heCg1MDAsIE1hdGgubWluKE51bWJlcihtZXRhLnRpbWVMaW1pdE1zKSB8fCAyMDAwLCAxNTAwMCkpLAogICAgICBNYXRoLm1heCg2NDAwMCwgTWF0aC5taW4oTnVtYmVyKG1ldGEubWVtb3J5TGltaXRLYikgfHwgMjU2MDAwLCAxMDI0MDAwKSksCiAgICAgIHByb2JsZW1JZCwKICAgICk7CgogICAgY29uc3QgeyB2ZXJkaWN0LCBwYXNzZWRUZXN0Q2FzZXMsIHRvdGFsVGVzdENhc2VzLCB0ZXN0Q2FzZVJlc3VsdHMgfSA9IGp1ZGdlUmVzdWx0OwogICAgY29uc3QgYWNjZXB0ZWQgPSB2ZXJkaWN0ID09PSAnQWNjZXB0ZWQnOwogICAgY29uc3Qgbm93SXNvID0gbmV3IERhdGUoKS50b0lTT1N0cmluZygpOwoKICAgIC8vIC0tLS0gU2VydmVyLXNpZGUgdmVyZGljdCArIHN0YXRzIChBZG1pbiBTREs7IG5vdCBzcG9vZmFibGUgYnkgY2xpZW50cykgLS0tLQogICAgY29uc3Qgc3VibWlzc2lvblJlZiA9IGRiLmNvbGxlY3Rpb24oJ3VzZXJzJykuZG9jKHVpZCkuY29sbGVjdGlvbignc3VibWlzc2lvbnMnKS5kb2MoKTsKICAgIGNvbnN0IHN1Ym1pc3Npb25EYXRhID0gewogICAgICB1c2VySWQ6IHVpZCwgcHJvYmxlbUlkLCBsYW5ndWFnZSwgY29kZSwKICAgICAgdmVyZGljdCwgcGFzc2VkVGVzdENhc2VzLCB0b3RhbFRlc3RDYXNlcywKICAgICAgZXhlY3V0aW9uVGltZU1zOiBqdWRnZVJlc3VsdC5leGVjdXRpb25UaW1lTXMsCiAgICAgIG1lbW9yeVVzZWRLYjoganVkZ2VSZXN1bHQubWVtb3J5VXNlZEtiLAogICAgICBjb21waWxlVGltZU1zOiBqdWRnZVJlc3VsdC5jb21waWxlVGltZU1zID8/IG51bGwsCiAgICAgIGNvZGVTaXplOiBqdWRnZVJlc3VsdC5jb2RlU2l6ZSA/PyBudWxsLAogICAgICBzdWJtaXR0ZWRBdDogRmllbGRWYWx1ZS5zZXJ2ZXJUaW1lc3RhbXAoKSwKICAgIH07CiAgICBzdWJtaXNzaW9uUmVmLnNldChzdWJtaXNzaW9uRGF0YSk7CgogICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgZGIucnVuVHJhbnNhY3Rpb24oYXN5bmMgKHR4KSA9PiB7CiAgICAgIGNvbnN0IFtwcFNuYXAsIHByb2dTbmFwLCB1c2VyU25hcFR4XSA9IGF3YWl0IFByb21pc2UuYWxsKFsKICAgICAgICB0eC5nZXQoZGIuY29sbGVjdGlvbigndXNlcnMnKS5kb2ModWlkKS5jb2xsZWN0aW9uKCdwcmFjdGljZVByb2dyZXNzJykuZG9jKHByb2JsZW1JZCkpLAogICAgICAgIHR4LmdldChkYi5jb2xsZWN0aW9uKCd1c2VycycpLmRvYyh1aWQpLmNvbGxlY3Rpb24oJ3Byb2dyZXNzJykuZG9jKHByb2JsZW1JZCkpLAogICAgICAgIHR4LmdldChkYi5jb2xsZWN0aW9uKCd1c2VycycpLmRvYyh1aWQpKSwKICAgICAgXSk7CgogICAgICBjb25zdCBhbHJlYWR5U29sdmVkID0gKHBwU25hcC5leGlzdHMgJiYgcHBTbmFwLmRhdGEoKT8uc29sdmVkID09PSB0cnVlKQogICAgICAgIHx8IChwcm9nU25hcC5leGlzdHMgJiYgcHJvZ1NuYXAuZGF0YSgpPy5zb2x2ZWQgPT09IHRydWUpOwoKICAgICAgY29uc3QgYmFzZVByb2dyZXNzID0gewogICAgICAgIHVzZXJJZDogdWlkLAogICAgICAgIHByb2JsZW1JZCwKICAgICAgICBzb2x2ZWQ6IGFscmVhZHlTb2x2ZWQgfHwgYWNjZXB0ZWQsCiAgICAgICAgYXR0ZW1wdGVkOiB0cnVlLAogICAgICAgIGJlc3RTdWJtaXNzaW9uSWQ6IHN1Ym1pc3Npb25SZWYuaWQsCiAgICAgICAgc3VibWlzc2lvbnNDb3VudDogRmllbGRWYWx1ZS5pbmNyZW1lbnQoMSksCiAgICAgICAgbGFzdFN1Ym1pdHRlZEF0OiBGaWVsZFZhbHVlLnNlcnZlclRpbWVzdGFtcCgpLAogICAgICAgIGxhc3RWZXJkaWN0OiB2ZXJkaWN0IGFzIFZlcmRpY3QsCiAgICAgIH07CgogICAgICB0eC5zZXQoZGIuY29sbGVjdGlvbigndXNlcnMnKS5kb2ModWlkKS5jb2xsZWN0aW9uKCdwcmFjdGljZVByb2dyZXNzJykuZG9jKHByb2JsZW1JZCksIGJhc2VQcm9ncmVzcywgeyBtZXJnZTogdHJ1ZSB9KTsKICAgICAgdHguc2V0KGRiLmNvbGxlY3Rpb24oJ3VzZXJzJykuZG9jKHVpZCkuY29sbGVjdGlvbigncHJvZ3Jlc3MnKS5kb2MocHJvYmxlbUlkKSwgYmFzZVByb2dyZXNzLCB7IG1lcmdlOiB0cnVlIH0pOwoKICAgICAgaWYgKHVzZXJTbmFwVHguZXhpc3RzKSB7CiAgICAgICAgdHgudXBkYXRlKGRiLmNvbGxlY3Rpb24oJ3VzZXJzJykuZG9jKHVpZCksIHsKICAgICAgICAgIHhwOiBGaWVsZFZhbHVlLmluY3JlbWVudChhY2NlcHRlZCAmJiAhYWxyZWFkeVNvbHZlZCA/IDUwIDogYWNjZXB0ZWQgPyAxNSA6IDEwKSwKICAgICAgICAgIHRvdGFsU3VibWlzc2lvbnM6IEZpZWxkVmFsdWUuaW5jcmVtZW50KDEpLAogICAgICAgICAgLi4uKGFjY2VwdGVkICYmICFhbHJlYWR5U29sdmVkID8geyBwcm9ibGVtc1NvbHZlZDogRmllbGRWYWx1ZS5pbmNyZW1lbnQoMSkgfSA6IHt9KSwKICAgICAgICAgIGxhc3RBY3RpdmU6IEZpZWxkVmFsdWUuc2VydmVyVGltZXN0YW1wKCksCiAgICAgICAgICB1cGRhdGVkQXQ6IEZpZWxkVmFsdWUuc2VydmVyVGltZXN0YW1wKCksCiAgICAgICAgfSk7CiAgICAgIH0KICAgICAgcmV0dXJuIHsgYWxyZWFkeVNvbHZlZCB9OwogICAgfSk7CgogICAgY29uc3Qgc3VibWlzc2lvbiA9IHsKICAgICAgaWQ6IHN1Ym1pc3Npb25SZWYuaWQsCiAgICAgIHVzZXJJZDogdWlkLAogICAgICBwcm9ibGVtSWQsCiAgICAgIGxhbmd1YWdlLAogICAgICBjb2RlLAogICAgICB2ZXJkaWN0LAogICAgICBwYXNzZWRUZXN0Q2FzZXMsCiAgICAgIHRvdGFsVGVzdENhc2VzLAogICAgICBleGVjdXRpb25UaW1lTXM6IGp1ZGdlUmVzdWx0LmV4ZWN1dGlvblRpbWVNcywKICAgICAgbWVtb3J5VXNlZEtiOiBqdWRnZVJlc3VsdC5tZW1vcnlVc2VkS2IsCiAgICAgIHN1Ym1pdHRlZEF0OiBub3dJc28sCiAgICB9OwoKICAgIC8vIEp1ZGdlLWVuZ2luZSBhbHJlYWR5IG1hc2tzIGhpZGRlbiBjYXNlcycgaW5wdXQvZXhwZWN0ZWQvYWN0dWFsIOKAlCByZXR1cm4gYXMtaXMuCiAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oewogICAgICBzdWJtaXNzaW9uLAogICAgICByZXN1bHRzOiB0ZXN0Q2FzZVJlc3VsdHMsCiAgICAgIGNvbXBpbGVUaW1lTXM6IGp1ZGdlUmVzdWx0LmNvbXBpbGVUaW1lTXMsCiAgICAgIGNvZGVTaXplOiBqdWRnZVJlc3VsdC5jb2RlU2l6ZSwKICAgIH0pOwogIH0gY2F0Y2ggKGVycjogYW55KSB7CiAgICBjb25zb2xlLmVycm9yKCdbUHJhY3RpY2UgSnVkZ2VdIEVycm9yOicsIGVycik7CiAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oeyBlcnJvcjogZXJyPy5tZXNzYWdlIHx8ICdJbnRlcm5hbCBzZXJ2ZXIgZXJyb3InIH0sIHsgc3RhdHVzOiA1MDAgfSk7CiAgfQp9Cg==
+import { NextRequest, NextResponse } from 'next/server';
+import { getAdminAuth, getAdminFirestore } from '@/firebase/admin';
+import { FieldValue } from 'firebase-admin/firestore';
+import { executeTestCases, isLanguageSupported } from '@/services/judge-engine';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import type { CodingLanguage, Verdict } from '@/types';
+
+const ALLOWED_LANGUAGES: CodingLanguage[] = ['javascript', 'typescript', 'python', 'java', 'cpp', 'go', 'rust'];
+const MAX_CODE_LENGTH = 100000;
+
+export async function POST(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const idToken = authHeader.slice(7);
+    let decodedToken;
+    try {
+      decodedToken = await getAdminAuth().verifyIdToken(idToken);
+    } catch {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    const uid = decodedToken.uid;
+    const rateCheck = checkRateLimit(uid, request, { windowMs: 60_000, maxRequests: 12 });
+    if (!rateCheck.allowed) return rateLimitResponse(rateCheck.retryAfterMs);
+
+    const body = await request.json();
+    const problemId = body?.problemId;
+    const language: CodingLanguage = ALLOWED_LANGUAGES.includes(body?.language) ? body.language : 'python';
+    const code = body?.code;
+
+    if (!problemId || typeof problemId !== 'string') {
+      return NextResponse.json({ error: 'Missing problemId' }, { status: 400 });
+    }
+    if (typeof code !== 'string' || code.length === 0) {
+      return NextResponse.json({ error: 'Missing code' }, { status: 400 });
+    }
+    if (code.length > MAX_CODE_LENGTH) {
+      return NextResponse.json({ error: 'Code too long' }, { status: 400 });
+    }
+    if (!isLanguageSupported(language)) {
+      return NextResponse.json({ error: `Unsupported language: ${language}` }, { status: 400 });
+    }
+
+    const db = getAdminFirestore();
+
+    // Authoritative test cases live server-side; the client never supplies them.
+    const [metaSnap, userSnap, secretsSnap, contentSnap] = await Promise.all([
+      db.collection('problems').doc(problemId).get(),
+      db.collection('users').doc(uid).get(),
+      db.collection('problemSecrets').doc(problemId).get().catch(() => null),
+      db.collection('problemContent').doc(problemId).get(),
+    ]);
+
+    const source = (secretsSnap?.exists && (secretsSnap.data()?.testCases as any)?.length > 0)
+      ? secretsSnap.data()!
+      : contentSnap.exists ? contentSnap.data()! : null;
+    if (userSnap.exists && userSnap.data()?.banned === true) {
+      return NextResponse.json({ error: 'Account banned' }, { status: 403 });
+    }
+    const rawTestCases: Array<{ input?: string; expected?: string; isHidden?: boolean }> =
+      (source?.testCases as any) || [];
+    if (rawTestCases.length === 0) {
+      return NextResponse.json({ error: 'Problem has no test cases' }, { status: 400 });
+    }
+
+    const meta = metaSnap.data() || {};
+
+    const judgeResult = await executeTestCases(
+      code,
+      language,
+      rawTestCases.map(tc => ({
+        input: String(tc.input ?? ''),
+        expected: String(tc.expected ?? ''),
+        isHidden: !!tc.isHidden,
+      })),
+      Math.max(500, Math.min(Number(meta.timeLimitMs) || 2000, 15000)),
+      Math.max(64000, Math.min(Number(meta.memoryLimitKb) || 256000, 1024000)),
+      problemId,
+    );
+
+    const { verdict, passedTestCases, totalTestCases, testCaseResults } = judgeResult;
+    const accepted = verdict === 'Accepted';
+    const nowIso = new Date().toISOString();
+
+    // ---- Server-side verdict + stats (Admin SDK; not spoofable by clients) ----
+    const submissionRef = db.collection('users').doc(uid).collection('submissions').doc();
+    const submissionData = {
+      userId: uid, problemId, language, code,
+      verdict, passedTestCases, totalTestCases,
+      executionTimeMs: judgeResult.executionTimeMs,
+      memoryUsedKb: judgeResult.memoryUsedKb,
+      compileTimeMs: judgeResult.compileTimeMs ?? null,
+      codeSize: judgeResult.codeSize ?? null,
+      submittedAt: FieldValue.serverTimestamp(),
+    };
+    submissionRef.set(submissionData);
+
+    const result = await db.runTransaction(async (tx) => {
+      const [ppSnap, progSnap, userSnapTx] = await Promise.all([
+        tx.get(db.collection('users').doc(uid).collection('practiceProgress').doc(problemId)),
+        tx.get(db.collection('users').doc(uid).collection('progress').doc(problemId)),
+        tx.get(db.collection('users').doc(uid)),
+      ]);
+
+      const alreadySolved = (ppSnap.exists && ppSnap.data()?.solved === true)
+        || (progSnap.exists && progSnap.data()?.solved === true);
+
+      const baseProgress = {
+        userId: uid,
+        problemId,
+        solved: alreadySolved || accepted,
+        attempted: true,
+        bestSubmissionId: submissionRef.id,
+        submissionsCount: FieldValue.increment(1),
+        lastSubmittedAt: FieldValue.serverTimestamp(),
+        lastVerdict: verdict as Verdict,
+      };
+
+      tx.set(db.collection('users').doc(uid).collection('practiceProgress').doc(problemId), baseProgress, { merge: true });
+      tx.set(db.collection('users').doc(uid).collection('progress').doc(problemId), baseProgress, { merge: true });
+
+      if (userSnapTx.exists) {
+        tx.update(db.collection('users').doc(uid), {
+          xp: FieldValue.increment(accepted && !alreadySolved ? 50 : accepted ? 15 : 10),
+          totalSubmissions: FieldValue.increment(1),
+          ...(accepted && !alreadySolved ? { problemsSolved: FieldValue.increment(1) } : {}),
+          lastActive: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+      }
+      return { alreadySolved };
+    });
+
+    const submission = {
+      id: submissionRef.id,
+      userId: uid,
+      problemId,
+      language,
+      code,
+      verdict,
+      passedTestCases,
+      totalTestCases,
+      executionTimeMs: judgeResult.executionTimeMs,
+      memoryUsedKb: judgeResult.memoryUsedKb,
+      submittedAt: nowIso,
+    };
+
+    // Judge-engine already masks hidden cases' input/expected/actual — return as-is.
+    return NextResponse.json({
+      submission,
+      results: testCaseResults,
+      compileTimeMs: judgeResult.compileTimeMs,
+      codeSize: judgeResult.codeSize,
+    });
+  } catch (err: any) {
+    console.error('[Practice Judge] Error:', err);
+    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
+  }
+}
