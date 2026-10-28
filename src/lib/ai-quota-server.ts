@@ -1,1 +1,93 @@
-aW1wb3J0IHsgZ2V0QWRtaW5GaXJlc3RvcmUgfSBmcm9tICdAL2ZpcmViYXNlL2FkbWluJzsKaW1wb3J0IHsKICBERUZBVUxUX0FJX0xJTUlUUywgZ2V0UGVyaW9kS2V5LCBnZXRDdXJyZW50UGVyaW9kS2V5LCBnZXROZXh0UmVzZXRUaW1lLAogIGlzUHJlbWl1bVRpZXIsIEFJX1FVT1RBU19DT05GSUdfRE9DLAp9IGZyb20gJ0AvY29uZmlnL2FpLWxpbWl0cyc7CmltcG9ydCB0eXBlIHsgQWlGZWF0dXJlLCBTdWJzY3JpcHRpb25UaWVyIH0gZnJvbSAnQC9jb25maWcvYWktbGltaXRzJzsKCmV4cG9ydCBpbnRlcmZhY2UgQWlRdW90YVJlc3VsdCB7CiAgYWxsb3dlZDogYm9vbGVhbjsKICByZXRyeUFmdGVyTXM/OiBudW1iZXI7CiAgcmVtYWluaW5nOiBudW1iZXIgfCBudWxsOwogIGxpbWl0OiBudW1iZXIgfCBudWxsOwp9CgppbnRlcmZhY2UgVXNhZ2VTbmFwc2hvdCB7CiAgY291bnQ6IG51bWJlcjsKICBwZXJpb2Q6IHN0cmluZzsKfQoKLyoqCiAqIFNlcnZlci1zaWRlIEFJIHF1b3RhIGVuZm9yY2VtZW50IHVzaW5nIHRoZSBBZG1pbiBTREsuCiAqIFRoZSBjbGllbnQtc2lkZSBjb3VudGVycyAoc2VydmljZXMvYWktdXNhZ2UudHMpIHJlbWFpbiBmb3IgVUkgZGlzcGxheSBvbmx5OwogKiB0aGlzIGNoZWNrIGlzIGF1dGhvcml0YXRpdmUgYW5kIGNhbm5vdCBiZSBzcG9vZmVkIGJ5IGNhbGxpbmcgdGhlIEFQSSBkaXJlY3RseS4KICovCmV4cG9ydCBhc3luYyBmdW5jdGlvbiBlbmZvcmNlQWlRdW90YSh1aWQ6IHN0cmluZywgZmVhdHVyZTogQWlGZWF0dXJlKTogUHJvbWlzZTxBaVF1b3RhUmVzdWx0PiB7CiAgY29uc3QgZGIgPSBnZXRBZG1pbkZpcmVzdG9yZSgpOwogIGlmICghZGIpIHJldHVybiB7IGFsbG93ZWQ6IGZhbHNlLCByZW1haW5pbmc6IG51bGwsIGxpbWl0OiBudWxsLCByZXRyeUFmdGVyTXM6IDYwXzAwMCB9OwoKICBjb25zdCBbdXNlclNuYXAsIGNvbmZpZ1NuYXBdID0gYXdhaXQgUHJvbWlzZS5hbGwoWwogICAgZGIuY29sbGVjdGlvbigndXNlcnMnKS5kb2ModWlkKS5nZXQoKSwKICAgIGRiLmNvbGxlY3Rpb24oJ2NvbmZpZycpLmRvYygnYWlRdW90YXMnKS5nZXQoKS5jYXRjaCgoKSA9PiBudWxsKSwKICBdKTsKCiAgY29uc3QgdGllciA9ICh1c2VyU25hcC5leGlzdHMgPyB1c2VyU25hcC5kYXRhKCk/LnN1YnNjcmlwdGlvblRpZXIgOiAnZnJlZScpIHx8ICdmcmVlJzsKICBpZiAoaXNQcmVtaXVtVGllcih0aWVyIGFzIFN1YnNjcmlwdGlvblRpZXIpKSB7CiAgICByZXR1cm4geyBhbGxvd2VkOiB0cnVlLCByZW1haW5pbmc6IG51bGwsIGxpbWl0OiBudWxsIH07CiAgfQoKICBjb25zdCBvdmVycmlkZSA9IGNvbmZpZ1NuYXA/LmV4aXN0cyA/IChjb25maWdTbmFwLmRhdGEoKT8uZmVhdHVyZXMgYXMgYW55KSA6IG51bGw7CiAgY29uc3QgY29uZmlndXJlZCA9IG92ZXJyaWRlPy5bZmVhdHVyZV07CiAgY29uc3QgZmFsbGJhY2sgPSBERUZBVUxUX0FJX0xJTUlUU1tmZWF0dXJlXTsKICBjb25zdCBsaW1pdENmZyA9IGNvbmZpZ3VyZWQgfHwgZmFsbGJhY2sgfHwgbnVsbDsKICBpZiAoIWxpbWl0Q2ZnKSB7CiAgICByZXR1cm4geyBhbGxvd2VkOiB0cnVlLCByZW1haW5pbmc6IG51bGwsIGxpbWl0OiBudWxsIH07CiAgfQoKICBjb25zdCBtYXhDb3VudCA9IChsaW1pdENmZy5kYWlseSA/PyBsaW1pdENmZy5tb250aGx5ID8/IG51bGwpIGFzIG51bWJlciB8IG51bGw7CiAgaWYgKG1heENvdW50ID09PSBudWxsKSB7CiAgICByZXR1cm4geyBhbGxvd2VkOiB0cnVlLCByZW1haW5pbmc6IG51bGwsIGxpbWl0OiBudWxsIH07CiAgfQoKICBjb25zdCByZWYgPSBkYi5jb2xsZWN0aW9uKCd1c2VycycpLmRvYyh1aWQpLmNvbGxlY3Rpb24oJ2FpVXNhZ2UnKS5kb2MoZmVhdHVyZSk7CiAgY29uc3QgZXhwZWN0ZWRQZXJpb2QgPSBnZXRDdXJyZW50UGVyaW9kS2V5KGZlYXR1cmUpOwoKICBjb25zdCByZXN1bHQgPSBhd2FpdCBkYi5ydW5UcmFuc2FjdGlvbihhc3luYyAodHgpID0+IHsKICAgIGNvbnN0IHNuYXAgPSBhd2FpdCB0eC5nZXQocmVmKTsKICAgIGNvbnN0IGRhdGEgPSBzbmFwLmV4aXN0cyA/IChzbmFwLmRhdGEoKSBhcyBQYXJ0aWFsPFVzYWdlU25hcHNob3Q+KSA6IG51bGw7CiAgICBjb25zdCB1c2VkID0gZGF0YSAmJiBkYXRhLnBlcmlvZCA9PT0gZXhwZWN0ZWRQZXJpb2QgPyAoZGF0YS5jb3VudCB8fCAwKSA6IDA7CiAgICBjb25zdCByZW1haW5pbmcgPSBNYXRoLm1heCgwLCBtYXhDb3VudCAtIHVzZWQpOwoKICAgIGlmIChyZW1haW5pbmcgPD0gMCkgewogICAgICByZXR1cm4geyBhbGxvd2VkOiBmYWxzZSwgdXNlZCwgcmVtYWluaW5nOiAwLCBsaW1pdDogbWF4Q291bnQgfTsKICAgIH0KCiAgICAvLyBSZXNldCBwZXJpb2Qga2V5cyB3aGVuIHJvbGxpbmcgb3Zlci4KICAgIHR4LnNldChyZWYsIHsKICAgICAgY291bnQ6IHVzZWQgKyAxLAogICAgICBwZXJpb2Q6IGV4cGVjdGVkUGVyaW9kLAogICAgICBwZXJpb2RUeXBlOiBnZXRQZXJpb2RLZXkoZmVhdHVyZSksCiAgICAgIHJlc2V0QXQ6IGRhdGEgJiYgZGF0YS5wZXJpb2QgPT09IGV4cGVjdGVkUGVyaW9kCiAgICAgICAgPyAoZGF0YSBhcyBhbnkpLnJlc2V0QXQKICAgICAgICA6IGdldE5leHRSZXNldFRpbWUoZmVhdHVyZSksCiAgICAgIGxhc3RVc2VkQXQ6IG5ldyBEYXRlKCksCiAgICAgIHVwZGF0ZWRBdDogbmV3IERhdGUoKSwKICAgICAgdWlkLAogICAgICBmZWF0dXJlLAogICAgfSwgeyBtZXJnZTogdHJ1ZSB9KTsKCiAgICByZXR1cm4geyBhbGxvd2VkOiB0cnVlLCB1c2VkOiB1c2VkICsgMSwgcmVtYWluaW5nOiByZW1haW5pbmcgLSAxLCBsaW1pdDogbWF4Q291bnQgfTsKICB9KTsKCiAgaWYgKCFyZXN1bHQuYWxsb3dlZCkgewogICAgLy8gQ29uc2VydmF0aXZlIHJldHJ5IGhpbnQ6IHRoZSBwZXJpb2QgcmVzZXRzIGVpdGhlciBhdCBtaWRuaWdodCBVVEMgb3IgdGhlCiAgICAvLyAxc3Qgb2YgbmV4dCBtb250aDsgY2xpZW50cyBtb3N0bHkgc2hvdyAibGltaXQgcmVhY2hlZCIuCiAgICByZXR1cm4geyBhbGxvd2VkOiBmYWxzZSwgcmVtYWluaW5nOiAwLCBsaW1pdDogbWF4Q291bnQsIHJldHJ5QWZ0ZXJNczogMzYwMF8wMDAgfTsKICB9CgogIHJldHVybiB7IGFsbG93ZWQ6IHRydWUsIHJlbWFpbmluZzogcmVzdWx0LnJlbWFpbmluZywgbGltaXQ6IHJlc3VsdC5saW1pdCB9Owp9CgpleHBvcnQgZnVuY3Rpb24gYWlRdW90YVJlc3BvbnNlKHJlc3VsdDogQWlRdW90YVJlc3VsdCwgZmVhdHVyZTogc3RyaW5nKTogeyBtZXNzYWdlOiBzdHJpbmcgfSB7CiAgcmV0dXJuIHsgbWVzc2FnZTogYERhaWx5IGxpbWl0IHJlYWNoZWQgZm9yICR7ZmVhdHVyZX0uIFRyeSBhZ2FpbiBsYXRlci5gIH07Cn0K
+import { getAdminFirestore } from '@/firebase/admin';
+import {
+  DEFAULT_AI_LIMITS, getPeriodKey, getCurrentPeriodKey, getNextResetTime,
+  isPremiumTier, AI_QUOTAS_CONFIG_DOC,
+} from '@/config/ai-limits';
+import type { AiFeature, SubscriptionTier } from '@/config/ai-limits';
+
+export interface AiQuotaResult {
+  allowed: boolean;
+  retryAfterMs?: number;
+  remaining: number | null;
+  limit: number | null;
+}
+
+interface UsageSnapshot {
+  count: number;
+  period: string;
+}
+
+/**
+ * Server-side AI quota enforcement using the Admin SDK.
+ * The client-side counters (services/ai-usage.ts) remain for UI display only;
+ * this check is authoritative and cannot be spoofed by calling the API directly.
+ */
+export async function enforceAiQuota(uid: string, feature: AiFeature): Promise<AiQuotaResult> {
+  const db = getAdminFirestore();
+  if (!db) return { allowed: false, remaining: null, limit: null, retryAfterMs: 60_000 };
+
+  const [userSnap, configSnap] = await Promise.all([
+    db.collection('users').doc(uid).get(),
+    db.collection('config').doc('aiQuotas').get().catch(() => null),
+  ]);
+
+  const tier = (userSnap.exists ? userSnap.data()?.subscriptionTier : 'free') || 'free';
+  if (isPremiumTier(tier as SubscriptionTier)) {
+    return { allowed: true, remaining: null, limit: null };
+  }
+
+  const override = configSnap?.exists ? (configSnap.data()?.features as any) : null;
+  const configured = override?.[feature];
+  const fallback = DEFAULT_AI_LIMITS[feature];
+  const limitCfg = configured || fallback || null;
+  if (!limitCfg) {
+    return { allowed: true, remaining: null, limit: null };
+  }
+
+  const maxCount = (limitCfg.daily ?? limitCfg.monthly ?? null) as number | null;
+  if (maxCount === null) {
+    return { allowed: true, remaining: null, limit: null };
+  }
+
+  const ref = db.collection('users').doc(uid).collection('aiUsage').doc(feature);
+  const expectedPeriod = getCurrentPeriodKey(feature);
+
+  const result = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? (snap.data() as Partial<UsageSnapshot>) : null;
+    const used = data && data.period === expectedPeriod ? (data.count || 0) : 0;
+    const remaining = Math.max(0, maxCount - used);
+
+    if (remaining <= 0) {
+      return { allowed: false, used, remaining: 0, limit: maxCount };
+    }
+
+    // Reset period keys when rolling over.
+    tx.set(ref, {
+      count: used + 1,
+      period: expectedPeriod,
+      periodType: getPeriodKey(feature),
+      resetAt: data && data.period === expectedPeriod
+        ? (data as any).resetAt
+        : getNextResetTime(feature),
+      lastUsedAt: new Date(),
+      updatedAt: new Date(),
+      uid,
+      feature,
+    }, { merge: true });
+
+    return { allowed: true, used: used + 1, remaining: remaining - 1, limit: maxCount };
+  });
+
+  if (!result.allowed) {
+    // Conservative retry hint: the period resets either at midnight UTC or the
+    // 1st of next month; clients mostly show "limit reached".
+    return { allowed: false, remaining: 0, limit: maxCount, retryAfterMs: 3600_000 };
+  }
+
+  return { allowed: true, remaining: result.remaining, limit: result.limit };
+}
+
+export function aiQuotaResponse(result: AiQuotaResult, feature: string): { message: string } {
+  return { message: `Daily limit reached for ${feature}. Try again later.` };
+}
