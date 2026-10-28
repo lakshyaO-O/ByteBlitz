@@ -1,1 +1,216 @@
-J3VzZSBjbGllbnQnOwoKaW1wb3J0IHsgdXNlU3RhdGUsIHVzZUVmZmVjdCwgdXNlQ2FsbGJhY2ssIHVzZVJlZiB9IGZyb20gJ3JlYWN0JzsKaW1wb3J0IHsgdXNlVXNlciB9IGZyb20gJ0AvZmlyZWJhc2UvYXV0aC91c2UtdXNlcic7CmltcG9ydCB7IGluaXRpYWxpemVGaXJlYmFzZSB9IGZyb20gJ0AvZmlyZWJhc2UnOwppbXBvcnQgeyBkb2MsIGdldERvYyB9IGZyb20gJ2ZpcmViYXNlL2ZpcmVzdG9yZSc7CmltcG9ydCB0eXBlIHsgRG9jdW1lbnRTbmFwc2hvdCwgRG9jdW1lbnREYXRhIH0gZnJvbSAnZmlyZWJhc2UvZmlyZXN0b3JlJzsKaW1wb3J0IHsgdXNlQXJlbmFTZXR0aW5ncyB9IGZyb20gJ0AvaG9va3MvdXNlLWFyZW5hLXNldHRpbmdzJzsKaW1wb3J0IHsKICBqb2luTWF0Y2htYWtpbmdRdWV1ZSwgbGVhdmVNYXRjaG1ha2luZ1F1ZXVlLCBzdWJzY3JpYmVNYXRjaG1ha2luZywKICBmaW5kTWF0Y2gsIGZldGNoQmF0dGxlLAp9IGZyb20gJ0Avc2VydmljZXMvYXJlbmEnOwppbXBvcnQgdHlwZSB7IE1hdGNobWFraW5nRW50cnksIEJhdHRsZURvY3VtZW50LCBQcm9ibGVtLCBUaWVyIH0gZnJvbSAnQC90eXBlcyc7Cgp0eXBlIE1hdGNobWFraW5nU3RhdHVzID0KICB8ICdpZGxlJwogIHwgJ2pvaW5pbmcnCiAgfCAnc2VhcmNoaW5nJwogIHwgJ2ZvdW5kJwogIHwgJ2NyZWF0aW5nX2JhdHRsZScKICB8ICdyZWFkeScKICB8ICdlcnJvcic7CgpleHBvcnQgZnVuY3Rpb24gdXNlQXJlbmFNYXRjaG1ha2luZygpIHsKICBjb25zdCB7IHVzZXIgfSA9IHVzZVVzZXIoKTsKICBjb25zdCB7IHNldHRpbmdzIH0gPSB1c2VBcmVuYVNldHRpbmdzKCk7CiAgY29uc3QgW3Byb2ZpbGUsIHNldFByb2ZpbGVdID0gdXNlU3RhdGU8eyB1c2VybmFtZTogc3RyaW5nOyByYXRpbmc6IG51bWJlcjsgdGllcjogc3RyaW5nIH0gfCBudWxsPihudWxsKTsKICBjb25zdCBbc3RhdHVzLCBzZXRTdGF0dXNdID0gdXNlU3RhdGU8TWF0Y2htYWtpbmdTdGF0dXM+KCdpZGxlJyk7CiAgY29uc3QgW29wcG9uZW50LCBzZXRPcHBvbmVudF0gPSB1c2VTdGF0ZTx7IHVpZDogc3RyaW5nOyB1c2VybmFtZTogc3RyaW5nOyByYXRpbmc6IG51bWJlcjsgdGllcjogc3RyaW5nIH0gfCBudWxsPihudWxsKTsKICBjb25zdCBbYmF0dGxlLCBzZXRCYXR0bGVdID0gdXNlU3RhdGU8QmF0dGxlRG9jdW1lbnQgfCBudWxsPihudWxsKTsKICBjb25zdCBbcHJvYmxlbSwgc2V0UHJvYmxlbV0gPSB1c2VTdGF0ZTxQcm9ibGVtIHwgbnVsbD4obnVsbCk7CiAgY29uc3QgW2Vycm9yLCBzZXRFcnJvcl0gPSB1c2VTdGF0ZTxzdHJpbmcgfCBudWxsPihudWxsKTsKICBjb25zdCBbcXVldWVUaW1lLCBzZXRRdWV1ZVRpbWVdID0gdXNlU3RhdGUoMCk7CiAgY29uc3QgdW5zdWJzY3JpYmVSZWYgPSB1c2VSZWY8KCgpID0+IHZvaWQpIHwgbnVsbD4obnVsbCk7CiAgY29uc3QgdGltZXJSZWYgPSB1c2VSZWY8UmV0dXJuVHlwZTx0eXBlb2Ygc2V0SW50ZXJ2YWw+IHwgbnVsbD4obnVsbCk7CiAgY29uc3QgcG9sbFJlZiA9IHVzZVJlZjxSZXR1cm5UeXBlPHR5cGVvZiBzZXRJbnRlcnZhbD4gfCBudWxsPihudWxsKTsKICBjb25zdCBtYXRjaGVkRW50cnlSZWYgPSB1c2VSZWY8TWF0Y2htYWtpbmdFbnRyeSB8IG51bGw+KG51bGwpOwoKICB1c2VFZmZlY3QoKCkgPT4gewogICAgaWYgKCF1c2VyPy51aWQpIHsgc2V0UHJvZmlsZShudWxsKTsgcmV0dXJuOyB9CiAgICBsZXQgbW91bnRlZCA9IHRydWU7CiAgICBjb25zdCB7IGZpcmVzdG9yZTogZGIgfSA9IGluaXRpYWxpemVGaXJlYmFzZSgpOwogICAgaWYgKCFkYikgcmV0dXJuOwogICAgZ2V0RG9jKGRvYyhkYiwgJ3VzZXJzJywgdXNlci51aWQpKS50aGVuKChzbmFwOiBEb2N1bWVudFNuYXBzaG90PERvY3VtZW50RGF0YT4pID0+IHsKICAgICAgaWYgKHNuYXAuZXhpc3RzKCkgJiYgbW91bnRlZCkgewogICAgICAgIGNvbnN0IGQgPSBzbmFwLmRhdGEoKTsKICAgICAgICBzZXRQcm9maWxlKHsKICAgICAgICAgIHVzZXJuYW1lOiBkLnVzZXJuYW1lIHx8IHVzZXIuZGlzcGxheU5hbWUgfHwgJ1BsYXllcicsCiAgICAgICAgICByYXRpbmc6IGQucmF0aW5nIHx8IDgwMCwKICAgICAgICAgIHRpZXI6IGQudGllciB8fCAnQmVnaW5uZXInLAogICAgICAgIH0pOwogICAgICB9CiAgICB9KTsKICAgIHJldHVybiAoKSA9PiB7IG1vdW50ZWQgPSBmYWxzZTsgfTsKICB9LCBbdXNlcj8udWlkLCB1c2VyPy5kaXNwbGF5TmFtZV0pOwoKICB1c2VFZmZlY3QoKCkgPT4gewogICAgcmV0dXJuICgpID0+IHsKICAgICAgaWYgKHVuc3Vic2NyaWJlUmVmLmN1cnJlbnQpIHVuc3Vic2NyaWJlUmVmLmN1cnJlbnQoKTsKICAgICAgaWYgKHRpbWVyUmVmLmN1cnJlbnQpIGNsZWFySW50ZXJ2YWwodGltZXJSZWYuY3VycmVudCk7CiAgICB9OwogIH0sIFtdKTsKCiAgY29uc3QgY2xlYW51cCA9IHVzZUNhbGxiYWNrKCgpID0+IHsKICAgIGlmICh1bnN1YnNjcmliZVJlZi5jdXJyZW50KSB7IHVuc3Vic2NyaWJlUmVmLmN1cnJlbnQoKTsgdW5zdWJzY3JpYmVSZWYuY3VycmVudCA9IG51bGw7IH0KICAgIGlmICh0aW1lclJlZi5jdXJyZW50KSB7IGNsZWFySW50ZXJ2YWwodGltZXJSZWYuY3VycmVudCk7IHRpbWVyUmVmLmN1cnJlbnQgPSBudWxsOyB9CiAgfSwgW10pOwoKICBjb25zdCBqb2luUXVldWUgPSB1c2VDYWxsYmFjayhhc3luYyAoKSA9PiB7CiAgICBpZiAoIXVzZXI/LnVpZCB8fCAhcHJvZmlsZSkgcmV0dXJuOwogICAgY2xlYW51cCgpOwogICAgc2V0U3RhdHVzKCdqb2luaW5nJyk7CiAgICBzZXRFcnJvcihudWxsKTsKICAgIHNldEJhdHRsZShudWxsKTsKICAgIHNldE9wcG9uZW50KG51bGwpOwogICAgc2V0UXVldWVUaW1lKDApOwoKICAgIHRyeSB7CiAgICAgIGF3YWl0IGpvaW5NYXRjaG1ha2luZ1F1ZXVlKHVzZXIudWlkLCB7CiAgICAgICAgdXNlcklkOiB1c2VyLnVpZCwKICAgICAgICB1c2VybmFtZTogcHJvZmlsZS51c2VybmFtZSwKICAgICAgICByYXRpbmc6IHByb2ZpbGUucmF0aW5nLAogICAgICAgIHRpZXI6IHByb2ZpbGUudGllciBhcyBUaWVyLAogICAgICAgIHByZWZlcnJlZExhbmd1YWdlOiBzZXR0aW5ncy5wcmVmZXJyZWRMYW5ndWFnZSwKICAgICAgICByYXRlZDogc2V0dGluZ3MucmF0ZWQsCiAgICAgICAgZGlmZmljdWx0eTogc2V0dGluZ3MuZGlmZmljdWx0eSwKICAgICAgICBjYXRlZ29yeTogc2V0dGluZ3MuY2F0ZWdvcnksCiAgICAgICAgdGltZUNvbnRyb2w6IHNldHRpbmdzLnRpbWVDb250cm9sLAogICAgICAgIHJlZ2lvbjogc2V0dGluZ3MucmVnaW9uLAogICAgICAgIGVsb1JhbmdlOiBzZXR0aW5ncy5lbG9SYW5nZSwKICAgICAgfSk7CiAgICAgIHNldFN0YXR1cygnc2VhcmNoaW5nJyk7CgogICAgICB0aW1lclJlZi5jdXJyZW50ID0gc2V0SW50ZXJ2YWwoKCkgPT4gewogICAgICAgIHNldFF1ZXVlVGltZShwcmV2ID0+IHByZXYgKyAxKTsKICAgICAgfSwgMTAwMCk7CgogICAgICB1bnN1YnNjcmliZVJlZi5jdXJyZW50ID0gc3Vic2NyaWJlTWF0Y2htYWtpbmcodXNlci51aWQsIChlbnRyeSkgPT4gewogICAgICAgIGlmIChlbnRyeT8uc3RhdHVzID09PSAnbWF0Y2hlZCcpIHsKICAgICAgICAgIC8vIFBhc3NpdmUgc2lkZTogY3JlYXRvciBhbHJlYWR5IGJ1aWx0IHRoZSBiYXR0bGUgd2l0aCBvdXIgYmF0dGxlSWQgaW4gb3VyIGVudHJ5LgogICAgICAgICAgbWF0Y2hlZEVudHJ5UmVmLmN1cnJlbnQgPSBlbnRyeTsKICAgICAgICAgIGNsZWFudXAoKTsKICAgICAgICAgIHNldFN0YXR1cygnZm91bmQnKTsKICAgICAgICB9CiAgICAgIH0pOwoKICAgICAgcG9sbFJlZi5jdXJyZW50ID0gc2V0SW50ZXJ2YWwoYXN5bmMgKCkgPT4gewogICAgICAgIGlmICghdXNlcj8udWlkKSByZXR1cm47CiAgICAgICAgaWYgKHN0YXR1cyAhPT0gJ3NlYXJjaGluZycpIHJldHVybjsKICAgICAgICBjb25zdCBmb3VuZCA9IGF3YWl0IGZpbmRNYXRjaCh1c2VyLnVpZCwgc2V0dGluZ3MpLmNhdGNoKCgpID0+IG51bGwpOwogICAgICAgIGlmIChmb3VuZCkgewogICAgICAgICAgc2V0U3RhdHVzKCdmb3VuZCcpOwogICAgICAgICAgc2V0T3Bwb25lbnQoeyB1aWQ6IGZvdW5kLnVzZXJJZCwgdXNlcm5hbWU6IGZvdW5kLnVzZXJuYW1lLCByYXRpbmc6IGZvdW5kLnJhdGluZywgdGllcjogZm91bmQudGllciB9KTsKICAgICAgICB9CiAgICAgIH0sIDMwMDApOwogICAgfSBjYXRjaCAoZTogYW55KSB7CiAgICAgIHNldEVycm9yKGU/Lm1lc3NhZ2UgfHwgJ0ZhaWxlZCB0byBqb2luIHF1ZXVlJyk7CiAgICAgIHNldFN0YXR1cygnZXJyb3InKTsKICAgIH0KICB9LCBbdXNlcj8udWlkLCBwcm9maWxlLCBzZXR0aW5ncywgY2xlYW51cCwgc3RhdHVzXSk7CgogIGNvbnN0IGxlYXZlUXVldWUgPSB1c2VDYWxsYmFjayhhc3luYyAoKSA9PiB7CiAgICBpZiAoIXVzZXI/LnVpZCkgcmV0dXJuOwogICAgY2xlYW51cCgpOwogICAgdHJ5IHsKICAgICAgYXdhaXQgbGVhdmVNYXRjaG1ha2luZ1F1ZXVlKHVzZXIudWlkKTsKICAgIH0gY2F0Y2ggeyAvKiBub29wICovIH0KICAgIHNldFN0YXR1cygnaWRsZScpOwogICAgc2V0T3Bwb25lbnQobnVsbCk7CiAgICBzZXRRdWV1ZVRpbWUoMCk7CiAgfSwgW3VzZXI/LnVpZCwgY2xlYW51cF0pOwoKICBjb25zdCBhY2NlcHRNYXRjaCA9IHVzZUNhbGxiYWNrKGFzeW5jICgpID0+IHsKICAgIGlmICghdXNlcj8udWlkIHx8ICFwcm9maWxlKSByZXR1cm47CgogICAgLy8gUGFzc2l2ZSBzaWRlOiB0aGUgY3JlYXRvciBhbHJlYWR5IG1hZGUgdGhlIGJhdHRsZTsgam9pbiBpdCBkaXJlY3RseS4KICAgIGNvbnN0IG1hdGNoZWRFbnRyeSA9IG1hdGNoZWRFbnRyeVJlZi5jdXJyZW50OwogICAgaWYgKG1hdGNoZWRFbnRyeT8uYmF0dGxlSWQpIHsKICAgICAgc2V0U3RhdHVzKCdjcmVhdGluZ19iYXR0bGUnKTsKICAgICAgdHJ5IHsKICAgICAgICBjb25zdCBiID0gYXdhaXQgZmV0Y2hCYXR0bGUobWF0Y2hlZEVudHJ5LmJhdHRsZUlkKTsKICAgICAgICBpZiAoIWIpIHRocm93IG5ldyBFcnJvcignQmF0dGxlIGNvdWxkIG5vdCBiZSBsb2FkZWQnKTsKICAgICAgICBzZXRCYXR0bGUoYik7CiAgICAgICAgc2V0UHJvYmxlbSh7CiAgICAgICAgICBpZDogYi5wcm9ibGVtLmlkLAogICAgICAgICAgdGl0bGU6IGIucHJvYmxlbS50aXRsZSwKICAgICAgICAgIGRpZmZpY3VsdHk6IGIucHJvYmxlbS5kaWZmaWN1bHR5IGFzIGFueSwKICAgICAgICAgIGNhdGVnb3J5OiBiLnByb2JsZW0uY2F0ZWdvcnkgfHwgJycsCiAgICAgICAgICBwb2ludHM6IGIucHJvYmxlbS5wb2ludHMgfHwgMTAwLAogICAgICAgICAgZGVzY3JpcHRpb246IGIucHJvYmxlbS5kZXNjcmlwdGlvbiwKICAgICAgICAgIGNvbnN0cmFpbnRzOiBiLnByb2JsZW0uY29uc3RyYWludHMgfHwgW10sCiAgICAgICAgICBleGFtcGxlczogYi5wcm9ibGVtLmV4YW1wbGVzIHx8IFtdLAogICAgICAgICAgc3RhcnRlckNvZGU6IGIucHJvYmxlbS5zdGFydGVyQ29kZSB8fCB7fSwKICAgICAgICB9KTsKICAgICAgICBpZiAoIW9wcG9uZW50KSB7CiAgICAgICAgICBzZXRPcHBvbmVudCgKICAgICAgICAgICAgYi5wbGF5ZXIxPy51c2VySWQgPT09IHVzZXIudWlkCiAgICAgICAgICAgICAgPyB7IHVpZDogYi5wbGF5ZXIyPy51c2VySWQgfHwgJycsIHVzZXJuYW1lOiBiLnBsYXllcjI/LnVzZXJuYW1lIHx8ICdQbGF5ZXInLCByYXRpbmc6IGIucGxheWVyMj8ucmF0aW5nIHx8IDgwMCwgdGllcjogYi5wbGF5ZXIyPy50aWVyIHx8ICdCZWdpbm5lcicgfQogICAgICAgICAgICAgIDogeyB1aWQ6IGIucGxheWVyMT8udXNlcklkIHx8ICcnLCB1c2VybmFtZTogYi5wbGF5ZXIxPy51c2VybmFtZSB8fCAnUGxheWVyJywgcmF0aW5nOiBiLnBsYXllcjE/LnJhdGluZyB8fCA4MDAsIHRpZXI6IGIucGxheWVyMT8udGllciB8fCAnQmVnaW5uZXInIH0sCiAgICAgICAgICApOwogICAgICAgIH0KICAgICAgICBzZXRTdGF0dXMoJ3JlYWR5Jyk7CiAgICAgIH0gY2F0Y2ggKGU6IGFueSkgewogICAgICAgIHNldEVycm9yKGU/Lm1lc3NhZ2UgfHwgJ0ZhaWxlZCB0byBqb2luIGJhdHRsZScpOwogICAgICAgIHNldFN0YXR1cygnZXJyb3InKTsKICAgICAgfQogICAgICByZXR1cm47CiAgICB9CgogICAgaWYgKCFvcHBvbmVudCkgcmV0dXJuOwogICAgc2V0U3RhdHVzKCdjcmVhdGluZ19iYXR0bGUnKTsKICAgIHRyeSB7CiAgICAgIGNvbnN0IHRva2VuID0gYXdhaXQgdXNlci5nZXRJZFRva2VuKCk7CiAgICAgIGNvbnN0IHJlcyA9IGF3YWl0IGZldGNoKCcvYXBpL2JhdHRsZXMvY3JlYXRlJywgewogICAgICAgIG1ldGhvZDogJ1BPU1QnLAogICAgICAgIGhlYWRlcnM6IHsgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJywgQXV0aG9yaXphdGlvbjogYEJlYXJlciAke3Rva2VufWAgfSwKICAgICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgICBvcHBvbmVudElkOiBvcHBvbmVudC51aWQgfHwgJycsCiAgICAgICAgICByYXRlZDogc2V0dGluZ3MucmF0ZWQsCiAgICAgICAgICB0aW1lQ29udHJvbDogc2V0dGluZ3MudGltZUNvbnRyb2wsCiAgICAgICAgICBsYW5ndWFnZTogc2V0dGluZ3MucHJlZmVycmVkTGFuZ3VhZ2UsCiAgICAgICAgfSksCiAgICAgIH0pOwoKICAgICAgY29uc3QgZGF0YSA9IGF3YWl0IHJlcy5qc29uKCk7CiAgICAgIGlmICghcmVzLm9rKSB0aHJvdyBuZXcgRXJyb3IoZGF0YS5lcnJvciB8fCAnRmFpbGVkIHRvIGNyZWF0ZSBiYXR0bGUnKTsKCiAgICAgIGlmIChkYXRhLmJhdHRsZUlkKSB7CiAgICAgICAgY29uc3QgYmF0dGxlRG9jID0gYXdhaXQgZmV0Y2hCYXR0bGUoZGF0YS5iYXR0bGVJZCk7CiAgICAgICAgaWYgKGJhdHRsZURvYykgewogICAgICAgICAgc2V0QmF0dGxlKGJhdHRsZURvYyk7CiAgICAgICAgfQogICAgICAgIHNldFByb2JsZW0oewogICAgICAgICAgaWQ6IGRhdGEucHJvYmxlbS5pZCwKICAgICAgICAgIHRpdGxlOiBkYXRhLnByb2JsZW0udGl0bGUsCiAgICAgICAgICBkaWZmaWN1bHR5OiBkYXRhLnByb2JsZW0uZGlmZmljdWx0eSBhcyBhbnksCiAgICAgICAgICBjYXRlZ29yeTogJycsCiAgICAgICAgICBwb2ludHM6IDEwMCwKICAgICAgICAgIGRlc2NyaXB0aW9uOiBkYXRhLnByb2JsZW0uZGVzY3JpcHRpb24sCiAgICAgICAgICBjb25zdHJhaW50czogW10sCiAgICAgICAgICBleGFtcGxlczogZGF0YS5wcm9ibGVtLmV4YW1wbGVzIHx8IFtdLAogICAgICAgICAgc3RhcnRlckNvZGU6IGRhdGEucHJvYmxlbS5zdGFydGVyQ29kZSwKICAgICAgICB9KTsKICAgICAgICBzZXRTdGF0dXMoJ3JlYWR5Jyk7CiAgICAgIH0KICAgIH0gY2F0Y2ggKGU6IGFueSkgewogICAgICBzZXRFcnJvcihlLm1lc3NhZ2UpOwogICAgICBzZXRTdGF0dXMoJ2Vycm9yJyk7CiAgICB9CiAgfSwgW3VzZXIsIG9wcG9uZW50LCBwcm9maWxlLCBzZXR0aW5nc10pOwoKICByZXR1cm4gewogICAgc3RhdHVzLCBvcHBvbmVudCwgYmF0dGxlLCBwcm9ibGVtLCBlcnJvciwgcXVldWVUaW1lLAogICAgam9pblF1ZXVlLCBsZWF2ZVF1ZXVlLCBhY2NlcHRNYXRjaCwKICB9Owp9Cg==
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useUser } from '@/firebase/auth/use-user';
+import { initializeFirebase } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import type { DocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { useArenaSettings } from '@/hooks/use-arena-settings';
+import {
+  joinMatchmakingQueue, leaveMatchmakingQueue, subscribeMatchmaking,
+  findMatch, fetchBattle,
+} from '@/services/arena';
+import type { MatchmakingEntry, BattleDocument, Problem, Tier } from '@/types';
+
+type MatchmakingStatus =
+  | 'idle'
+  | 'joining'
+  | 'searching'
+  | 'found'
+  | 'creating_battle'
+  | 'ready'
+  | 'error';
+
+export function useArenaMatchmaking() {
+  const { user } = useUser();
+  const { settings } = useArenaSettings();
+  const [profile, setProfile] = useState<{ username: string; rating: number; tier: string } | null>(null);
+  const [status, setStatus] = useState<MatchmakingStatus>('idle');
+  const [opponent, setOpponent] = useState<{ uid: string; username: string; rating: number; tier: string } | null>(null);
+  const [battle, setBattle] = useState<BattleDocument | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [queueTime, setQueueTime] = useState(0);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const matchedEntryRef = useRef<MatchmakingEntry | null>(null);
+
+  useEffect(() => {
+    if (!user?.uid) { setProfile(null); return; }
+    let mounted = true;
+    const { firestore: db } = initializeFirebase();
+    if (!db) return;
+    getDoc(doc(db, 'users', user.uid)).then((snap: DocumentSnapshot<DocumentData>) => {
+      if (snap.exists() && mounted) {
+        const d = snap.data();
+        setProfile({
+          username: d.username || user.displayName || 'Player',
+          rating: d.rating || 800,
+          tier: d.tier || 'Beginner',
+        });
+      }
+    });
+    return () => { mounted = false; };
+  }, [user?.uid, user?.displayName]);
+
+  useEffect(() => {
+    return () => {
+      if (unsubscribeRef.current) unsubscribeRef.current();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const cleanup = useCallback(() => {
+    if (unsubscribeRef.current) { unsubscribeRef.current(); unsubscribeRef.current = null; }
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+  }, []);
+
+  const joinQueue = useCallback(async () => {
+    if (!user?.uid || !profile) return;
+    cleanup();
+    setStatus('joining');
+    setError(null);
+    setBattle(null);
+    setOpponent(null);
+    setQueueTime(0);
+
+    try {
+      await joinMatchmakingQueue(user.uid, {
+        userId: user.uid,
+        username: profile.username,
+        rating: profile.rating,
+        tier: profile.tier as Tier,
+        preferredLanguage: settings.preferredLanguage,
+        rated: settings.rated,
+        difficulty: settings.difficulty,
+        category: settings.category,
+        timeControl: settings.timeControl,
+        region: settings.region,
+        eloRange: settings.eloRange,
+      });
+      setStatus('searching');
+
+      timerRef.current = setInterval(() => {
+        setQueueTime(prev => prev + 1);
+      }, 1000);
+
+      unsubscribeRef.current = subscribeMatchmaking(user.uid, (entry) => {
+        if (entry?.status === 'matched') {
+          // Passive side: creator already built the battle with our battleId in our entry.
+          matchedEntryRef.current = entry;
+          cleanup();
+          setStatus('found');
+        }
+      });
+
+      pollRef.current = setInterval(async () => {
+        if (!user?.uid) return;
+        if (status !== 'searching') return;
+        const found = await findMatch(user.uid, settings).catch(() => null);
+        if (found) {
+          setStatus('found');
+          setOpponent({ uid: found.userId, username: found.username, rating: found.rating, tier: found.tier });
+        }
+      }, 3000);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to join queue');
+      setStatus('error');
+    }
+  }, [user?.uid, profile, settings, cleanup, status]);
+
+  const leaveQueue = useCallback(async () => {
+    if (!user?.uid) return;
+    cleanup();
+    try {
+      await leaveMatchmakingQueue(user.uid);
+    } catch { /* noop */ }
+    setStatus('idle');
+    setOpponent(null);
+    setQueueTime(0);
+  }, [user?.uid, cleanup]);
+
+  const acceptMatch = useCallback(async () => {
+    if (!user?.uid || !profile) return;
+
+    // Passive side: the creator already made the battle; join it directly.
+    const matchedEntry = matchedEntryRef.current;
+    if (matchedEntry?.battleId) {
+      setStatus('creating_battle');
+      try {
+        const b = await fetchBattle(matchedEntry.battleId);
+        if (!b) throw new Error('Battle could not be loaded');
+        setBattle(b);
+        setProblem({
+          id: b.problem.id,
+          title: b.problem.title,
+          difficulty: b.problem.difficulty as any,
+          category: b.problem.category || '',
+          points: b.problem.points || 100,
+          description: b.problem.description,
+          constraints: b.problem.constraints || [],
+          examples: b.problem.examples || [],
+          starterCode: b.problem.starterCode || {},
+        });
+        if (!opponent) {
+          setOpponent(
+            b.player1?.userId === user.uid
+              ? { uid: b.player2?.userId || '', username: b.player2?.username || 'Player', rating: b.player2?.rating || 800, tier: b.player2?.tier || 'Beginner' }
+              : { uid: b.player1?.userId || '', username: b.player1?.username || 'Player', rating: b.player1?.rating || 800, tier: b.player1?.tier || 'Beginner' },
+          );
+        }
+        setStatus('ready');
+      } catch (e: any) {
+        setError(e?.message || 'Failed to join battle');
+        setStatus('error');
+      }
+      return;
+    }
+
+    if (!opponent) return;
+    setStatus('creating_battle');
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch('/api/battles/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          opponentId: opponent.uid || '',
+          rated: settings.rated,
+          timeControl: settings.timeControl,
+          language: settings.preferredLanguage,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create battle');
+
+      if (data.battleId) {
+        const battleDoc = await fetchBattle(data.battleId);
+        if (battleDoc) {
+          setBattle(battleDoc);
+        }
+        setProblem({
+          id: data.problem.id,
+          title: data.problem.title,
+          difficulty: data.problem.difficulty as any,
+          category: '',
+          points: 100,
+          description: data.problem.description,
+          constraints: [],
+          examples: data.problem.examples || [],
+          starterCode: data.problem.starterCode,
+        });
+        setStatus('ready');
+      }
+    } catch (e: any) {
+      setError(e.message);
+      setStatus('error');
+    }
+  }, [user, opponent, profile, settings]);
+
+  return {
+    status, opponent, battle, problem, error, queueTime,
+    joinQueue, leaveQueue, acceptMatch,
+  };
+}
