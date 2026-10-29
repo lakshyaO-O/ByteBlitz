@@ -32,11 +32,11 @@ export function HeroSection() {
           animate="visible"
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/25 bg-primary/5 text-primary text-xs font-headline font-bold uppercase tracking-widest mb-8 shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-1.5 glass-badge text-primary text-xs font-headline font-bold uppercase tracking-widest mb-8 backdrop-blur-md"
             variants={itemVariants}
           >
             <Zap className="w-3.5 h-3.5 fill-primary" />
-            Early Access — Join the Arena
+            Early Access â€” Join the Arena
           </motion.div>
 
           <motion.h1
@@ -72,7 +72,7 @@ export function HeroSection() {
 
             <Link
               href="/auth?mode=login"
-              className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold border border-border/70 bg-card/50 text-foreground hover:bg-muted/60 hover:border-border/60 transition-all rounded-xl shadow-sm hover:shadow-md active:scale-[0.98]"
+              className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold text-foreground hover:border-primary/30 transition-all rounded-xl glass active:scale-[0.98]"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <LogIn className="w-4 h-4" />
@@ -82,7 +82,7 @@ export function HeroSection() {
 
             <Link
               href="/practice"
-              className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold border border-border/70 bg-card/50 text-foreground hover:bg-muted/60 hover:border-border/60 transition-all rounded-xl shadow-sm hover:shadow-md active:scale-[0.98]"
+              className="group relative inline-flex items-center justify-center gap-2 h-14 px-10 text-base font-headline font-bold text-foreground hover:border-primary/30 transition-all rounded-xl glass active:scale-[0.98]"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <Code2 className="w-4 h-4" />
@@ -104,9 +104,10 @@ export function HeroSection() {
               <motion.div
                 key={feature.label}
                 whileHover={{ y: -2, scale: 1.02 }}
-                className="flex items-start gap-3 p-4 rounded-xl border border-border/40 bg-card/40 hover:bg-card/60 hover:border-border/60 hover:shadow-md transition-all duration-200"
+                className="relative flex items-start gap-3 p-4 rounded-xl glass-card overflow-hidden"
               >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
+                <span className="glass-halo rounded-xl" aria-hidden />
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/25 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0">
                   <feature.icon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-left">
@@ -123,7 +124,7 @@ export function HeroSection() {
           >
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse-soft" />
-              Early Access — Free to use
+              Early Access â€” Free to use
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary/50" />
