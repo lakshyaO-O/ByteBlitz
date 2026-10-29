@@ -55,17 +55,20 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
         {/* Profile Header */}
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+        <div className="relative glass-panel p-6 md:p-8 overflow-hidden">
+          <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 bg-primary/10 rounded-full blur-[100px]" />
+          <div className="pointer-events-none absolute bottom-0 left-1/3 w-64 h-64 bg-secondary/5 rounded-full blur-[100px]" />
+          <CardContent className="p-0">
+            <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="relative">
-                <Avatar className="w-24 h-24 md:w-28 md:h-28 border-4 border-primary/30">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/40 to-secondary/20 blur-md" aria-hidden />
+                <Avatar className="relative w-24 h-24 md:w-28 md:h-28 border-4 border-white/10 shadow-lg">
                   <AvatarImage src={user?.photoURL || ''} />
                   <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-secondary px-3 py-1 rounded-full text-[11px] font-medium uppercase tracking-wider text-white">
+                <div className="absolute -bottom-1 -right-1 glass-badge px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-white/90">
                   LVL {currentLevel}
                 </div>
               </div>
@@ -74,7 +77,7 @@ export default function ProfilePage() {
                   <h1 className="text-2xl md:text-3xl font-headline font-bold">
                     {beginner.name || stats.username || user?.displayName || 'Coder'}
                   </h1>
-                  <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider', getTierColor(tier))}>
+                  <Badge variant="outline" className={cn('text-[11px] uppercase tracking-wider backdrop-blur-sm', getTierColor(tier))}>
                     {tier}
                   </Badge>
                 </div>
@@ -84,7 +87,7 @@ export default function ProfilePage() {
                   <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-400" /> {beginner.streak} day streak</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={() => router.push('/settings')}>
+                  <Button variant="outline" size="sm" className="gap-1 text-xs glass" onClick={() => router.push('/settings')}>
                     <Edit3 className="w-3 h-3" /> Edit Profile
                   </Button>
                   <ShareAchievement
@@ -95,11 +98,11 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Learning Progress */}
-          <Card className="bg-card/50 border-border lg:col-span-2">
+          <Card className="glass-card border-0 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg font-headline font-bold uppercase tracking-widest flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-primary" /> Learning Progress
@@ -127,11 +130,11 @@ export default function ProfilePage() {
                       <StatBox label="Lessons Done" value={lessonCount} color="text-primary" />
                       <StatBox label="XP Earned" value={beginner.xp} color="text-orange-400" />
                       <StatBox label="Current Level" value={currentLevel} color="text-secondary" />
-                      <StatBox label="Day Streak" value={`${beginner.streak} 🔥`} color="text-orange-400" />
+                      <StatBox label="Day Streak" value={`${beginner.streak} ðŸ”¥`} color="text-orange-400" />
                     </div>
 
                     {/* XP Progress */}
-                    <Card className="bg-muted/20 border-border/50">
+                    <div className="glass rounded-xl">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between text-xs mb-2">
                           <span className="text-muted-foreground">Level {currentLevel} Progress</span>
@@ -142,7 +145,7 @@ export default function ProfilePage() {
                           {500 - xpInLevel} XP until Level {currentLevel + 1}
                         </p>
                       </CardContent>
-                    </Card>
+                    </div>
 
                     {/* Topics Mastered */}
                     <div>
@@ -171,11 +174,11 @@ export default function ProfilePage() {
                     <StatBox label="Wins" value={stats.wins || 0} color="text-emerald-400" />
                     <StatBox label="Losses" value={stats.losses || 0} color="text-destructive" />
                     <StatBox label="Draws" value={stats.draws || 0} color="text-yellow-400" />
-                    <StatBox label="Win Rate" value={winRate > 0 ? `${winRate}%` : '—'} color="text-primary" />
+                    <StatBox label="Win Rate" value={winRate > 0 ? `${winRate}%` : 'â€”'} color="text-primary" />
                     <StatBox label="Highest ELO" value={stats.highestRating || 1200} color="text-secondary" />
                     <StatBox label="Total Games" value={(stats.wins || 0) + (stats.losses || 0) + (stats.draws || 0)} color="text-foreground" />
                     <StatBox label="Total XP" value={stats.xp || beginner.xp || 0} color="text-orange-400" />
-                    <StatBox label="Rank" value={`#${stats.rank || '—'}`} color="text-muted-foreground" />
+                    <StatBox label="Rank" value={`#${stats.rank || 'â€”'}`} color="text-muted-foreground" />
                     <StatBox label="DevCoins" value={(stats.devcoins || 0).toLocaleString()} color="text-yellow-400" />
                   </div>
                 </TabsContent>
@@ -188,7 +191,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Achievements Sidebar */}
-          <Card className="bg-card/50 border-border">
+          <Card className="glass-card border-0">
             <CardHeader>
               <CardTitle className="text-lg font-headline font-bold uppercase tracking-widest flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-secondary" /> Achievements
@@ -218,7 +221,7 @@ export default function ProfilePage() {
 
 function StatBox({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
-    <div className="space-y-1 p-4 rounded-lg bg-muted/30">
+    <div className="glass-card space-y-1 p-4 card-hover">
       <div className={cn('text-2xl font-headline font-bold', color)}>{value}</div>
       <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
     </div>
@@ -228,14 +231,14 @@ function StatBox({ label, value, color }: { label: string; value: string | numbe
 function AchievementBadge({ achieved, label, icon: Icon }: { achieved: boolean; label: string; icon: any }) {
   return (
     <div className={cn(
-      'flex flex-col items-center gap-2 p-3 rounded-lg border text-center',
-      achieved ? 'border-secondary/30 bg-secondary/5' : 'border-border bg-muted/20 opacity-80'
+      'flex flex-col items-center gap-2 p-3 rounded-xl text-center glass-card',
+      achieved ? 'border-secondary/30 bg-secondary/5' : 'opacity-70'
     )}>
-      <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', achieved ? 'bg-secondary/10' : 'bg-muted')}>
+      <div className={cn('w-10 h-10 rounded-full flex items-center justify-center', achieved ? 'bg-secondary/15' : 'bg-muted/40')}>
         {achieved ? (
           <Icon className="w-5 h-5 text-secondary" />
         ) : (
-          <div className="w-5 h-5 text-muted-foreground" />
+          <div className="w-5 h-5 text-muted-foreground/60" />
         )}
       </div>
       <span className="text-[11px] font-medium uppercase tracking-wider">{label}</span>
