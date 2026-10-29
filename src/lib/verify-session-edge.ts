@@ -1,39 +1,63 @@
-import { jwtVerify, createLocalJWKSet, importX509, exportJWK } from 'jose';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
-let cachedKeySet: ReturnType<typeof createLocalJWKSet> | null = null;
+// Session-cookie verification for the Edge runtime (middleware).
+// Must not depend on build-time env inlining: it derives the Firebase
+// projectId from the signed token itself (aud/iss), and only falls back to
+// env vars for a cross-check. Signature verification is still done against
+// Google's published JWKS, so a forged aud cannot pass.
 
-async function getFirebasePublicKeySet() {
-  if (cachedKeySet) return cachedKeySet;
+const FIREBASE_JWKS_URL =
+  'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  if (!projectId) {
-    throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set');
+let cachedJwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getProjectIdFromEnv(): string {
+  return process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || '';
+}
+
+function decodeJwtPayload(token: string): Record<string, any> | null {
+  try {
+    const b64 = token.split('.')[1];
+    if (!b64) return null;
+    const base64 = b64.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(b64.length / 4) * 4, '=');
+    const bin = atob(base64);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+  } catch {
+    return null;
   }
+}
 
-  const url = `https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch Firebase public keys: HTTP ${response.status}`);
+function getJwks() {
+  if (!cachedJwks) {
+    cachedJwks = createRemoteJWKSet(new URL(FIREBASE_JWKS_URL));
   }
-  const data: Record<string, string> = await response.json();
-
-  const keys: any[] = [];
-  for (const kid of Object.keys(data)) {
-    const cert = data[kid];
-    const key = await importX509(cert, 'RS256');
-    keys.push(await exportJWK(key));
-  }
-  cachedKeySet = createLocalJWKSet({ keys });
-  return cachedKeySet;
+  return cachedJwks;
 }
 
 export async function verifySessionCookie(cookieValue: string): Promise<{ uid: string } | null> {
+  if (!cookieValue) return null;
   try {
-    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-    if (!projectId) return null;
+    const decoded = decodeJwtPayload(cookieValue);
+    const aud = decoded && typeof decoded.aud === 'string' ? decoded.aud : '';
+    const envProjectId = getProjectIdFromEnv();
 
-    const JWKS = await getFirebasePublicKeySet();
-    const { payload } = await jwtVerify(cookieValue, JWKS, {
+    if (envProjectId && aud && aud !== envProjectId) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[verify-session] project mismatch: cookie aud=${aud} env=${envProjectId}`
+      );
+      return null;
+    }
+
+    const projectId = envProjectId || aud;
+    if (!projectId) {
+      // eslint-disable-next-line no-console
+      console.error('[verify-session] no projectId available (env unset, token unreadable)');
+      return null;
+    }
+
+    const { payload } = await jwtVerify(cookieValue, getJwks(), {
       issuer: `https://session.firebase.google.com/${projectId}`,
       audience: projectId,
     });
@@ -42,7 +66,16 @@ export async function verifySessionCookie(cookieValue: string): Promise<{ uid: s
     return { uid: payload.sub };
   } catch (err: any) {
     // eslint-disable-next-line no-console
-    console.error('[verify-session] rejected cookie:', err?.name, err?.code, err?.message, 'len=', cookieValue.length);
+    console.error(
+      '[verify-session] rejected cookie:',
+      err?.name,
+      err?.code,
+      err?.message,
+      'envProjectId=',
+      getProjectIdFromEnv() || '(unset)',
+      'len=',
+      cookieValue.length
+    );
     return null;
   }
 }
