@@ -68,7 +68,7 @@ export function FeaturesSection() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 glass-badge text-primary text-xs font-bold uppercase tracking-widest mb-6">
             <Sparkles className="w-3 h-3" />
             Platform Features
           </div>
@@ -77,7 +77,7 @@ export function FeaturesSection() {
             <span className="text-gradient">compete</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground text-base leading-relaxed">
-            Practice problems, real-time battles, AI coaching, and rankings — all in one platform.
+            Practice problems, real-time battles, AI coaching, and rankings â€” all in one platform.
           </p>
         </motion.div>
 
@@ -92,10 +92,11 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group relative p-8 rounded-xl bg-card/40 border border-border/40 hover:border-primary/20 hover:bg-card/60 transition-all duration-300 hover-lift overflow-hidden"
+              className="group relative p-8 rounded-xl glass-card overflow-hidden"
             >
+              <span className="glass-halo rounded-xl" aria-hidden />
               <div className={cn(
-                'inline-flex p-3 rounded-xl bg-gradient-to-br mb-5 border border-white/5',
+                'inline-flex p-3 rounded-xl bg-gradient-to-br mb-5 border border-white/10 backdrop-blur-sm',
                 iconColors[idx]
               )}>
                 <feature.icon className="w-6 h-6" />
