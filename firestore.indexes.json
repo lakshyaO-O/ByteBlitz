@@ -471,7 +471,7 @@
         { "fieldPath": "isPublished", "order": "ASCENDING" },
         { "fieldPath": "title", "order": "ASCENDING" }
       ]
-    }
+    },
     {
       "collectionGroup": "reports",
       "queryScope": "COLLECTION",
