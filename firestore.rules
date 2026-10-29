@@ -88,7 +88,7 @@ service cloud.firestore {
       }
       function touchesProtectedUserFields() {
         return request.resource.data.diff(resource.data).affectedKeys()
-          .filter(k => userProtectedKeys().hasAny([k])).size() > 0;
+          .hasAny(userProtectedKeys());
       }
 
       allow read: if isAuthenticated();
@@ -461,7 +461,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ===== MATCHMAKING =====
+    // ===== ROOM INVITES (client-side battle invites) =====
+    match /invites/{inviteId} {
+      allow read: if isAuthenticated()
+        && (request.auth.uid == resource.data.fromUserId
+            || request.auth.uid == resource.data.toUserId);
+      allow create: if isAuthenticated()
+        && request.resource.data.fromUserId == request.auth.uid;
+      allow update, delete: if isAuthenticated()
+        && request.auth.uid == resource.data.toUserId
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'updatedAt']);
+    }
     match /matchmaking/{docId} {
       allow read: if isAuthenticated();
       allow create: if isOwner(docId)
